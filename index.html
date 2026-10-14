@@ -407,6 +407,7 @@ dd .sub{
   text-shadow: 0 0 18px rgba(var(--surface-rgb), .9);
   transition: font-size .35s cubic-bezier(.22,.61,.36,1);
 }
+.artists li.spotlight.picked{ color: inherit }
 
 /* 초대 문구 */
 .invite-line{
@@ -1269,7 +1270,8 @@ try{
       }, 560);
     }
 
-    function pickArtist(name){
+    // quiet: 공유 링크(#이름)로 미리 골라 둘 때. 화면을 끌어내리거나 입력칸에 커서를 두지 않는다
+    function pickArtist(name, quiet){
       var first = body.hidden;
 
       form.artist.value = name;
@@ -1295,6 +1297,7 @@ try{
 
       if(intro) intro.hidden = true;
       slideOpenBody();
+      if(quiet) return;
 
       setTimeout(function(){
         sec.scrollIntoView({ behavior: ANIM ? 'smooth' : 'auto', block: 'start' });
@@ -1314,6 +1317,17 @@ try{
     });
 
     if(allBtn) allBtn.addEventListener('click', function(){ pickArtist('전체'); });
+
+    // 링크 끝에 작가 이름(#이재이)이 있으면 받는 사람으로 미리 골라 둔다
+    function pickFromHash(){
+      var raw = '';
+      try{ raw = decodeURIComponent((location.hash || '').slice(1)).trim(); }catch(e){}
+      for(var i = 0; i < items.length; i++){
+        if(raw && items[i].textContent.trim() === raw){ pickArtist(raw, true); return; }
+      }
+    }
+    pickFromHash();
+    window.addEventListener('hashchange', pickFromHash);
 
     // 받는 사람을 다시 고르러 명단으로 돌려보낸다
     if(change){
