@@ -882,15 +882,15 @@ try{
         </div>
 
         <div class="field">
-          <label for="visitParty">방문 인원 <span class="opt">(선택 · 본인 포함)</span></label>
-          <select id="visitParty" name="visitors">
+          <label for="visitParty">함께 오는 사람 <span class="opt">(선택 · 예약자 제외)</span></label>
+          <select id="visitParty" name="companions">
             <option value="">고르지 않음</option>
-            <option value="1">1명 (혼자)</option>
+            <option value="0">없어요</option>
+            <option value="1">1명</option>
             <option value="2">2명</option>
             <option value="3">3명</option>
             <option value="4">4명</option>
             <option value="5">5명</option>
-            <option value="6">6명</option>
           </select>
         </div>
 
@@ -1489,7 +1489,7 @@ try{
         name:       name,
         date:       dateEl.value,
         artist:     artEl.value,           // 비어 있으면 워크인 칸으로 간다
-        visitors:   form.visitors.value    // 본인 포함 인원. 시트에는 동반인원(본인 제외)으로 바꿔 적는다
+        companions: form.companions.value  // 예약자를 뺀 인원. 비어 있으면 시트에도 비워 둔다
       };
 
       btn.disabled = true;
