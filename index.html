@@ -251,8 +251,11 @@ h1 em{
   text-shadow: 0 1px 12px rgba(16,22,44,.55);
   word-break: keep-all;
 }
-.artist-page .title-copy .work-hello p{ margin:0; font-size:.92rem; line-height:1.75; color:#fff }
+.artist-page .title-copy .work-hello p{ margin:0; font-size:1.1rem; line-height:1.75; color:#fff }   /* 기본 소개 문구의 약 1.2배 */
 .artist-page .title-copy .work-notice{ background:none; border:0; padding:0 }
+/* 작가 그림은 모두 같은 밝기로 (포스터에 겹친 그림과 맞춤) */
+.artist-page .work-zoom img,
+.artist-page .work-viewer img{ filter: brightness(1.14) saturate(1.04) }
 .artist-page .title-copy .work-notice strong{ display:block; margin:0 0 2px; color:#fff; font-weight:600 }
 .artist-page .title-copy .work-notice em{ color:#fff }
 .subtitle{
