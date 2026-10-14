@@ -882,15 +882,15 @@ try{
         </div>
 
         <div class="field">
-          <label for="visitParty">함께 오는 사람 <span class="opt">(선택 · 본인 제외)</span></label>
-          <select id="visitParty" name="companions">
+          <label for="visitParty">방문 인원 <span class="opt">(선택 · 본인 포함)</span></label>
+          <select id="visitParty" name="visitors">
             <option value="">고르지 않음</option>
-            <option value="0">혼자 와요</option>
-            <option value="1">1명</option>
+            <option value="1">1명 (혼자)</option>
             <option value="2">2명</option>
             <option value="3">3명</option>
             <option value="4">4명</option>
             <option value="5">5명</option>
+            <option value="6">6명</option>
           </select>
         </div>
 
@@ -1025,9 +1025,8 @@ try{
       <h2>함께 보기</h2>
       <span class="en">SHARE</span>
     </div>
-    <p class="note">같이 가고 싶은 사람이 있다면, 전시 정보를 한 번에 복사해 보낼 수 있습니다.</p>
     <div class="btn-row">
-      <button class="btn primary" type="button" id="copyInvite">전시 정보 복사하기</button>
+      <button class="btn primary" type="button" id="copyLink">링크 복사하기</button>
     </div>
   </section>
 
@@ -1109,20 +1108,6 @@ try{
 
   /* ── 복사 ── */
   var ADDRESS = '서울 마포구 신촌로 48 (홍대 피시스 아카이브)';
-  var INVITE = [
-    '조금 이상한 우리들 (Everyone Is a Little off)',
-    '이즈드로잉 취미미술학원 단체전',
-    '',
-    '기간 | 2026. 11. 12 (목) ~ 11. 17 (화)',
-    '시간 | 11:00 ~ 21:00',
-    '       12일 13:00 개관 / 17일 20:00 마감',
-    '입장 | 5,000원',
-    '장소 | 홍대 피시스 아카이브',
-    '주소 | 서울 마포구 신촌로 48',
-    '',
-    '취미로 그림을 배우는 스무 명이 모여 만든 전시입니다.',
-    '편하게 들러 구경해 주세요 :)'
-  ].join('\n');
 
   var toastTimer = null;
   function toast(msg){
@@ -1170,9 +1155,10 @@ try{
     copy(ADDRESS, '주소를 복사했습니다');
   });
 
-  var inviteBtn = document.getElementById('copyInvite');
-  if(inviteBtn) inviteBtn.addEventListener('click', function(){
-    copy(INVITE, '전시 정보를 복사했습니다');
+  // 지금 보고 있는 주소를 그대로 복사한다 (#작가 공유 링크로 들어왔다면 그것까지)
+  var linkBtn = document.getElementById('copyLink');
+  if(linkBtn) linkBtn.addEventListener('click', function(){
+    copy(location.href, '링크를 복사했습니다');
   });
 
   /* ▼ 구글 Apps Script 웹앱 주소. '작가에게 한마디'와 '관람 예약'이 함께 쓴다.
@@ -1503,7 +1489,7 @@ try{
         name:       name,
         date:       dateEl.value,
         artist:     artEl.value,           // 비어 있으면 워크인 칸으로 간다
-        companions: form.companions.value  // 비어 있으면 시트에도 비워 둔다
+        visitors:   form.visitors.value    // 본인 포함 인원. 시트에는 동반인원(본인 제외)으로 바꿔 적는다
       };
 
       btn.disabled = true;
