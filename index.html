@@ -175,6 +175,7 @@ body::before{
   border: 5px solid #fff;
   box-shadow: 0 10px 24px rgba(40,28,18,.28), 0 2px 4px rgba(40,28,18,.18);
   transform: rotate(6deg);
+  filter: brightness(1.14) saturate(1.04);   /* 포스터 옆에서 어둡게 보이지 않도록 살짝 밝게 */
   transition: transform .6s cubic-bezier(.22,.61,.36,1);
   pointer-events:none;
 }
@@ -855,6 +856,13 @@ dd .sub{
   border-radius: calc(var(--radius) + 2px);
 }
 .btn.primary:hover{ opacity:.9; color: var(--on-accent); border-color: var(--accent) }
+/* 작가 전용 페이지: 친근한 톤에 맞춰 채운 버튼 대신 테두리 버튼 */
+.artist-page .btn.primary{
+  background: transparent;
+  color: var(--accent);
+  border: 1.5px solid var(--accent);
+}
+.artist-page .btn.primary:hover{ opacity:1; background: rgba(30,86,184,.06); color: var(--accent) }
 
 /* ── 푸터 ─────────────────────────────────── */
 footer{
@@ -1302,6 +1310,8 @@ try{
     document.title = artistLabel(PAGE_ARTIST) + ' · 조금 이상한 우리들';
     var workSec = document.getElementById('workSection');
     if(workSec) workSec.hidden = false;
+    document.documentElement.classList.add('artist-page');
+
     // 포스터에 작가 그림을 살짝 겹쳐 붙인다
     var ARTIST_COVER = { '이재이': '/works/jessie/01.jpg' };
     var posterFrame = document.querySelector('.hero .frame');
