@@ -549,6 +549,9 @@ dd .sub{
 .sticky.is-new{ animation: stickIn .5s cubic-bezier(.22,.61,.36,1) both }
 @keyframes stickIn{ from{ opacity:0; scale:1.25 } to{ opacity:1; scale:1 } }
 @media (min-width: 560px){ .sticky{ width: calc(33.333% - 10px) } }
+.board-more{ display:flex; justify-content:center; margin-top:14px }
+.board-more .btn{ flex:0 0 auto }
+.board-write{ margin-top:26px; padding-top:22px; border-top:1px dashed var(--line) }
 .board-empty{ margin:12px 0 0; text-align:center; font-size:.86rem; color: var(--ink-soft) }
 .board-loading{ align-self:center; font-size:.85rem; color: var(--ink-soft) }
 
@@ -1004,9 +1007,10 @@ try{
     </div>
     <div class="board" id="board" aria-live="polite"></div>
     <p class="board-empty" id="boardEmpty" hidden>아직 붙은 쪽지가 없어요. 첫 번째 쪽지를 붙여 주세요!</p>
-    <div class="btn-row">
-      <button class="btn primary" type="button" id="boardWrite">나도 쪽지 붙이기</button>
+    <div class="board-more" id="boardMoreRow" hidden>
+      <button class="btn" type="button" id="boardMore">쪽지 더 보기</button>
     </div>
+    <div class="board-write" id="boardWriteSlot"></div>
   </section>
 
   <div class="work-viewer" id="workViewer" hidden>
@@ -1014,7 +1018,7 @@ try{
     <button class="work-close" type="button" aria-label="닫기">✕</button>
   </div>
 
-  <section class="card reveal">
+  <section class="card reveal" id="questSection">
     <div class="section-head">
       <h2>조금 이상한 질문</h2>
       <span class="en">A LITTLE OFF</span>
@@ -1026,7 +1030,7 @@ try{
     </div>
   </section>
 
-  <section class="card reveal">
+  <section class="card reveal" id="infoSection">
     <div class="section-head">
       <h2>전시 안내</h2>
       <span class="en">INFORMATION</span>
@@ -1137,7 +1141,7 @@ try{
   </section>
 
 
-  <section class="card reveal">
+  <section class="card reveal" id="artistsSection">
     <div class="section-head">
       <h2>참여 작가</h2>
       <span class="en">ARTISTS</span>
@@ -1223,7 +1227,7 @@ try{
     </div>
   </section>
 
-  <section class="card reveal">
+  <section class="card reveal" id="shareSection">
     <div class="section-head">
       <h2>함께 보기</h2>
       <span class="en">SHARE</span>
@@ -1283,6 +1287,23 @@ try{
     // 작가 전용 페이지에서는 학원 링크를 숨긴다
     var studio = document.querySelector('.studio-links');
     if(studio) studio.hidden = true;
+
+    /* 카드 순서: 그림 → 쪽지(게시판 + 쓰는 칸) → 질문 → 전시 안내 → 지금 전시장에는 → 예약
+       참여 작가·작가에게 한마디·함께 보기 카드는 숨긴다. 받는 사람은 이 작가로 정해져 있다 */
+    var footer = document.querySelector('footer');
+    ['workSection', 'boardSection', 'questSection', 'infoSection', 'ondutySection', 'visitSection'].forEach(function(id){
+      var el = document.getElementById(id);
+      if(el && footer) footer.parentNode.insertBefore(el, footer);
+    });
+    ['artistsSection', 'noteSection', 'shareSection'].forEach(function(id){
+      var el = document.getElementById(id);
+      if(el) el.hidden = true;
+    });
+    var slot = document.getElementById('boardWriteSlot');
+    var noteBody = document.getElementById('noteBody');
+    if(slot && noteBody) slot.appendChild(noteBody);
+    var change = document.getElementById('noteChange');
+    if(change) change.hidden = true;
   }
 
   // 작품 사진을 누르면 화면 가득 크게 본다
@@ -1709,6 +1730,19 @@ try{
     var countEl = document.getElementById('boardCount');
     var PAPERS = ['#FFF4A8', '#FFD9E4', '#D7F0FF', '#DDF5D2', '#FFE3C2', '#EADCFF'];
     var total = 0;
+    var PAGE = 12;          // 처음에 보여 줄 장수, '더 보기'를 누를 때마다 이만큼 더
+    var shown = PAGE;
+    var moreRow = document.getElementById('boardMoreRow');
+    var moreBtn = document.getElementById('boardMore');
+
+    function paginate(){
+      var all = board.querySelectorAll('.sticky');
+      for(var i = 0; i < all.length; i++) all[i].hidden = i >= shown;
+      var rest = all.length - shown;
+      moreRow.hidden = rest <= 0;
+      if(rest > 0) moreBtn.textContent = '쪽지 더 보기 (' + rest + '장 더)';
+    }
+    moreBtn.addEventListener('click', function(){ shown += PAGE; paginate(); });
 
     // 같은 쪽지는 늘 같은 색·기울기로 붙도록 글자로 값을 정한다
     function seed(str){
@@ -1753,6 +1787,7 @@ try{
         notes.forEach(function(n){ board.appendChild(note(n)); });
         total = notes.length;
         setCount();
+        paginate();
       })
       .catch(function(){
         board.innerHTML = '';
@@ -1767,15 +1802,11 @@ try{
       var d = new Date();
       board.insertBefore(note({ message: p.message, sender: p.sender, at: (d.getMonth() + 1) + '/' + d.getDate() }, true), board.firstChild);
       total++;
+      shown++;            // 방금 붙인 쪽지 때문에 다른 쪽지가 밀려 사라지지 않게
       setCount();
+      paginate();
     });
 
-    document.getElementById('boardWrite').addEventListener('click', function(){
-      var noteSec = document.getElementById('noteSection');
-      if(noteSec) noteSec.scrollIntoView({ behavior: ANIM ? 'smooth' : 'auto', block: 'start' });
-      var msgEl = document.getElementById('noteMessage');
-      if(msgEl) setTimeout(function(){ msgEl.focus(); }, 500);
-    });
   })();
 
   /* ── 관람 예약 ──
