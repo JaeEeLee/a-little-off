@@ -167,7 +167,15 @@ body::before{
 }
 .frame:hover{ transform: rotate(0deg) }
 /* 작가 전용 페이지: 포스터 오른쪽 아래에 작가의 그림을 살짝 겹쳐 둔다 (포스터 넓이의 약 1/4) */
-.frame.has-work{ position:relative; margin-bottom: 34px }
+.frame.has-work{
+  /* 겹친 그림이 오른쪽으로 약 16% 삐져나오므로, 둘을 한 덩어리(포스터 넓이의 약 1.2배)로 보고
+     화면 좌우 16px 안에 들어가게 줄인 뒤, 덩어리가 가운데 오도록 왼쪽으로 옮긴다 (375px 화면에서 좌우 21px로 측정) */
+  --fw: min(300px, calc((100vw - 32px) / 1.22));
+  width: var(--fw);
+  position:relative;
+  right: calc(var(--fw) * .077);
+  margin-bottom: 34px;
+}
 .frame-work{
   position:absolute; right:-16%; bottom:-9%;
   width:50%; aspect-ratio: 1135 / 1600;
@@ -187,9 +195,10 @@ body::before{
   background: inherit;                 /* 같은 그림을 한 장 더 겹쳐 흐리게 */
   border:0;
   filter: blur(3px);
-  /* 오른쪽 아래에서 대각선으로 그림의 절반을 덮고, 가운데 대각선 쪽으로 옅어진다 */
-  -webkit-mask-image: linear-gradient(to top left, #000 0%, rgba(0,0,0,.7) 28%, rgba(0,0,0,.25) 44%, transparent 56%);
-          mask-image: linear-gradient(to top left, #000 0%, rgba(0,0,0,.7) 28%, rgba(0,0,0,.25) 44%, transparent 56%);
+  /* 오른쪽 아래 ↔ 왼쪽 위 모서리를 잇는 대각선을 기준으로 오른쪽 위 절반을 덮는다.
+     '모서리 방향' 그라디언트의 50% 선은 정확히 그 대각선이라, 거기서 0 → 오른쪽 위 모서리에서 가장 진하게 */
+  -webkit-mask-image: linear-gradient(to top right, transparent 50%, rgba(0,0,0,.45) 66%, rgba(0,0,0,.85) 84%, #000 100%);
+          mask-image: linear-gradient(to top right, transparent 50%, rgba(0,0,0,.45) 66%, rgba(0,0,0,.85) 84%, #000 100%);
 }
 @media (prefers-reduced-motion: reduce){
   .frame, .frame:hover{ transition:none; transform: rotate(-1.2deg) }
@@ -1036,9 +1045,9 @@ try{
     </div>
 
     <div class="work-hello">
-      <p>취미 미술 학원에서 틈틈이 그려 온 그림으로 단체전을 열게 됐어요. 관람료 5천 원이 있는 전시라, 직접 오라고 하기가 조금 미안했어요. 그래서 이 페이지를 따로 만들었어요. 꼭 와야 한다는 부담은 갖지 않아도 괜찮아요. 제가 전시를 한다는 걸 알아 주는 것만으로도 충분히 기뻐요. 오기 어려운 분들을 위해 여기에 그림을 걸어 두었으니, 작은 온라인 전시장이라 생각하고 편하게 둘러보세요.</p>
+      <p>취미 미술 학원에서 틈틈이 그려 온 그림으로 단체전을 열게 됐어요. 전시 소식을 편하게 전하고 싶어서 이 페이지를 따로 만들었어요. 꼭 와야 한다는 부담은 갖지 않아도 괜찮아요. 제가 전시를 한다는 걸 알아 주는 것만으로도 충분히 기뻐요. 오기 어려운 분들을 위해 여기에 그림을 걸어 두었으니, 작은 온라인 전시장이라 생각하고 편하게 둘러보세요.</p>
       <p class="work-notice"><strong class="q">언제 가면 만날 수 있나요?</strong> <em>11월 14일 토요일</em>에는 하루 종일 전시장에 있어요. 다른 날도 집이 가까워서 퇴근하고 언제든 달려갈 수 있어요.</p>
-      <p class="work-notice work-extra"><strong class="q">가면 그림만 있나요?</strong> 전시장에 오면 저를 포함해 <strong>스무 명의 그림</strong>을 한 번에 즐길 수 있어요. 작가들의 이야기를 담은 <strong>도슨트</strong>도 준비돼 있어서, 전시장 QR을 찍으면 그림마다 들으며 볼 수 있어요. <strong>키링이나 엽서 같은 굿즈</strong>도 팔고, 사진 찍기 좋은 <strong>포토 스팟</strong>도 있어요. 가볍게 마실 <strong>웰컴 드링크</strong>도 준비해 둘게요!</p>
+      <p class="work-notice work-extra"><strong class="q">전시장에서는 또 뭘 즐길 수 있나요?</strong> 전시장에 오면 저를 포함해 <strong>스무 명의 그림</strong>을 한 번에 즐길 수 있어요. 작가들의 이야기를 담은 <strong>도슨트</strong>도 준비돼 있어서, 전시장 QR을 찍으면 그림마다 들으며 볼 수 있어요. <strong>키링이나 엽서 같은 굿즈</strong>도 팔고, 사진 찍기 좋은 <strong>포토 스팟</strong>도 있어요. 가볍게 마실 <strong>웰컴 드링크</strong>도 준비해 둘게요!</p>
     </div>
 
     <figure class="work-main">
