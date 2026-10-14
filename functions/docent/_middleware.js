@@ -7,7 +7,8 @@
  * Cloudflare Pages > 설정 > 변수 및 비밀(Production)에 넣는 값
  *  - DOCENT_KEY     QR 주소에 붙는 열쇠. 바꾸면 이전 QR은 더 이상 열리지 않는다
  *  - DOCENT_SECRET  입장권 서명용 비밀값. 밖으로 알려지지 않게 둔다
- *  - DOCENT_ALWAYS_OPEN  "true"면 운영 시간과 상관없이 연다 (전시 전 리허설용, 전시 때는 지운다)
+ *  - DOCENT_ALWAYS_OPEN  "true"면 운영 시간과 상관없이 연다 (전시 전 리허설용)
+ *                        REHEARSAL_UNTIL 이 지나면 값이 남아 있어도 자동으로 무시한다
  * 두 값이 없으면 아무도 들어오지 못한다.
  *
  * 점검용 (잠금 없이 열린다. 열쇠·비밀값은 절대 보여 주지 않는다)
@@ -19,6 +20,12 @@
 
 const COOKIE = 'docent_pass';
 const PASS_SECONDS = 3 * 60 * 60;   // 입장권 유효 시간 3시간
+
+// 리허설 모드는 전시 첫날 0시(한국 시간)에 저절로 꺼진다
+const REHEARSAL_UNTIL = new Date('2026-11-12T00:00:00+09:00');
+function rehearsal(env, date) {
+  return env.DOCENT_ALWAYS_OPEN === 'true' && date < REHEARSAL_UNTIL;
+}
 
 // 운영 시간 (한국 시간). 날짜: [여는 시각, 닫는 시각]
 const HOURS = {
@@ -44,7 +51,7 @@ export async function onRequest(context) {
   }
 
   if (!env.DOCENT_KEY || !env.DOCENT_SECRET) return notice('closed', 503);
-  if (env.DOCENT_ALWAYS_OPEN !== 'true' && !isOpen(new Date())) return notice('hours', 403);
+  if (!rehearsal(env, new Date()) && !isOpen(new Date())) return notice('hours', 403);
 
   const now = Math.floor(Date.now() / 1000);
 
@@ -95,7 +102,10 @@ async function status(request, env, url) {
   const nowDate = new Date();
   const now = Math.floor(nowDate.getTime() / 1000);
   const keySet = !!env.DOCENT_KEY, secretSet = !!env.DOCENT_SECRET;
-  const alwaysOpen = env.DOCENT_ALWAYS_OPEN === 'true';
+  const alwaysOpen = rehearsal(env, nowDate);
+  const rehearsalNote = env.DOCENT_ALWAYS_OPEN !== 'true' ? '꺼짐'
+    : alwaysOpen ? 'true (리허설: 운영 시간 무시 · ' + kstText(REHEARSAL_UNTIL) + '에 자동으로 꺼짐)'
+    : '설정은 남아 있지만 ' + kstText(REHEARSAL_UNTIL) + '이 지나 무시됨';
   const openNow = isOpen(nowDate);
   const pass = await checkPass(request, env, now);
 
@@ -109,7 +119,7 @@ async function status(request, env, url) {
   const body = {
     nowKst: kstText(nowDate),
     gate,
-    settings: { DOCENT_KEY: keySet ? '설정됨' : '없음', DOCENT_SECRET: secretSet ? '설정됨' : '없음', DOCENT_ALWAYS_OPEN: alwaysOpen ? 'true (리허설: 운영 시간 무시)' : '꺼짐' },
+    settings: { DOCENT_KEY: keySet ? '설정됨' : '없음', DOCENT_SECRET: secretSet ? '설정됨' : '없음', DOCENT_ALWAYS_OPEN: rehearsalNote },
     hours: { openNow, today: HOURS[kstText(nowDate).slice(0, 10)] || null, all: HOURS },
     pass,
     passSeconds: PASS_SECONDS

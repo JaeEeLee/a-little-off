@@ -96,7 +96,7 @@ pre{ margin:10px 0 0; padding:10px; background:#F4F2EE; border-radius:8px; overf
           ['/docent 결과', badge(esc(s.gate), gateKind)],
           ['DOCENT_KEY', badge(esc(s.settings.DOCENT_KEY), s.settings.DOCENT_KEY === '설정됨' ? 'ok' : 'bad')],
           ['DOCENT_SECRET', badge(esc(s.settings.DOCENT_SECRET), s.settings.DOCENT_SECRET === '설정됨' ? 'ok' : 'bad')],
-          ['리허설 모드', badge(esc(s.settings.DOCENT_ALWAYS_OPEN), /^true/.test(s.settings.DOCENT_ALWAYS_OPEN) ? 'warn' : 'ok')],
+          ['리허설 모드', badge(esc(s.settings.DOCENT_ALWAYS_OPEN), /^true/.test(s.settings.DOCENT_ALWAYS_OPEN) ? 'warn' : /무시됨/.test(s.settings.DOCENT_ALWAYS_OPEN) ? 'warn' : 'ok')],
           ['지금 운영 시간', s.hours.openNow ? badge('운영 중', 'ok') : badge('운영 시간 아님', 'warn') + (s.hours.today ? ' 오늘 ' + s.hours.today.join('–') : ' 오늘은 전시일 아님')],
           ['입장권', badge(p.valid ? '유효' : (p.present ? '무효' : '없음'), p.valid ? 'ok' : 'warn') + ' ' + esc(p.reason) +
             (p.valid ? '<br>' + esc(p.expiresKst) + '까지 · ' + p.remainingMin + '분 남음' : '')]
