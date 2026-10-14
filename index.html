@@ -402,20 +402,10 @@ dd .sub{
   --j: center;
   grid-column: span 2;
   font-weight:700;
-  color: var(--spark);
   position:relative;
   z-index:1;
   text-shadow: 0 0 18px rgba(var(--surface-rgb), .9);
-  transition: color .3s ease, font-size .35s cubic-bezier(.22,.61,.36,1);
-}
-.artists li.spotlight::after{
-  content:"";
-  position:absolute;
-  left:-6px; right:-6px; bottom:-5px;
-  height:2px;
-  background: var(--spark);
-  border-radius:2px;
-  opacity:.5;
+  transition: font-size .35s cubic-bezier(.22,.61,.36,1);
 }
 
 /* 초대 문구 */
