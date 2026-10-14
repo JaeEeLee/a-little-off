@@ -510,6 +510,48 @@ dd .sub{
   border:0; background: rgba(255,255,255,.9); font-size:1rem; cursor:pointer;
 }
 
+/* 재이 페이지 인사말 */
+.work-hello{ display:grid; gap:10px; margin-top:20px }
+.work-hello > p:first-child{ margin:0; font-size:.92rem; line-height:1.75 }
+
+/* ── 쪽지 게시판: 메모지가 여기저기 붙은 느낌 ── */
+.board{
+  display:flex; flex-wrap:wrap; justify-content:center; align-items:flex-start;
+  gap:2px; margin-top:20px; padding:18px 6px 22px;
+  border-radius: var(--radius);
+  background-color:#F6F1E7;
+  background-image: radial-gradient(rgba(120,95,60,.12) 1px, transparent 1.2px);
+  background-size: 14px 14px;
+  min-height: 120px;
+}
+.sticky{
+  position:relative;
+  width: calc(50% - 10px); max-width: 210px;
+  margin: 6px 4px -2px;
+  padding: 20px 14px 12px;
+  background: var(--paper, #FFF4A8);
+  box-shadow: 0 6px 14px rgba(70,50,30,.16), 0 1px 2px rgba(70,50,30,.12);
+  rotate: var(--r, -2deg);
+  translate: 0 var(--y, 0);
+  font-family: "Gaegu", "Hahmlet", sans-serif;
+  color:#3B2E22;
+  transition: rotate .25s ease, scale .25s ease;
+}
+.sticky:hover{ rotate:0deg; scale:1.03; z-index:2 }
+.sticky::before{   /* 위에 붙인 테이프 */
+  content:""; position:absolute; top:-9px; left:50%; width:54px; height:18px;
+  translate:-50% 0; rotate: var(--t, 3deg);
+  background: rgba(255,255,255,.55);
+  box-shadow: 0 1px 2px rgba(0,0,0,.08);
+}
+.sticky-msg{ margin:0; font-size:1.08rem; line-height:1.45; white-space:pre-line; word-break:break-word }
+.sticky-meta{ display:flex; justify-content:space-between; gap:8px; margin-top:10px; font-size:.92rem; opacity:.75 }
+.sticky.is-new{ animation: stickIn .5s cubic-bezier(.22,.61,.36,1) both }
+@keyframes stickIn{ from{ opacity:0; scale:1.25 } to{ opacity:1; scale:1 } }
+@media (min-width: 560px){ .sticky{ width: calc(33.333% - 10px) } }
+.board-empty{ margin:12px 0 0; text-align:center; font-size:.86rem; color: var(--ink-soft) }
+.board-loading{ align-self:center; font-size:.85rem; color: var(--ink-soft) }
+
 /* 초대 문구 */
 .invite-line{
   margin:0 0 10px;
@@ -930,7 +972,10 @@ try{
       <span class="en">THE WORK</span>
     </div>
 
-    <p class="work-notice"><strong>공지</strong> 재이 작가는 <em>11월 14일 토요일</em>에만 전시장에 있어요. 작가와 직접 이야기 나누고 싶다면 토요일에 들러 주세요.</p>
+    <div class="work-hello">
+      <p>관람료 5천 원이 있는 전시라, 직접 오라고 하기가 조금 미안했어요. 그래서 이 페이지를 따로 만들었어요. 여기서 먼저 재밌게 놀다 가 주세요!</p>
+      <p class="work-notice"><strong>언제 가면 만날 수 있나요?</strong> <em>11월 14일 토요일</em>에는 하루 종일 전시장에 있어요. 다른 날도 집이 가까워서 퇴근하고 언제든 달려갈 수 있어요.</p>
+    </div>
 
     <figure class="work-main">
       <button class="work-zoom" type="button" data-src="/works/jessie/01.jpg" aria-label="그림 크게 보기">
@@ -948,6 +993,19 @@ try{
       <button class="work-zoom" type="button" data-src="/works/jessie/03.jpg"><img src="/works/jessie/03.jpg" alt="하늘을 향한 붉은 양귀비와 꼬인 기둥" loading="lazy"></button>
       <button class="work-zoom" type="button" data-src="/works/jessie/04.jpg"><img src="/works/jessie/04.jpg" alt="붉은 열매 덩굴과 분홍 꽃잎" loading="lazy"></button>
       <button class="work-zoom" type="button" data-src="/works/jessie/06.jpg"><img src="/works/jessie/06.jpg" alt="나이트 말을 감싸 안은 소녀" loading="lazy"></button>
+    </div>
+  </section>
+
+  <section class="card reveal" id="boardSection" hidden>
+    <div class="section-head">
+      <h2>재이에게 온 쪽지</h2>
+      <span class="en">NOTES</span>
+      <span class="count" id="boardCount"></span>
+    </div>
+    <div class="board" id="board" aria-live="polite"></div>
+    <p class="board-empty" id="boardEmpty" hidden>아직 붙은 쪽지가 없어요. 첫 번째 쪽지를 붙여 주세요!</p>
+    <div class="btn-row">
+      <button class="btn primary" type="button" id="boardWrite">나도 쪽지 붙이기</button>
     </div>
   </section>
 
@@ -1128,7 +1186,7 @@ try{
         <button class="note-change" type="button" id="noteChange">다른 작가 고르기</button>
       </div>
 
-      <p class="note" style="margin-top:18px">전시가 끝난 뒤 작가에게 그대로 전해집니다. 여기 적은 글은 사이트에 공개되지 않으며, 연락처나 링크는 넣을 수 없습니다.</p>
+      <p class="note" style="margin-top:18px" id="notePrivacy">전시가 끝난 뒤 작가에게 그대로 전해집니다. 여기 적은 글은 사이트에 공개되지 않으며, 연락처나 링크는 넣을 수 없습니다.</p>
 
       <form class="note-form" id="noteForm" novalidate>
         <input type="hidden" id="noteArtist" name="artist" value="전체">
@@ -1159,7 +1217,7 @@ try{
 
     <div class="note-done" id="noteDone" hidden>
       <p class="note-done-title">잘 전해드리겠습니다.</p>
-      <p class="note-done-sub">전시가 끝나면 작가에게 그대로 전달됩니다.</p>
+      <p class="note-done-sub" id="noteDoneSub">전시가 끝나면 작가에게 그대로 전달됩니다.</p>
       <button class="btn" type="button" id="noteAgain">한 번 더 쓰기</button>
     </div>
     </div>
@@ -1204,6 +1262,9 @@ try{
     ARTIST_LABEL[name] = label;
     ARTIST_BY_LABEL[label] = name;
   });
+  // 쪽지를 자기 페이지 게시판에 보여 주기로 한 작가 (Apps Script 의 BOARD_ARTISTS 와 같아야 한다)
+  var BOARD_ARTISTS = { '이재이': true };
+
   function artistName(li){ return li.getAttribute('data-name') || li.textContent.trim(); }
   function artistLabel(name){ return ARTIST_LABEL[name] || name; }
 
@@ -1465,6 +1526,22 @@ try{
     }
 
     // quiet: 공유 링크(#이름)로 미리 골라 둘 때. 화면을 끌어내리거나 입력칸에 커서를 두지 않는다
+    // 게시판을 연 작가에게 쓰는 쪽지는 그 작가 페이지에 붙는다고 알려 준다
+    var privacyEl = document.getElementById('notePrivacy');
+    var doneSubEl = document.getElementById('noteDoneSub');
+    var PRIVATE_TEXT = privacyEl ? privacyEl.textContent : '';
+    var PRIVATE_DONE = doneSubEl ? doneSubEl.textContent : '';
+    function notePrivacy(name){
+      var open = !!BOARD_ARTISTS[name];
+      var label = artistLabel(name);
+      if(privacyEl) privacyEl.textContent = open
+        ? label + ' 작가에게 남긴 쪽지는 ' + label + ' 작가 페이지의 쪽지 게시판에 붙어요. 연락처나 링크는 넣을 수 없어요.'
+        : PRIVATE_TEXT;
+      if(doneSubEl) doneSubEl.textContent = open
+        ? label + ' 작가 페이지 게시판에 붙었어요.'
+        : PRIVATE_DONE;
+    }
+
     function pickArtist(name, quiet){
       var first = body.hidden;
 
@@ -1478,6 +1555,7 @@ try{
           name === '전체' ? '에게' : ' 작가에게'));
       }
       markPicked(name);
+      notePrivacy(name);
 
       // 다 쓴 상태였다면 폼으로 되돌린다
       if(done && !done.hidden){
@@ -1592,6 +1670,7 @@ try{
       }).then(function(){
         markSent();
         showDone();
+        window.dispatchEvent(new CustomEvent('note-sent', { detail: payload }));
       }).catch(function(){
         // 응답을 읽지 못해도 전달 자체는 되는 경우가 많다. 한 번 더 시도한다
         return fetch(ENDPOINT, {
@@ -1608,6 +1687,94 @@ try{
       }).then(function(){
         if(btn){ btn.disabled = false; btn.textContent = '전하기'; }
       });
+    });
+  })();
+
+  /* ── 작가 쪽지 게시판 (/jessie) ──
+     Apps Script 에서 그 작가에게 온 쪽지만 받아 메모지처럼 붙인다 */
+  (function(){
+    var sec = document.getElementById('boardSection');
+    if(!sec || !PAGE_ARTIST || !BOARD_ARTISTS[PAGE_ARTIST]) return;
+    if(SHEET_ENDPOINT.indexOf('http') !== 0) return;
+    sec.hidden = false;
+
+    // 손글씨 느낌 글꼴은 이 페이지에서만 불러온다
+    var font = document.createElement('link');
+    font.rel = 'stylesheet';
+    font.href = 'https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap';
+    document.head.appendChild(font);
+
+    var board = document.getElementById('board');
+    var empty = document.getElementById('boardEmpty');
+    var countEl = document.getElementById('boardCount');
+    var PAPERS = ['#FFF4A8', '#FFD9E4', '#D7F0FF', '#DDF5D2', '#FFE3C2', '#EADCFF'];
+    var total = 0;
+
+    // 같은 쪽지는 늘 같은 색·기울기로 붙도록 글자로 값을 정한다
+    function seed(str){
+      var h = 0;
+      for(var i = 0; i < str.length; i++){ h = (h * 31 + str.charCodeAt(i)) | 0; }
+      return Math.abs(h);
+    }
+
+    function note(n, fresh){
+      var el = document.createElement('article');
+      el.className = 'sticky' + (fresh ? ' is-new' : '');
+      var k = seed((n.message || '') + (n.at || ''));
+      el.style.setProperty('--paper', PAPERS[k % PAPERS.length]);
+      el.style.setProperty('--r', ((k % 9) - 4) + 'deg');
+      el.style.setProperty('--t', ((k % 7) - 3) * 2 + 'deg');
+      el.style.setProperty('--y', ((k % 5) * 3) + 'px');
+      var msg = document.createElement('p');
+      msg.className = 'sticky-msg';
+      msg.textContent = n.message;
+      var meta = document.createElement('div');
+      meta.className = 'sticky-meta';
+      var who = document.createElement('span');
+      who.textContent = '- ' + (n.sender || '익명');
+      var when = document.createElement('span');
+      when.textContent = n.at || '';
+      meta.appendChild(who); meta.appendChild(when);
+      el.appendChild(msg); el.appendChild(meta);
+      return el;
+    }
+
+    function setCount(){
+      countEl.textContent = total ? total + '장' : '';
+      empty.hidden = total > 0;
+    }
+
+    board.innerHTML = '<span class="board-loading">쪽지를 가져오는 중…</span>';
+    fetch(SHEET_ENDPOINT + '?type=board&artist=' + encodeURIComponent(PAGE_ARTIST))
+      .then(function(r){ return r.json(); })
+      .then(function(r){
+        board.innerHTML = '';
+        var notes = (r && r.ok && r.notes) || [];
+        notes.forEach(function(n){ board.appendChild(note(n)); });
+        total = notes.length;
+        setCount();
+      })
+      .catch(function(){
+        board.innerHTML = '';
+        empty.textContent = '쪽지를 불러오지 못했어요. 잠시 뒤에 다시 들러 주세요.';
+        empty.hidden = false;
+      });
+
+    // 이 페이지에서 쪽지를 보내면 바로 맨 앞에 붙인다
+    window.addEventListener('note-sent', function(e){
+      var p = e.detail || {};
+      if(p.artist !== PAGE_ARTIST) return;
+      var d = new Date();
+      board.insertBefore(note({ message: p.message, sender: p.sender, at: (d.getMonth() + 1) + '/' + d.getDate() }, true), board.firstChild);
+      total++;
+      setCount();
+    });
+
+    document.getElementById('boardWrite').addEventListener('click', function(){
+      var noteSec = document.getElementById('noteSection');
+      if(noteSec) noteSec.scrollIntoView({ behavior: ANIM ? 'smooth' : 'auto', block: 'start' });
+      var msgEl = document.getElementById('noteMessage');
+      if(msgEl) setTimeout(function(){ msgEl.focus(); }, 500);
     });
   })();
 
