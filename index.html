@@ -498,6 +498,8 @@ dd .sub{
 }
 .artists li.spotlight.picked{ color: inherit }
 
+.host-line{ margin:14px 0 0; font-size:.76rem }
+.host-line a{ margin-left:4px }
 /* ── 작가 전용 페이지의 작품 ─────────────── */
 .work-notice{
   margin:20px 0 0; padding:12px 14px; border-radius: var(--radius);
@@ -1016,9 +1018,9 @@ try{
     </div>
 
     <div class="work-hello">
-      <p>관람료 5천 원이 있는 전시라, 직접 오라고 하기가 조금 미안했어요. 그래서 이 페이지를 따로 만들었어요. 꼭 와야 한다는 부담은 갖지 않아도 괜찮아요. 제가 전시를 한다는 걸 알아 주는 것만으로도 충분히 기뻐요. 오기 어려운 분들을 위해 여기에 그림을 걸어 두었으니, 작은 온라인 전시장이라 생각하고 편하게 둘러보세요.</p>
+      <p>취미 미술 학원에서 틈틈이 그려 온 그림으로 단체전을 열게 됐어요. 관람료 5천 원이 있는 전시라, 직접 오라고 하기가 조금 미안했어요. 그래서 이 페이지를 따로 만들었어요. 꼭 와야 한다는 부담은 갖지 않아도 괜찮아요. 제가 전시를 한다는 걸 알아 주는 것만으로도 충분히 기뻐요. 오기 어려운 분들을 위해 여기에 그림을 걸어 두었으니, 작은 온라인 전시장이라 생각하고 편하게 둘러보세요.</p>
       <p class="work-notice"><strong>언제 가면 만날 수 있나요?</strong> <em>11월 14일 토요일</em>에는 하루 종일 전시장에 있어요. 다른 날도 집이 가까워서 퇴근하고 언제든 달려갈 수 있어요.</p>
-      <p class="work-extra">전시장에 오면 <strong>키링이나 엽서 같은 굿즈</strong>도 팔고, 사진 찍기 좋은 <strong>포토 스팟</strong>도 있어요. 가볍게 마실 <strong>웰컴 드링크</strong>도 준비해 둘게요!</p>
+      <p class="work-extra">전시장에 오면 저를 포함해 <strong>스무 명의 그림</strong>을 한 번에 즐길 수 있어요. <strong>키링이나 엽서 같은 굿즈</strong>도 팔고, 사진 찍기 좋은 <strong>포토 스팟</strong>도 있어요. 가볍게 마실 <strong>웰컴 드링크</strong>도 준비해 둘게요!</p>
     </div>
 
     <figure class="work-main">
@@ -1285,6 +1287,7 @@ try{
     조금 이상한 우리들 · Everyone Is a Little off<br>
     2026. 11. 12 (목) — 11. 17 (화) · 홍대 피시스 아카이브<br>
     <a href="https://www.pieces-archive.com/" target="_blank" rel="noopener">pieces-archive.com</a>
+    <p class="host-line" id="hostLine" hidden>주최: 이즈드로잉 취미미술학원 <a href="https://www.instagram.com/izdrawing.studio/" target="_blank" rel="noopener">인스타그램 바로가기 ↗</a></p>
   </footer>
 
 </div>
@@ -1350,9 +1353,13 @@ try{
       posterFrame.appendChild(cover);
     }
 
-    // 작가 전용 페이지에서는 학원 링크를 숨긴다
+    // 작가 전용 페이지에서는 상단 학원 표기·링크를 숨기고, 맨 아래 '주최' 줄로 대신한다
     var studio = document.querySelector('.studio-links');
     if(studio) studio.hidden = true;
+    var eyebrow = document.querySelector('.hero .eyebrow');
+    if(eyebrow) eyebrow.hidden = true;
+    var hostLine = document.getElementById('hostLine');
+    if(hostLine) hostLine.hidden = false;
 
     /* 카드 순서: 그림 → 쪽지(게시판 + 쓰는 칸) → 질문 → 전시 안내 → 지금 전시장에는 → 예약
        참여 작가·작가에게 한마디·함께 보기 카드는 숨긴다. 받는 사람은 이 작가로 정해져 있다 */
