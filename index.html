@@ -349,9 +349,9 @@ dd .sub{
 .artists{
   display:grid;
   grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
-  gap: 14px 10px;
+  gap: 24px 10px;
   margin:0;
-  padding:0;
+  padding: 8px 6px;
   list-style:none;
 }
 .artists li{
@@ -373,10 +373,24 @@ dd .sub{
   color: var(--spark);
   font-weight:700;
 }
-/* 줄이 딱 맞게 서지 않도록, 조금씩 어긋나게 */
-.artists li:nth-child(3n+1){ margin-top:4px }
-.artists li:nth-child(4n+3){ margin-top:-3px }
-.artists li:nth-child(5n+2){ margin-top:2px }
+/* 이름들이 종이 위에 흩뿌려진 것처럼 — 칸 안에서 쏠리고, 기울고, 크기가 다르다.
+   서로 다른 주기의 규칙이 겹치면서 불규칙하게 보인다.
+   translate·rotate 속성은 등장 애니메이션의 transform과 따로 놀아 겹치지 않는다 */
+.artists li{
+  justify-self: var(--j, center);
+  translate: var(--dx, 0) var(--dy, 0);
+  rotate: var(--r, 0deg);
+  font-size: var(--fs, 1rem);
+  line-height:1.2;
+}
+.artists li:nth-child(2n)  { --r:-4deg }
+.artists li:nth-child(3n)  { --r:5deg;  --dy:-9px }
+.artists li:nth-child(3n+1){ --j:start; --dx:6px;  --dy:8px }
+.artists li:nth-child(4n+2){ --j:end;   --dx:-4px }
+.artists li:nth-child(5n)  { --fs:1.22rem; --dy:5px }
+.artists li:nth-child(5n+3){ --fs:.9rem;  --r:-7deg }
+.artists li:nth-child(6n+5){ --fs:1.12rem; --dx:-10px }
+.artists li:nth-child(7n+4){ --j:center; --dy:-12px; --r:3deg }
 
 /* 공유 링크로 들어왔을 때 그 작가만 도드라진다 */
 .artists li.spotlight{
