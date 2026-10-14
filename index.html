@@ -948,8 +948,6 @@ try{
       <button class="work-zoom" type="button" data-src="/works/jessie/03.jpg"><img src="/works/jessie/03.jpg" alt="하늘을 향한 붉은 양귀비와 꼬인 기둥" loading="lazy"></button>
       <button class="work-zoom" type="button" data-src="/works/jessie/04.jpg"><img src="/works/jessie/04.jpg" alt="붉은 열매 덩굴과 분홍 꽃잎" loading="lazy"></button>
       <button class="work-zoom" type="button" data-src="/works/jessie/06.jpg"><img src="/works/jessie/06.jpg" alt="나이트 말을 감싸 안은 소녀" loading="lazy"></button>
-      <button class="work-zoom" type="button" data-src="/works/jessie/05.jpg"><img src="/works/jessie/05.jpg" alt="옆으로 누운 시선으로 본 나이트 말과 소녀" loading="lazy"></button>
-      <button class="work-zoom" type="button" data-src="/works/jessie/07.jpg"><img src="/works/jessie/07.jpg" alt="벽에 기대 세운 캔버스 전체" loading="lazy"></button>
     </div>
   </section>
 
@@ -1221,6 +1219,9 @@ try{
     document.title = artistLabel(PAGE_ARTIST) + ' · 조금 이상한 우리들';
     var workSec = document.getElementById('workSection');
     if(workSec) workSec.hidden = false;
+    // 작가 전용 페이지에서는 학원 링크를 숨긴다
+    var studio = document.querySelector('.studio-links');
+    if(studio) studio.hidden = true;
   }
 
   // 작품 사진을 누르면 화면 가득 크게 본다
