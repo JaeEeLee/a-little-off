@@ -166,6 +166,19 @@ body::before{
   transition: transform .6s cubic-bezier(.22,.61,.36,1);
 }
 .frame:hover{ transform: rotate(0deg) }
+/* 작가 전용 페이지: 포스터 오른쪽 아래에 작가의 그림을 살짝 겹쳐 둔다 (포스터 넓이의 약 1/4) */
+.frame.has-work{ position:relative; margin-bottom: 34px }
+.frame-work{
+  position:absolute; right:-16%; bottom:-9%;
+  width:50%; aspect-ratio: 1135 / 1600;
+  background-size: cover; background-position: center;
+  border: 5px solid #fff;
+  box-shadow: 0 10px 24px rgba(40,28,18,.28), 0 2px 4px rgba(40,28,18,.18);
+  transform: rotate(6deg);
+  transition: transform .6s cubic-bezier(.22,.61,.36,1);
+  pointer-events:none;
+}
+.frame:hover .frame-work{ transform: rotate(3deg) translate(4px, -2px) }
 @media (prefers-reduced-motion: reduce){
   .frame, .frame:hover{ transition:none; transform: rotate(-1.2deg) }
 }
@@ -1289,6 +1302,18 @@ try{
     document.title = artistLabel(PAGE_ARTIST) + ' · 조금 이상한 우리들';
     var workSec = document.getElementById('workSection');
     if(workSec) workSec.hidden = false;
+    // 포스터에 작가 그림을 살짝 겹쳐 붙인다
+    var ARTIST_COVER = { '이재이': '/works/jessie/01.jpg' };
+    var posterFrame = document.querySelector('.hero .frame');
+    if(posterFrame && ARTIST_COVER[PAGE_ARTIST]){
+      var cover = document.createElement('span');
+      cover.className = 'frame-work';
+      cover.style.backgroundImage = 'url("' + ARTIST_COVER[PAGE_ARTIST] + '")';
+      cover.setAttribute('aria-hidden', 'true');
+      posterFrame.classList.add('has-work');
+      posterFrame.appendChild(cover);
+    }
+
     // 작가 전용 페이지에서는 학원 링크를 숨긴다
     var studio = document.querySelector('.studio-links');
     if(studio) studio.hidden = true;
