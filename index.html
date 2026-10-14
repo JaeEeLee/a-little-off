@@ -612,11 +612,6 @@ dd .sub{
   font-variant-numeric: tabular-nums;
 }
 .field input[type="text"]::placeholder{ color: var(--ink-soft); opacity:.6 }
-.field-row{
-  display:grid;
-  grid-template-columns: 1fr 1fr;
-  gap:12px;
-}
 #visitSubmit[disabled]{ opacity:.55; cursor:default }
 /* 자동 프로그램을 거르는 칸 — 화면에서 완전히 치운다 */
 .trap{
@@ -868,31 +863,28 @@ try{
     <div id="visitFormWrap">
       <form class="note-form" id="visitForm" novalidate>
         <div class="field">
-          <label for="visitArtist">초대한 작가</label>
-          <select id="visitArtist" name="artist">
-            <option value="">고르기</option>
+          <label for="visitName">예약자 성함</label>
+          <input id="visitName" name="name" type="text" maxlength="20" autocomplete="name" placeholder="입구에서 확인할 이름" required>
+        </div>
+
+        <div class="field">
+          <label for="visitDate">방문 날짜</label>
+          <select id="visitDate" name="date" required>
+            <option value="">날짜 고르기</option>
           </select>
         </div>
 
         <div class="field">
-          <label for="visitName">예약자 성함</label>
-          <input id="visitName" name="name" type="text" maxlength="20" autocomplete="name" placeholder="입구에서 확인할 이름">
-        </div>
-
-        <div class="field-row">
-          <div class="field">
-            <label for="visitDate">방문 날짜</label>
-            <select id="visitDate" name="date"></select>
-          </div>
-          <div class="field">
-            <label for="visitTime">방문 시간</label>
-            <select id="visitTime" name="time"></select>
-          </div>
+          <label for="visitArtist">초대한 작가 <span class="opt">(선택)</span></label>
+          <select id="visitArtist" name="artist">
+            <option value="">따로 없어요</option>
+          </select>
         </div>
 
         <div class="field">
-          <label for="visitParty">함께 오는 사람 <span class="opt">(본인 제외)</span></label>
+          <label for="visitParty">함께 오는 사람 <span class="opt">(선택 · 본인 제외)</span></label>
           <select id="visitParty" name="companions">
+            <option value="">고르지 않음</option>
             <option value="0">혼자 와요</option>
             <option value="1">1명</option>
             <option value="2">2명</option>
@@ -900,11 +892,6 @@ try{
             <option value="4">4명</option>
             <option value="5">5명</option>
           </select>
-        </div>
-
-        <div class="field">
-          <label for="visitMemo">남길 말 <span class="opt">(선택)</span></label>
-          <input id="visitMemo" name="memo" type="text" maxlength="100" placeholder="늦을 수 있어요, 휠체어로 가요 등">
         </div>
 
         <div class="trap" aria-hidden="true">
@@ -1429,69 +1416,49 @@ try{
   })();
 
   /* ── 관람 예약 ──
-     Apps Script가 예약 시트의 해당 작가 칸에 한 줄씩 채운다 */
+     Apps Script가 예약 시트의 해당 작가 칸에 한 줄씩 채운다.
+     결제 방법·입장여부·메모는 운영진이 직접 적는 칸이라 받지 않는다 */
   (function(){
     var sec = document.getElementById('visitSection');
     if(!sec) return;
     if(SHEET_ENDPOINT.indexOf('http') !== 0){ sec.hidden = true; return; }
 
-    var form   = document.getElementById('visitForm');
-    var wrap   = document.getElementById('visitFormWrap');
-    var done   = document.getElementById('visitDone');
-    var doneSub= document.getElementById('visitDoneSub');
-    var again  = document.getElementById('visitAgain');
-    var statEl = document.getElementById('visitStatus');
-    var btn    = document.getElementById('visitSubmit');
-    var dateEl = document.getElementById('visitDate');
-    var timeEl = document.getElementById('visitTime');
-    var artEl  = document.getElementById('visitArtist');
+    var form    = document.getElementById('visitForm');
+    var wrap    = document.getElementById('visitFormWrap');
+    var done    = document.getElementById('visitDone');
+    var doneSub = document.getElementById('visitDoneSub');
+    var again   = document.getElementById('visitAgain');
+    var statEl  = document.getElementById('visitStatus');
+    var btn     = document.getElementById('visitSubmit');
+    var dateEl  = document.getElementById('visitDate');
+    var artEl   = document.getElementById('visitArtist');
 
-    var WALK_IN  = '워크인';
     var COOLDOWN = 20000;
 
-    // 날짜별 여는 시각·닫는 시각. 입장은 닫기 한 시간 전까지 받는다
+    // 값은 예약 시트 '방문 날짜' 드롭다운과 똑같아야 한다
     var DAYS = [
-      { v:'2026-11-12', label:'11월 12일 (목)', open:'13:00', close:'21:00' },
-      { v:'2026-11-13', label:'11월 13일 (금)', open:'11:00', close:'21:00' },
-      { v:'2026-11-14', label:'11월 14일 (토)', open:'11:00', close:'21:00' },
-      { v:'2026-11-15', label:'11월 15일 (일)', open:'11:00', close:'21:00' },
-      { v:'2026-11-16', label:'11월 16일 (월)', open:'11:00', close:'21:00' },
-      { v:'2026-11-17', label:'11월 17일 (화)', open:'11:00', close:'20:00' }
+      { v:'11/12(목)', label:'11월 12일 (목) · 13:00 개관' },
+      { v:'11/13(금)', label:'11월 13일 (금)' },
+      { v:'11/14(토)', label:'11월 14일 (토)' },
+      { v:'11/15(일)', label:'11월 15일 (일)' },
+      { v:'11/16(월)', label:'11월 16일 (월)' },
+      { v:'11/17(화)', label:'11월 17일 (화) · 20:00 마감' }
     ];
-
-    function toMin(t){ var p = t.split(':'); return +p[0] * 60 + +p[1]; }
-    function toTime(m){ return ('0' + Math.floor(m / 60)).slice(-2) + ':' + ('0' + m % 60).slice(-2); }
+    DAYS.forEach(function(d){ dateEl.appendChild(new Option(d.label, d.v)); });
 
     // 작가 명단은 위 '참여 작가'에서 그대로 가져온다
     Array.prototype.forEach.call(document.querySelectorAll('.artists li'), function(li){
       var name = li.textContent.trim();
       artEl.appendChild(new Option(name, name));
     });
-    artEl.appendChild(new Option('따로 없어요', WALK_IN));
 
-    DAYS.forEach(function(d){ dateEl.appendChild(new Option(d.label, d.v)); });
-
-    function fillTimes(){
-      var day = DAYS.filter(function(d){ return d.v === dateEl.value; })[0] || DAYS[0];
-      var keep = timeEl.value;
-      timeEl.innerHTML = '';
-      for(var m = toMin(day.open); m <= toMin(day.close) - 60; m += 30){
-        timeEl.appendChild(new Option(toTime(m), toTime(m)));
-      }
-      if(keep) timeEl.value = keep;
-      if(!timeEl.value) timeEl.selectedIndex = 0;
-    }
-    dateEl.addEventListener('change', fillTimes);
-    fillTimes();
-
-    // 공유 링크(#이름)나 명단에서 고른 작가가 있으면 미리 골라 둔다
-    function preselect(name){
-      if(!name) return;
+    // 공유 링크(#이름)로 들어왔다면 그 작가를 미리 골라 둔다
+    try{
+      var hashName = decodeURIComponent(location.hash.slice(1));
       for(var i = 0; i < artEl.options.length; i++){
-        if(artEl.options[i].value === name){ artEl.selectedIndex = i; return; }
+        if(hashName && artEl.options[i].value === hashName){ artEl.selectedIndex = i; break; }
       }
-    }
-    try{ preselect(decodeURIComponent(location.hash.slice(1))); }catch(e){}
+    }catch(e){}
 
     var BLOCKED = /([\w.+-]+@[\w-]+\.[\w.]{2,}|01[016-9][-.\s]?\d{3,4}[-.\s]?\d{4}|\d{9,}|https?:\/\/|www\.)/i;
 
@@ -1503,10 +1470,9 @@ try{
       try{ localStorage.setItem('visit-sent', String(Date.now())); }catch(e){}
     }
 
-    function showDone(p){
-      var day = DAYS.filter(function(d){ return d.v === p.date; })[0];
-      var who = p.companions > 0 ? (p.companions + 1) + '명' : '혼자';
-      doneSub.textContent = (day ? day.label : p.date) + ' ' + p.time + ', ' + who + ' 오시는 걸로 적어 두었어요.';
+    function showDone(date){
+      var day = DAYS.filter(function(d){ return d.v === date; })[0];
+      doneSub.textContent = (day ? day.label.split(' · ')[0] : date) + '에 오시는 걸로 적어 두었어요.';
       wrap.hidden = true;
       done.hidden = false;
     }
@@ -1515,7 +1481,6 @@ try{
       var keepArtist = artEl.value;
       form.reset();
       artEl.value = keepArtist;
-      fillTimes();
       setStatus('');
       done.hidden = true;
       wrap.hidden = false;
@@ -1525,24 +1490,20 @@ try{
       e.preventDefault();
       setStatus('');
 
-      if(form.nickname.value){ showDone({ date: dateEl.value, time: timeEl.value, companions: 0 }); return; }
+      if(form.nickname.value){ showDone(dateEl.value); return; }
 
       var name = form.name.value.trim();
-      var memo = form.memo.value.trim();
-
-      if(!artEl.value){ setStatus('초대한 작가를 골라 주세요. 없으면 ‘따로 없어요’를 고르면 됩니다.'); artEl.focus(); return; }
       if(!name){ setStatus('입구에서 확인할 수 있도록 성함을 적어 주세요.'); form.name.focus(); return; }
-      if(BLOCKED.test(name) || BLOCKED.test(memo)){ setStatus('연락처나 링크는 적지 않으셔도 됩니다.'); return; }
+      if(!dateEl.value){ setStatus('방문 날짜를 골라 주세요.'); dateEl.focus(); return; }
+      if(BLOCKED.test(name)){ setStatus('성함만 적어 주세요. 연락처나 링크는 넣을 수 없습니다.'); return; }
       if(Date.now() - lastSent() < COOLDOWN){ setStatus('방금 예약을 남겼습니다. 잠시 뒤에 다시 시도해 주세요.'); return; }
 
       var payload = {
         type:       'reservation',
-        artist:     artEl.value,
         name:       name,
-        companions: parseInt(form.companions.value, 10) || 0,
         date:       dateEl.value,
-        time:       timeEl.value,
-        memo:       memo
+        artist:     artEl.value,           // 비어 있으면 워크인 칸으로 간다
+        companions: form.companions.value  // 비어 있으면 시트에도 비워 둔다
       };
 
       btn.disabled = true;
@@ -1557,16 +1518,16 @@ try{
       }).then(function(r){
         if(r && r.ok === false){
           var msg = {
-            blocked:        '보낼 수 없는 표현이 들어 있습니다. 다시 확인해 주세요.',
-            bad_time:       '고를 수 없는 날짜나 시간입니다. 다시 골라 주세요.',
-            rate_limited:   '지금 예약이 몰려 있습니다. 잠시 뒤에 다시 시도해 주세요.',
-            busy:           '지금 예약이 몰려 있습니다. 잠시 뒤에 다시 시도해 주세요.'
+            blocked:      '보낼 수 없는 표현이 들어 있습니다. 다시 확인해 주세요.',
+            bad_date:     '고를 수 없는 날짜입니다. 다시 골라 주세요.',
+            rate_limited: '지금 예약이 몰려 있습니다. 잠시 뒤에 다시 시도해 주세요.',
+            busy:         '지금 예약이 몰려 있습니다. 잠시 뒤에 다시 시도해 주세요.'
           }[String(r.reason).replace(/^blocked_.*/, 'blocked')];
           setStatus(msg || '예약을 남기지 못했습니다. 잠시 뒤에 다시 시도해 주세요.');
           return;
         }
         markSent();
-        showDone(payload);
+        showDone(payload.date);
       }).catch(function(){
         setStatus('연결이 원활하지 않습니다. 잠시 뒤에 다시 시도해 주세요.');
       }).then(function(){
