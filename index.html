@@ -410,6 +410,13 @@ dd .sub{
 .artists li.spotlight.picked{ color: inherit }
 
 /* ── 작가 전용 페이지의 작품 ─────────────── */
+.work-notice{
+  margin:20px 0 0; padding:12px 14px; border-radius: var(--radius);
+  background: rgba(30,86,184,.06); border:1px solid rgba(30,86,184,.18);
+  font-size:.86rem; line-height:1.65; color: var(--ink);
+}
+.work-notice strong{ margin-right:6px; color: var(--accent); font-weight:600 }
+.work-notice em{ font-style:normal; font-weight:600 }
 .work-main{ margin:22px 0 0; display:grid; gap:16px; justify-items:center }
 .work-zoom{
   display:block; padding:0; border:0; background:none; cursor:zoom-in;
@@ -854,6 +861,8 @@ try{
       <h2>이재이의 그림</h2>
       <span class="en">THE WORK</span>
     </div>
+
+    <p class="work-notice"><strong>공지</strong> 이재이 작가는 <em>11월 14일 토요일</em>에만 전시장에 있어요. 작가와 직접 이야기 나누고 싶다면 토요일에 들러 주세요.</p>
 
     <figure class="work-main">
       <button class="work-zoom" type="button" data-src="/works/jessie/01.jpg" aria-label="그림 크게 보기">
