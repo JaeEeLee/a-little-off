@@ -187,8 +187,9 @@ body::before{
   background: inherit;                 /* 같은 그림을 한 장 더 겹쳐 흐리게 */
   border:0;
   filter: blur(3px);
-  -webkit-mask-image: radial-gradient(farthest-corner at 100% 100%, #000 0%, rgba(0,0,0,.65) 20%, transparent 42%);
-          mask-image: radial-gradient(farthest-corner at 100% 100%, #000 0%, rgba(0,0,0,.65) 20%, transparent 42%);
+  /* 오른쪽 아래에서 대각선으로 그림의 절반을 덮고, 가운데 대각선 쪽으로 옅어진다 */
+  -webkit-mask-image: linear-gradient(to top left, #000 0%, rgba(0,0,0,.7) 28%, rgba(0,0,0,.25) 44%, transparent 56%);
+          mask-image: linear-gradient(to top left, #000 0%, rgba(0,0,0,.7) 28%, rgba(0,0,0,.25) 44%, transparent 56%);
 }
 @media (prefers-reduced-motion: reduce){
   .frame, .frame:hover{ transition:none; transform: rotate(-1.2deg) }
@@ -262,11 +263,12 @@ h1 em{
   word-break: keep-all;
 }
 .artist-page .title-copy .work-hello p{ margin:0; font-size:1.1rem; line-height:1.75; color:#fff }   /* 기본 소개 문구의 약 1.2배 */
-.artist-page .title-copy .work-notice{ background:none; border:0; padding:0 }
+.artist-page .title-copy .work-notice{ background:none; border:0; padding:14px 0 }   /* 질문 덩어리마다 위아래 여백 */
 /* 작가 그림은 모두 같은 밝기로 (포스터에 겹친 그림과 맞춤) */
 .artist-page .work-zoom img,
 .artist-page .work-viewer img{ filter: brightness(1.14) saturate(1.04) }
-.artist-page .title-copy .work-notice strong{ display:block; margin:0 0 2px; color:#fff; font-weight:600 }
+.artist-page .title-copy .work-notice strong{ margin-right:0; color:#fff; font-weight:600 }
+.artist-page .title-copy .work-notice .q{ display:block; margin:0 0 4px }
 .artist-page .title-copy .work-notice em{ color:#fff }
 .subtitle{
   margin:0;
@@ -1035,8 +1037,8 @@ try{
 
     <div class="work-hello">
       <p>취미 미술 학원에서 틈틈이 그려 온 그림으로 단체전을 열게 됐어요. 관람료 5천 원이 있는 전시라, 직접 오라고 하기가 조금 미안했어요. 그래서 이 페이지를 따로 만들었어요. 꼭 와야 한다는 부담은 갖지 않아도 괜찮아요. 제가 전시를 한다는 걸 알아 주는 것만으로도 충분히 기뻐요. 오기 어려운 분들을 위해 여기에 그림을 걸어 두었으니, 작은 온라인 전시장이라 생각하고 편하게 둘러보세요.</p>
-      <p class="work-notice"><strong>언제 가면 만날 수 있나요?</strong> <em>11월 14일 토요일</em>에는 하루 종일 전시장에 있어요. 다른 날도 집이 가까워서 퇴근하고 언제든 달려갈 수 있어요.</p>
-      <p class="work-extra">전시장에 오면 저를 포함해 <strong>스무 명의 그림</strong>을 한 번에 즐길 수 있어요. 작가들의 이야기를 담은 <strong>도슨트</strong>도 준비돼 있어서, 전시장 QR을 찍으면 그림마다 들으며 볼 수 있어요. <strong>키링이나 엽서 같은 굿즈</strong>도 팔고, 사진 찍기 좋은 <strong>포토 스팟</strong>도 있어요. 가볍게 마실 <strong>웰컴 드링크</strong>도 준비해 둘게요!</p>
+      <p class="work-notice"><strong class="q">언제 가면 만날 수 있나요?</strong> <em>11월 14일 토요일</em>에는 하루 종일 전시장에 있어요. 다른 날도 집이 가까워서 퇴근하고 언제든 달려갈 수 있어요.</p>
+      <p class="work-notice work-extra"><strong class="q">가면 그림만 있나요?</strong> 전시장에 오면 저를 포함해 <strong>스무 명의 그림</strong>을 한 번에 즐길 수 있어요. 작가들의 이야기를 담은 <strong>도슨트</strong>도 준비돼 있어서, 전시장 QR을 찍으면 그림마다 들으며 볼 수 있어요. <strong>키링이나 엽서 같은 굿즈</strong>도 팔고, 사진 찍기 좋은 <strong>포토 스팟</strong>도 있어요. 가볍게 마실 <strong>웰컴 드링크</strong>도 준비해 둘게요!</p>
     </div>
 
     <figure class="work-main">
