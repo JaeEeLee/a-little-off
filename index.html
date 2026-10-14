@@ -858,11 +858,11 @@ try{
 
   <section class="card reveal work" id="workSection" hidden>
     <div class="section-head">
-      <h2>이재이의 그림</h2>
+      <h2>재이의 그림</h2>
       <span class="en">THE WORK</span>
     </div>
 
-    <p class="work-notice"><strong>공지</strong> 이재이 작가는 <em>11월 14일 토요일</em>에만 전시장에 있어요. 작가와 직접 이야기 나누고 싶다면 토요일에 들러 주세요.</p>
+    <p class="work-notice"><strong>공지</strong> 재이 작가는 <em>11월 14일 토요일</em>에만 전시장에 있어요. 작가와 직접 이야기 나누고 싶다면 토요일에 들러 주세요.</p>
 
     <figure class="work-main">
       <button class="work-zoom" type="button" data-src="/works/jessie/01.jpg" aria-label="그림 크게 보기">
@@ -1027,12 +1027,12 @@ try{
       <li>노정균</li>
       <li>박수룡</li>
       <li>박정은</li>
-      <li>배정연</li>
+      <li data-name="배정연">정연</li>
       <li>엄현서</li>
       <li>윤혜진</li>
       <li>이경도</li>
       <li>이서현</li>
-      <li>이재이</li>
+      <li data-name="이재이">재이</li>
       <li>이희지</li>
       <li>임소라</li>
       <li>조수연</li>
@@ -1130,14 +1130,28 @@ try{
      예약·한마디에 미리 골라진다). 링크 끝의 #이름이 있으면 그쪽이 먼저다 */
   var PAGE_ARTISTS = { jessie: '이재이' };
   var PAGE_ARTIST = PAGE_ARTISTS[location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase()] || '';
+  /* 작가 이름은 두 가지다. 화면에는 작가명(정연·재이), 시트와 링크에는 본명(배정연·이재이).
+     명단의 <li data-name="본명">작가명</li> 에서 짝을 읽는다. 작가명이 본명과 같으면 data-name 이 없다 */
+  var ARTIST_LABEL = {}, ARTIST_BY_LABEL = {};
+  Array.prototype.forEach.call(document.querySelectorAll('.artists li'), function(li){
+    var label = li.textContent.trim();
+    var name = li.getAttribute('data-name') || label;
+    ARTIST_LABEL[name] = label;
+    ARTIST_BY_LABEL[label] = name;
+  });
+  function artistName(li){ return li.getAttribute('data-name') || li.textContent.trim(); }
+  function artistLabel(name){ return ARTIST_LABEL[name] || name; }
+
+  // 링크의 #이름은 본명(#이재이)이든 작가명(#재이)이든 본명으로 돌려준다
   function sharedArtist(){
     var raw = '';
     try{ raw = decodeURIComponent((location.hash || '').slice(1)).trim(); }
     catch(e){ raw = (location.hash || '').slice(1).trim(); }
-    return raw || PAGE_ARTIST;
+    raw = raw || PAGE_ARTIST;
+    return ARTIST_BY_LABEL[raw] || raw;
   }
   if(PAGE_ARTIST){
-    document.title = PAGE_ARTIST + ' · 조금 이상한 우리들';
+    document.title = artistLabel(PAGE_ARTIST) + ' · 조금 이상한 우리들';
     var workSec = document.getElementById('workSection');
     if(workSec) workSec.hidden = false;
   }
@@ -1353,7 +1367,7 @@ try{
 
     function markPicked(name){
       Array.prototype.forEach.call(items, function(li){
-        li.classList.toggle('picked', li.textContent.trim() === name);
+        li.classList.toggle('picked', artistName(li) === name);
       });
     }
 
@@ -1390,7 +1404,7 @@ try{
       if(toEl){
         toEl.innerHTML = '';
         var em = document.createElement('em');
-        em.textContent = (name === '전체') ? '참여 작가 모두' : name;
+        em.textContent = (name === '전체') ? '참여 작가 모두' : artistLabel(name);
         toEl.appendChild(em);
         toEl.appendChild(document.createTextNode(
           name === '전체' ? '에게' : ' 작가에게'));
@@ -1418,10 +1432,10 @@ try{
     }
 
     Array.prototype.forEach.call(items, function(li){
-      var name = li.textContent.trim();
+      var name = artistName(li);   // 시트에는 본명으로 간다
       li.setAttribute('role', 'button');
       li.setAttribute('tabindex', '0');
-      li.setAttribute('aria-label', name + ' 작가에게 한마디 남기기');
+      li.setAttribute('aria-label', artistLabel(name) + ' 작가에게 한마디 남기기');
       li.addEventListener('click', function(){ pickArtist(name); });
       li.addEventListener('keydown', function(e){
         if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); pickArtist(name); }
@@ -1434,7 +1448,7 @@ try{
     function pickFromHash(){
       var raw = sharedArtist();
       for(var i = 0; i < items.length; i++){
-        if(raw && items[i].textContent.trim() === raw){ pickArtist(raw, true); return; }
+        if(raw && artistName(items[i]) === raw){ pickArtist(raw, true); return; }
       }
     }
     pickFromHash();
@@ -1562,8 +1576,8 @@ try{
 
     // 작가 명단은 위 '참여 작가'에서 그대로 가져온다
     Array.prototype.forEach.call(document.querySelectorAll('.artists li'), function(li){
-      var name = li.textContent.trim();
-      artEl.appendChild(new Option(name, name));
+      var name = artistName(li);
+      artEl.appendChild(new Option(artistLabel(name), name));
     });
 
     // 공유 링크(#이름)로 들어왔다면 그 작가를 미리 골라 둔다
@@ -1661,13 +1675,13 @@ try{
       var hit = null;
       for(var i = 0; i < items.length; i++){
         items[i].classList.remove('spotlight');
-        if(raw && items[i].textContent.trim() === raw) hit = items[i];
+        if(raw && artistName(items[i]) === raw) hit = items[i];
       }
       if(!hit){ if(line) line.hidden = true; return; }
 
       hit.classList.add('spotlight');
       if(line){
-        line.textContent = raw + ' 작가가 초대합니다';
+        line.textContent = artistLabel(raw) + ' 작가가 초대합니다';
         line.hidden = false;
       }
       if(visit) visit.value = raw;   // 관람 예약의 '초대한 작가'도 미리 골라 둔다

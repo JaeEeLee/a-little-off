@@ -339,7 +339,8 @@ h1{ margin:0; font-family:"Hahmlet",serif; font-weight:700; font-size:1.9rem; le
     try{ name = decodeURIComponent(location.hash.slice(1)).trim(); }catch(e){}
     if(!name) return;
     for(var i = 0; i < queue.length; i++){
-      if(queue[i].name === name){ load(i, true); return; }
+      // 본명(#이재이)으로도, 작가명(#재이)으로도 찾는다. 현장 QR에는 본명이 들어 있다
+      if(queue[i].name && (queue[i].name === name || queue[i].label === name)){ load(i, true); return; }
     }
   }
   fromHash();
