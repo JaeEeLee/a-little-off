@@ -241,6 +241,20 @@ h1 em{
   -webkit-mask-image: radial-gradient(ellipse closest-side at center, #000 30%, transparent 100%);
   mask-image: radial-gradient(ellipse closest-side at center, #000 30%, transparent 100%);
 }
+/* 작가 전용 페이지: 맨 위 소개 자리에 흰 글씨 인사말 */
+.artist-page .title-copy::before{
+  background: radial-gradient(ellipse closest-side at center,
+    rgba(16,22,44,.32) 0%, rgba(16,22,44,.2) 45%, rgba(16,22,44,0) 100%);
+}
+.artist-page .title-copy .work-hello{
+  margin-top:6px; gap:12px; color:#fff; text-align:center;
+  text-shadow: 0 1px 12px rgba(16,22,44,.55);
+  word-break: keep-all;
+}
+.artist-page .title-copy .work-hello p{ margin:0; font-size:.92rem; line-height:1.75; color:#fff }
+.artist-page .title-copy .work-notice{ background:none; border:0; padding:0 }
+.artist-page .title-copy .work-notice strong{ display:block; margin:0 0 2px; color:#fff; font-weight:600 }
+.artist-page .title-copy .work-notice em{ color:#fff }
 .subtitle{
   margin:0;
   color: #332519;
@@ -1311,6 +1325,15 @@ try{
     var workSec = document.getElementById('workSection');
     if(workSec) workSec.hidden = false;
     document.documentElement.classList.add('artist-page');
+
+    // 작가 인사말은 그림 카드가 아니라 맨 위 소개 문구 자리에 둔다
+    var hello = document.querySelector('#workSection .work-hello');
+    var titleCopy = document.querySelector('.hero .title-copy');
+    var subtitle = titleCopy && titleCopy.querySelector('.subtitle');
+    if(hello && titleCopy){
+      if(subtitle) subtitle.hidden = true;
+      titleCopy.appendChild(hello);
+    }
 
     // 포스터에 작가 그림을 살짝 겹쳐 붙인다
     var ARTIST_COVER = { '이재이': '/works/jessie/01.jpg' };
