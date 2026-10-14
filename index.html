@@ -470,6 +470,7 @@ dd .sub{
   line-height:1.65;
   letter-spacing:-.015em;
   text-wrap: balance;
+  white-space: pre-line;   /* 온점·반점 뒤에서 JS가 넣은 줄바꿈을 그대로 보여 준다 */
   /* 질문마다 길이가 달라 아래 카드가 들썩이지 않도록 높이를 고정한다.
      실제 값은 가장 긴 질문을 재어 JS가 --quest-h 로 넣는다 */
   height: var(--quest-h, 6.6em);
@@ -1614,6 +1615,9 @@ try{
 
     var textEl = document.getElementById('questText');
     var byEl   = document.getElementById('questBy');
+
+    // 온점·반점 다음에 띄어쓰기가 오면 그 자리에서 줄을 내린다 (1+1+1=1 같은 건 건드리지 않는다)
+    function breakLines(q){ return q.replace(/([.,])\s+/g, '$1\n'); }
     var btn    = document.getElementById('questNext');
     if(!textEl || !btn) return;
 
@@ -1636,7 +1640,7 @@ try{
 
       var max = 0;
       for(var i = 0; i < QUESTIONS.length; i++){
-        textEl.textContent = QUESTIONS[i].q;
+        textEl.textContent = breakLines(QUESTIONS[i].q);
         if(textEl.scrollHeight > max) max = textEl.scrollHeight;
       }
 
@@ -1647,7 +1651,7 @@ try{
 
     function render(){
       var item = QUESTIONS[order[cursor]];
-      textEl.textContent = item.q;
+      textEl.textContent = breakLines(item.q);
       // 출처가 없어도 자리는 비워 둔다. 지우면 그만큼 카드가 줄어든다
       if(byEl) byEl.textContent = item.by || '';
     }
