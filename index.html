@@ -409,6 +409,42 @@ dd .sub{
 }
 .artists li.spotlight.picked{ color: inherit }
 
+/* ── 작가 전용 페이지의 작품 ─────────────── */
+.work-main{ margin:22px 0 0; display:grid; gap:16px; justify-items:center }
+.work-zoom{
+  display:block; padding:0; border:0; background:none; cursor:zoom-in;
+  border-radius:4px; overflow:hidden;
+}
+.work-main .work-zoom{
+  width:min(100%, 420px);
+  border:10px solid #fff;
+  box-shadow: 0 18px 40px var(--card-shadow);
+  rotate:-1deg;
+}
+.work-zoom img{ display:block; width:100%; height:auto }
+.work-main figcaption{ display:grid; gap:6px; text-align:center }
+.work-title{ font-family:"Hahmlet", serif; font-weight:500; font-size:1.15rem; letter-spacing:-.01em }
+.work-q{ font-family:"Hahmlet", serif; font-weight:300; font-size:.95rem; color: var(--ink-soft) }
+.work-label{
+  margin:30px 0 10px; font-size:.72rem; letter-spacing:.18em; color: var(--ink-soft);
+}
+.work-strip{
+  display:flex; gap:10px; overflow-x:auto; scroll-snap-type:x mandatory;
+  padding-bottom:8px; margin-inline:-4px; padding-inline:4px;
+}
+.work-strip .work-zoom{ flex:0 0 42%; max-width:180px; scroll-snap-align:start }
+.work-strip .work-zoom:focus-visible, .work-main .work-zoom:focus-visible{ outline:2px solid var(--spark); outline-offset:2px }
+.work-viewer{
+  position:fixed; inset:0; z-index:50; display:flex; align-items:center; justify-content:center;
+  background: rgba(20,16,12,.88); padding:16px; cursor:zoom-out;
+}
+.work-viewer[hidden]{ display:none }
+.work-viewer img{ max-width:100%; max-height:100%; object-fit:contain; box-shadow:0 20px 60px rgba(0,0,0,.5) }
+.work-close{
+  position:absolute; top:14px; right:14px; width:40px; height:40px; border-radius:50%;
+  border:0; background: rgba(255,255,255,.9); font-size:1rem; cursor:pointer;
+}
+
 /* 초대 문구 */
 .invite-line{
   margin:0 0 10px;
@@ -813,6 +849,38 @@ try{
     </div>
   </header>
 
+  <section class="card reveal work" id="workSection" hidden>
+    <div class="section-head">
+      <h2>이재이의 그림</h2>
+      <span class="en">THE WORK</span>
+    </div>
+
+    <figure class="work-main">
+      <button class="work-zoom" type="button" data-src="/works/jessie/01.jpg" aria-label="그림 크게 보기">
+        <img src="/works/jessie/01.jpg" alt="체스판 위 분홍 나이트 말 곁에 선 소녀, 잠든 흰 토끼와 녹아내린 시계, 하늘로 피어오른 양귀비들" loading="lazy">
+      </button>
+      <figcaption>
+        <span class="work-title">〈어디에 둘까요?〉</span>
+        <span class="work-q">당신의 다음 수는 어디에 두고 싶나요?</span>
+      </figcaption>
+    </figure>
+
+    <p class="work-label">가까이 보기</p>
+    <div class="work-strip" tabindex="0" aria-label="그림의 부분들. 옆으로 넘겨 보세요">
+      <button class="work-zoom" type="button" data-src="/works/jessie/02.jpg"><img src="/works/jessie/02.jpg" alt="흰 양귀비와 떨어지는 작은 사람들" loading="lazy"></button>
+      <button class="work-zoom" type="button" data-src="/works/jessie/03.jpg"><img src="/works/jessie/03.jpg" alt="하늘을 향한 붉은 양귀비와 꼬인 기둥" loading="lazy"></button>
+      <button class="work-zoom" type="button" data-src="/works/jessie/04.jpg"><img src="/works/jessie/04.jpg" alt="붉은 열매 덩굴과 분홍 꽃잎" loading="lazy"></button>
+      <button class="work-zoom" type="button" data-src="/works/jessie/06.jpg"><img src="/works/jessie/06.jpg" alt="나이트 말을 감싸 안은 소녀" loading="lazy"></button>
+      <button class="work-zoom" type="button" data-src="/works/jessie/05.jpg"><img src="/works/jessie/05.jpg" alt="옆으로 누운 시선으로 본 나이트 말과 소녀" loading="lazy"></button>
+      <button class="work-zoom" type="button" data-src="/works/jessie/07.jpg"><img src="/works/jessie/07.jpg" alt="벽에 기대 세운 캔버스 전체" loading="lazy"></button>
+    </div>
+  </section>
+
+  <div class="work-viewer" id="workViewer" hidden>
+    <img alt="">
+    <button class="work-close" type="button" aria-label="닫기">✕</button>
+  </div>
+
   <section class="card reveal">
     <div class="section-head">
       <h2>조금 이상한 질문</h2>
@@ -1047,6 +1115,41 @@ try{
   "use strict";
 
   var ANIM = document.documentElement.classList.contains('anim');
+
+  /* ── 작가 전용 주소 ──
+     /jessie 처럼 들어오면 그 작가의 페이지로 바뀐다 (작품 섹션이 열리고, 이름이 강조되고,
+     예약·한마디에 미리 골라진다). 링크 끝의 #이름이 있으면 그쪽이 먼저다 */
+  var PAGE_ARTISTS = { jessie: '이재이' };
+  var PAGE_ARTIST = PAGE_ARTISTS[location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase()] || '';
+  function sharedArtist(){
+    var raw = '';
+    try{ raw = decodeURIComponent((location.hash || '').slice(1)).trim(); }
+    catch(e){ raw = (location.hash || '').slice(1).trim(); }
+    return raw || PAGE_ARTIST;
+  }
+  if(PAGE_ARTIST){
+    document.title = PAGE_ARTIST + ' · 조금 이상한 우리들';
+    var workSec = document.getElementById('workSection');
+    if(workSec) workSec.hidden = false;
+  }
+
+  // 작품 사진을 누르면 화면 가득 크게 본다
+  (function(){
+    var viewer = document.getElementById('workViewer');
+    if(!viewer) return;
+    var img = viewer.querySelector('img');
+    function close(){ viewer.hidden = true; img.removeAttribute('src'); document.body.style.overflow = ''; }
+    Array.prototype.forEach.call(document.querySelectorAll('.work-zoom'), function(b){
+      b.addEventListener('click', function(){
+        img.src = b.getAttribute('data-src');
+        img.alt = (b.querySelector('img') || {}).alt || '';
+        viewer.hidden = false;
+        document.body.style.overflow = 'hidden';
+      });
+    });
+    viewer.addEventListener('click', close);
+    document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && !viewer.hidden) close(); });
+  })();
 
   /* 배경 그라데이션이 풀리기 시작하는 지점을 히어로 높이에 맞춘다 */
   function syncHeroHeight(){
@@ -1320,8 +1423,7 @@ try{
 
     // 링크 끝에 작가 이름(#이재이)이 있으면 받는 사람으로 미리 골라 둔다
     function pickFromHash(){
-      var raw = '';
-      try{ raw = decodeURIComponent((location.hash || '').slice(1)).trim(); }catch(e){}
+      var raw = sharedArtist();
       for(var i = 0; i < items.length; i++){
         if(raw && items[i].textContent.trim() === raw){ pickArtist(raw, true); return; }
       }
@@ -1456,12 +1558,10 @@ try{
     });
 
     // 공유 링크(#이름)로 들어왔다면 그 작가를 미리 골라 둔다
-    try{
-      var hashName = decodeURIComponent(location.hash.slice(1));
-      for(var i = 0; i < artEl.options.length; i++){
-        if(hashName && artEl.options[i].value === hashName){ artEl.selectedIndex = i; break; }
-      }
-    }catch(e){}
+    var hashName = sharedArtist();
+    for(var i = 0; i < artEl.options.length; i++){
+      if(hashName && artEl.options[i].value === hashName){ artEl.selectedIndex = i; break; }
+    }
 
     var BLOCKED = /([\w.+-]+@[\w-]+\.[\w.]{2,}|01[016-9][-.\s]?\d{3,4}[-.\s]?\d{4}|\d{9,}|https?:\/\/|www\.)/i;
 
@@ -1547,9 +1647,7 @@ try{
     var visit = document.getElementById('visitArtist');
 
     function apply(){
-      var raw = '';
-      try{ raw = decodeURIComponent((window.location.hash || '').slice(1)).trim(); }
-      catch(e){ raw = (window.location.hash || '').slice(1).trim(); }
+      var raw = sharedArtist();
 
       var hit = null;
       for(var i = 0; i < items.length; i++){
