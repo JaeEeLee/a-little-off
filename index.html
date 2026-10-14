@@ -392,11 +392,21 @@ dd .sub{
 .artists li:nth-child(6n+5){ --fs:1.12rem; --dx:-10px }
 .artists li:nth-child(7n+4){ --j:center; --dy:-12px; --r:3deg }
 
-/* 공유 링크로 들어왔을 때 그 작가만 도드라진다 */
+/* 공유 링크(#이름)로 들어왔을 때 그 작가만 크게 도드라진다.
+   흩어진 이름들 사이에서 두 칸을 차지하고, 기울기·쏠림은 거둬 가운데 선다 */
 .artists li.spotlight{
+  --fs: 1.85rem;
+  --r: -3deg;
+  --dx: 0;
+  --dy: 0;
+  --j: center;
+  grid-column: span 2;
   font-weight:700;
   color: var(--spark);
   position:relative;
+  z-index:1;
+  text-shadow: 0 0 18px rgba(var(--surface-rgb), .9);
+  transition: color .3s ease, font-size .35s cubic-bezier(.22,.61,.36,1);
 }
 .artists li.spotlight::after{
   content:"";
@@ -1528,25 +1538,33 @@ try{
 
   /* ── 작가별 공유 링크 (#이름) ── */
   (function(){
-    var raw = '';
-    try{ raw = decodeURIComponent((window.location.hash || '').slice(1)).trim(); }
-    catch(e){ raw = (window.location.hash || '').slice(1).trim(); }
-    if(!raw) return;
-
     var items = document.querySelectorAll('.artists li');
-    var hit = null;
-    for(var i = 0; i < items.length; i++){
-      if(items[i].textContent.trim() === raw){ hit = items[i]; break; }
-    }
-    if(!hit) return;
+    var line  = document.getElementById('inviteLine');
+    var visit = document.getElementById('visitArtist');
 
-    hit.classList.add('spotlight');
+    function apply(){
+      var raw = '';
+      try{ raw = decodeURIComponent((window.location.hash || '').slice(1)).trim(); }
+      catch(e){ raw = (window.location.hash || '').slice(1).trim(); }
 
-    var line = document.getElementById('inviteLine');
-    if(line){
-      line.textContent = raw + ' 작가가 초대합니다';
-      line.hidden = false;
+      var hit = null;
+      for(var i = 0; i < items.length; i++){
+        items[i].classList.remove('spotlight');
+        if(raw && items[i].textContent.trim() === raw) hit = items[i];
+      }
+      if(!hit){ if(line) line.hidden = true; return; }
+
+      hit.classList.add('spotlight');
+      if(line){
+        line.textContent = raw + ' 작가가 초대합니다';
+        line.hidden = false;
+      }
+      if(visit) visit.value = raw;   // 관람 예약의 '초대한 작가'도 미리 골라 둔다
     }
+
+    apply();
+    // 이미 열린 페이지에서 주소 끝의 #이름만 바꿔도 바로 반영한다
+    window.addEventListener('hashchange', apply);
   })();
 
   /* ── 조금 이상한 질문 ── */
