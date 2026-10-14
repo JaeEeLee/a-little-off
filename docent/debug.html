@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light only">
+<meta name="robots" content="noindex, nofollow">
+<title>도슨트 점검</title>
+<style>
+:root{ --ink:#332519; --soft:#6E6254; --line:#E2DFD8; --accent:#1E56B8; --ok:#1F7A4D; --bad:#B3361B; --warn:#9A6A00 }
+*{ box-sizing:border-box }
+body{ margin:0; background:#FAFAFA; color:var(--ink); font:14px/1.6 -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif }
+.wrap{ max-width:720px; margin:0 auto; padding:28px 16px 60px }
+h1{ margin:0 0 4px; font-size:1.3rem } .sub{ margin:0 0 22px; color:var(--soft); font-size:.82rem }
+section{ background:#fff; border:1px solid var(--line); border-radius:10px; padding:16px; margin-bottom:14px }
+h2{ margin:0 0 10px; font-size:.95rem }
+dl{ display:grid; grid-template-columns: 130px 1fr; gap:6px 12px; margin:0 } dt{ color:var(--soft) } dd{ margin:0; word-break:break-all }
+.badge{ display:inline-block; padding:2px 8px; border-radius:999px; font-size:.78rem; font-weight:600 }
+.ok{ background:#E6F4EC; color:var(--ok) } .bad{ background:#FBE9E5; color:var(--bad) } .warn{ background:#FFF4D6; color:var(--warn) }
+.row{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:10px }
+input{ font:inherit; padding:8px 10px; border:1px solid var(--line); border-radius:8px; min-width:0 }
+button, .btn{ font:inherit; padding:8px 12px; border:1px solid var(--line); border-radius:8px; background:#fff; cursor:pointer; color:var(--ink); text-decoration:none }
+button.primary{ background:var(--accent); border-color:var(--accent); color:#fff }
+table{ width:100%; border-collapse:collapse; font-size:.82rem }
+th, td{ text-align:left; padding:6px 4px; border-bottom:1px solid var(--line); vertical-align:top }
+th{ color:var(--soft); font-weight:500 }
+td.num{ font-variant-numeric:tabular-nums; white-space:nowrap }
+pre{ margin:10px 0 0; padding:10px; background:#F4F2EE; border-radius:8px; overflow:auto; font-size:.75rem; max-height:260px }
+.note{ margin:8px 0 0; color:var(--soft); font-size:.78rem }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>도슨트 점검</h1>
+  <p class="sub">잠금 상태 · 입장권 · 운영 시간 · 음성 파일을 확인합니다. 열쇠와 비밀값은 이 페이지에 나오지 않습니다.</p>
+
+  <section>
+    <h2>1. 지금 상태 <button type="button" id="refresh" style="float:right;padding:4px 10px;font-size:.78rem">새로고침</button></h2>
+    <dl id="statusList"><dt>불러오는 중…</dt><dd></dd></dl>
+    <pre id="raw" hidden></pre>
+    <div class="row"><button type="button" id="toggleRaw">원본 JSON 보기</button></div>
+  </section>
+
+  <section>
+    <h2>2. 입장 시험</h2>
+    <div class="row">
+      <input id="key" type="text" placeholder="QR 열쇠 (DOCENT_KEY)" autocomplete="off" style="flex:1 1 180px">
+      <select id="who"><option value="">처음부터</option></select>
+      <button type="button" class="primary" id="enter">QR로 들어가기</button>
+    </div>
+    <div class="row">
+      <button type="button" id="logout">이 휴대폰 입장권 지우기</button>
+      <a class="btn" href="/docent/" id="open">도슨트 열기</a>
+    </div>
+    <p class="note">QR로 들어가기 = 전시장 QR을 찍은 것과 같습니다. 성공하면 3시간짜리 입장권이 생기고 도슨트로 넘어갑니다.</p>
+  </section>
+
+  <section>
+    <h2>3. 운영 시간 시험</h2>
+    <div class="row">
+      <input id="at" type="datetime-local" value="2026-11-14T15:00">
+      <button type="button" id="checkAt">이 시각에 열리나?</button>
+      <span id="atResult"></span>
+    </div>
+    <p class="note">한국 시간 기준입니다. 실제 잠금에는 영향을 주지 않고 판단 결과만 보여 줍니다.</p>
+  </section>
+
+  <section>
+    <h2>4. 음성 파일 <button type="button" id="checkFiles" style="float:right;padding:4px 10px;font-size:.78rem">다시 확인</button></h2>
+    <p class="note" id="fileNote">입장권이 있어야 음성 파일을 확인할 수 있습니다.</p>
+    <table>
+      <thead><tr><th>#</th><th>이름</th><th>파일</th><th>상태</th><th>길이</th></tr></thead>
+      <tbody id="files"></tbody>
+    </table>
+  </section>
+</div>
+
+<script src="/docent/tracks.js"></script>
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var last = null;
+
+  function badge(text, kind){ return '<span class="badge ' + kind + '">' + text + '</span>'; }
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]; }); }
+
+  function loadStatus(extra){
+    return fetch('/docent/__status' + (extra || ''), { cache: 'no-store', credentials: 'same-origin' })
+      .then(function(r){ return r.json(); })
+      .then(function(s){
+        last = s;
+        var gateKind = /^open/.test(s.gate) ? 'ok' : /^need_qr/.test(s.gate) ? 'warn' : 'bad';
+        var p = s.pass;
+        var rows = [
+          ['한국 시간', esc(s.nowKst)],
+          ['/docent 결과', badge(esc(s.gate), gateKind)],
+          ['DOCENT_KEY', badge(esc(s.settings.DOCENT_KEY), s.settings.DOCENT_KEY === '설정됨' ? 'ok' : 'bad')],
+          ['DOCENT_SECRET', badge(esc(s.settings.DOCENT_SECRET), s.settings.DOCENT_SECRET === '설정됨' ? 'ok' : 'bad')],
+          ['리허설 모드', badge(esc(s.settings.DOCENT_ALWAYS_OPEN), /^true/.test(s.settings.DOCENT_ALWAYS_OPEN) ? 'warn' : 'ok')],
+          ['지금 운영 시간', s.hours.openNow ? badge('운영 중', 'ok') : badge('운영 시간 아님', 'warn') + (s.hours.today ? ' 오늘 ' + s.hours.today.join('–') : ' 오늘은 전시일 아님')],
+          ['입장권', badge(p.valid ? '유효' : (p.present ? '무효' : '없음'), p.valid ? 'ok' : 'warn') + ' ' + esc(p.reason) +
+            (p.valid ? '<br>' + esc(p.expiresKst) + '까지 · ' + p.remainingMin + '분 남음' : '')]
+        ];
+        $('statusList').innerHTML = rows.map(function(r){ return '<dt>' + r[0] + '</dt><dd>' + r[1] + '</dd>'; }).join('');
+        $('raw').textContent = JSON.stringify(s, null, 2);
+        $('fileNote').textContent = p.valid
+          ? '입장권이 있어서 실제 파일을 확인했습니다.'
+          : '입장권이 없어 파일 요청이 잠금에 막힙니다. 위 2번에서 QR로 들어간 뒤 다시 확인하세요.';
+        return s;
+      })
+      .catch(function(e){
+        $('statusList').innerHTML = '<dt>오류</dt><dd>' + badge('상태를 불러오지 못함', 'bad') + ' ' + esc(e.message) + '</dd>';
+      });
+  }
+
+  // ── 음성 파일 확인: 실제로 받아서 오디오인지, 길이가 얼마인지 본다
+  var queue = [];
+  CHAPTERS.forEach(function(ch){ ch.tracks.forEach(function(t){
+    queue.push({ label: t.label || t.name, name: t.name, file: (t.file || t.name) + '.mp3', no: t.no });
+  }); });
+  queue.forEach(function(t){ if(t.name) $('who').appendChild(new Option(t.label, t.name)); });
+
+  function checkFiles(){
+    $('files').innerHTML = queue.map(function(t, i){
+      return '<tr><td class="num">' + (t.no ? ('0' + t.no).slice(-2) : '·') + '</td><td>' + esc(t.label) + '</td><td>' + esc(t.file) +
+             '</td><td id="st' + i + '">확인 중…</td><td class="num" id="du' + i + '"></td></tr>';
+    }).join('');
+    var ok = 0;
+    queue.forEach(function(t, i){
+      var url = AUDIO_DIR + encodeURIComponent(t.file.replace(/\.mp3$/, '')) + '.mp3';
+      fetch(url, { method: 'HEAD', cache: 'no-store', credentials: 'same-origin' }).then(function(r){
+        var type = r.headers.get('Content-Type') || '';
+        var st = $('st' + i);
+        if(r.status === 403 || r.status === 503){ st.innerHTML = badge('잠김 ' + r.status, 'warn'); return; }
+        if(!/^audio\//.test(type) && !/mpeg|mp4/.test(type)){ st.innerHTML = badge('파일 없음', 'bad'); return; }
+        st.innerHTML = badge('있음', 'ok') + ' <span style="color:var(--soft)">' + esc(type) + '</span>';
+        ok++;
+        var a = new Audio();
+        a.preload = 'metadata';
+        a.onloadedmetadata = function(){ var s = Math.round(a.duration); $('du' + i).textContent = Math.floor(s / 60) + ':' + ('0' + s % 60).slice(-2); };
+        a.onerror = function(){ $('du' + i).innerHTML = badge('재생 불가', 'bad'); };
+        a.src = url;
+      }).catch(function(){ $('st' + i).innerHTML = badge('요청 실패', 'bad'); });
+    });
+  }
+
+  $('refresh').addEventListener('click', function(){ loadStatus(); });
+  $('toggleRaw').addEventListener('click', function(){ $('raw').hidden = !$('raw').hidden; });
+  $('checkFiles').addEventListener('click', checkFiles);
+
+  $('enter').addEventListener('click', function(){
+    var k = $('key').value.trim();
+    if(!k){ $('key').focus(); return; }
+    var who = $('who').value;
+    location.href = '/docent/?k=' + encodeURIComponent(k) + (who ? '#' + encodeURIComponent(who) : '');
+  });
+  $('who').addEventListener('change', function(){
+    $('open').href = '/docent/' + ($('who').value ? '#' + encodeURIComponent($('who').value) : '');
+  });
+  $('logout').addEventListener('click', function(){ loadStatus('?logout=1').then(function(){ loadStatus(); checkFiles(); }); });
+
+  $('checkAt').addEventListener('click', function(){
+    var v = $('at').value;
+    fetch('/docent/__status?at=' + encodeURIComponent(v), { cache: 'no-store' }).then(function(r){ return r.json(); }).then(function(s){
+      var c = s.checkAt || {};
+      $('atResult').innerHTML = c.error ? badge(c.error, 'bad') : (c.at + ' → ' + (c.open ? badge('열림', 'ok') : badge('닫힘', 'warn')));
+    });
+  });
+
+  loadStatus().then(checkFiles);
+})();
+</script>
+</body>
+</html>

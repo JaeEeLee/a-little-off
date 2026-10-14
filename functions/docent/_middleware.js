@@ -9,6 +9,12 @@
  *  - DOCENT_SECRET  입장권 서명용 비밀값. 밖으로 알려지지 않게 둔다
  *  - DOCENT_ALWAYS_OPEN  "true"면 운영 시간과 상관없이 연다 (전시 전 리허설용, 전시 때는 지운다)
  * 두 값이 없으면 아무도 들어오지 못한다.
+ *
+ * 점검용 (잠금 없이 열린다. 열쇠·비밀값은 절대 보여 주지 않는다)
+ *  - /docent/debug        점검 페이지
+ *  - /docent/__status     지금 상태를 JSON으로. ?at=2026-11-14T15:00 이면 그 시각의 운영 여부도 알려 준다
+ *                         ?logout=1 이면 이 휴대폰의 입장권을 지운다
+ *  - /docent/tracks.js    도슨트 순서표 (작가·작품 이름뿐이라 공개돼도 괜찮다)
  */
 
 const COOKIE = 'docent_pass';
@@ -27,6 +33,15 @@ const HOURS = {
 export async function onRequest(context) {
   const { request, env } = context;
   const url = new URL(request.url);
+
+  if (url.pathname === '/docent/__status') return status(request, env, url);
+  if (/^\/docent\/(debug(\.html)?|tracks\.js)$/.test(url.pathname)) {
+    const res = await context.next();
+    const out = new Response(res.body, res);
+    out.headers.set('Cache-Control', 'no-store');
+    out.headers.set('X-Robots-Tag', 'noindex, nofollow');
+    return out;
+  }
 
   if (!env.DOCENT_KEY || !env.DOCENT_SECRET) return notice('closed', 503);
   if (env.DOCENT_ALWAYS_OPEN !== 'true' && !isOpen(new Date())) return notice('hours', 403);
@@ -51,18 +66,71 @@ export async function onRequest(context) {
   }
 
   // 입장권 확인
-  const pass = readCookie(request.headers.get('Cookie') || '', COOKIE);
-  if (pass) {
-    const [exp, sig] = pass.split('.');
-    if (Number(exp) > now && sig && sameText(sig, await sign(exp, env.DOCENT_SECRET))) {
-      const res = await context.next();
-      const out = new Response(res.body, res);
-      out.headers.set('Cache-Control', 'private, no-store');
-      out.headers.set('X-Robots-Tag', 'noindex, nofollow');
-      return out;
-    }
+  if ((await checkPass(request, env, now)).valid) {
+    const res = await context.next();
+    const out = new Response(res.body, res);
+    out.headers.set('Cache-Control', 'private, no-store');
+    out.headers.set('X-Robots-Tag', 'noindex, nofollow');
+    return out;
   }
   return notice('qr', 403);
+}
+
+/* ── 입장권 · 점검 ───────────────────────── */
+
+async function checkPass(request, env, now) {
+  const pass = readCookie(request.headers.get('Cookie') || '', COOKIE);
+  if (!pass) return { present: false, valid: false, reason: '입장권 없음 (QR로 들어온 적이 없거나 3시간이 지남)' };
+  const [exp, sig] = pass.split('.');
+  if (!env.DOCENT_SECRET) return { present: true, valid: false, reason: 'DOCENT_SECRET 설정 없음' };
+  if (!sig || !sameText(sig, await sign(exp, env.DOCENT_SECRET))) {
+    return { present: true, valid: false, reason: '서명이 맞지 않음 (DOCENT_SECRET이 바뀌었거나 위조됨)' };
+  }
+  const left = Number(exp) - now;
+  if (left <= 0) return { present: true, valid: false, reason: '유효 시간이 지남' };
+  return { present: true, valid: true, reason: '유효', expiresKst: kstText(new Date(Number(exp) * 1000)), remainingMin: Math.floor(left / 60) };
+}
+
+async function status(request, env, url) {
+  const nowDate = new Date();
+  const now = Math.floor(nowDate.getTime() / 1000);
+  const keySet = !!env.DOCENT_KEY, secretSet = !!env.DOCENT_SECRET;
+  const alwaysOpen = env.DOCENT_ALWAYS_OPEN === 'true';
+  const openNow = isOpen(nowDate);
+  const pass = await checkPass(request, env, now);
+
+  // 지금 /docent 를 열면 무엇이 보일지
+  let gate;
+  if (!keySet || !secretSet) gate = 'closed: 설정값이 없어 "도슨트 준비 중"';
+  else if (!alwaysOpen && !openNow) gate = 'hours: 운영 시간이 아니라 막힘';
+  else if (pass.valid) gate = 'open: 도슨트를 들을 수 있음';
+  else gate = 'need_qr: 전시장 QR로 들어와야 함';
+
+  const body = {
+    nowKst: kstText(nowDate),
+    gate,
+    settings: { DOCENT_KEY: keySet ? '설정됨' : '없음', DOCENT_SECRET: secretSet ? '설정됨' : '없음', DOCENT_ALWAYS_OPEN: alwaysOpen ? 'true (리허설: 운영 시간 무시)' : '꺼짐' },
+    hours: { openNow, today: HOURS[kstText(nowDate).slice(0, 10)] || null, all: HOURS },
+    pass,
+    passSeconds: PASS_SECONDS
+  };
+
+  const at = url.searchParams.get('at');
+  if (at) {
+    const d = new Date(at.length <= 16 ? at + ':00+09:00' : at);
+    body.checkAt = isNaN(d) ? { at, error: '날짜 형식: 2026-11-14T15:00' } : { at: kstText(d), open: isOpen(d) };
+  }
+
+  const headers = { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex' };
+  if (url.searchParams.get('logout') === '1') {
+    headers['Set-Cookie'] = `${COOKIE}=; Path=/docent; Max-Age=0; HttpOnly; Secure; SameSite=Lax`;
+    body.loggedOut = true;
+  }
+  return new Response(JSON.stringify(body, null, 2), { status: 200, headers });
+}
+
+function kstText(date) {
+  return new Date(date.getTime() + 9 * 60 * 60 * 1000).toISOString().slice(0, 16).replace('T', ' ');
 }
 
 /* ── 도우미 ─────────────────────────────── */
