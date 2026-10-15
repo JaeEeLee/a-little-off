@@ -1,0 +1,11 @@
+# 사진·아이콘·포스터는 하루 동안 휴대폰에 저장해 두고 쓴다 (그 뒤 일주일까지는 저장본을 먼저 보여 주고 뒤에서 새로 확인)
+/works/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+/poster-hero.jpg
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+/og-image.jpg
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+/favicon-*.png
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+/apple-touch-icon.png
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
