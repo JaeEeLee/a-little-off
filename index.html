@@ -2111,7 +2111,24 @@ try{
     var total = 0;
     var PAGE = 12;          // 처음에 보여 줄 장수, '더 보기'를 누를 때마다 이만큼 더
     var shown = PAGE;
-    var CLAMP = 20;         // 이 글자 수를 넘는 쪽지는 접어 두고, 누르면 펼친다
+    /* 이 글자 수를 넘는 쪽지는 접어 두고, 누르면 펼친다.
+       고정값이 아니라 쪽지를 불러올 때마다 다시 정한다:
+       가장 긴 쪽지 하나를 뺀 나머지의 평균 글자 수 + CLAMP_EXTRA.
+       쪽지가 2개 미만이면 CLAMP_DEFAULT 를 쓴다 */
+    var CLAMP_DEFAULT = 20;
+    var CLAMP_EXTRA = 8;
+    var CLAMP = CLAMP_DEFAULT;
+    function setClamp(notes){
+      var lens = notes.map(function(n){ return Array.from((n.message || '').trim()).length; });
+      if(lens.length < 2){ CLAMP = CLAMP_DEFAULT; return; }
+      lens.sort(function(a, b){ return a - b; });
+      lens.pop();                                   // 가장 긴 쪽지 하나는 평균에서 뺀다
+      var sum = 0;
+      for(var i = 0; i < lens.length; i++) sum += lens[i];
+      var avg = Math.round(sum / lens.length);
+      CLAMP = avg + CLAMP_EXTRA;
+      try { console.log('쪽지 평균 ' + avg + '자 (가장 긴 쪽지 제외, ' + lens.length + '개) → ' + CLAMP + '자 넘으면 접음'); } catch(e){}
+    }
     var HEART_SENDERS = { '다진고기': true };   // 보낸 사람 이름이 이와 같으면 하트 쪽지 (접지 않음)
     var moreRow = document.getElementById('boardMoreRow');
     var moreBtn = document.getElementById('boardMore');
@@ -2235,6 +2252,7 @@ try{
       .then(function(r){
         board.innerHTML = '';
         var notes = (r && r.ok && r.notes) || [];
+        setClamp(notes);
         notes.forEach(function(n){ board.appendChild(note(n)); });
         total = notes.length;
         setCount();
