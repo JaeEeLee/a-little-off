@@ -45,6 +45,12 @@
 
 *{ box-sizing: border-box }
 
+/* 휴대폰에서 페이지가 흔들리지 않게
+   - 화면 밖으로 퍼지는 장식(소개 글 뒤 베일 등) 때문에 페이지가 옆으로 몇 px 밀리던 것을 잘라 낸다
+   - 맨 위·맨 아래에서 더 당길 때 출렁이는 고무줄 효과를 끈다 */
+html, body{ overflow-x: clip; overscroll-behavior-y: none }
+@supports not (overflow: clip){ body{ overflow-x: hidden } }
+
 body{
   position:relative;
   margin:0;
@@ -560,11 +566,28 @@ dd .sub{
 .work-label{
   margin:30px 0 10px; font-size:.72rem; letter-spacing:.18em; color: var(--ink-soft);
 }
+/* 가까이 보기: 스크롤바 대신 점 표시, 한 번 밀면 한 장씩, 다음 사진이 살짝 보이게 */
 .work-strip{
-  display:flex; gap:10px; overflow-x:auto; scroll-snap-type:x mandatory;
-  padding-bottom:8px; margin-inline:-4px; padding-inline:4px;
+  display:flex; gap:10px; overflow-x:auto;
+  scroll-snap-type:x mandatory;
+  overscroll-behavior-x: contain;          /* 끝까지 밀어도 페이지가 밀리거나 뒤로 가기가 되지 않게 */
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;                   /* 스크롤바 숨김 (Firefox) */
+  margin-inline:-4px; padding: 2px 4px 4px;
+  scroll-padding-inline: 4px;
 }
-.work-strip .work-zoom{ flex:0 0 42%; max-width:180px; scroll-snap-align:start }
+.work-strip::-webkit-scrollbar{ display:none }   /* 스크롤바 숨김 (Chrome·Safari) */
+.work-strip .work-zoom{
+  flex:0 0 64%; max-width:240px;
+  scroll-snap-align:start;
+  scroll-snap-stop: always;                /* 세게 튕겨도 한 장씩 멈춘다 */
+}
+.work-dots{ display:flex; justify-content:center; gap:6px; margin-top:12px }
+.work-dots span{
+  width:6px; height:6px; border-radius:50%;
+  background: var(--line); transition: background .2s ease, width .2s ease;
+}
+.work-dots span.on{ width:16px; border-radius:3px; background: var(--ink-soft) }
 .work-strip .work-zoom:focus-visible, .work-main .work-zoom:focus-visible{ outline:2px solid var(--spark); outline-offset:2px }
 .work-viewer{
   position:fixed; inset:0; z-index:50; display:flex; align-items:center; justify-content:center;
@@ -1482,6 +1505,30 @@ try{
       });
     });
     viewer.addEventListener('click', close);
+
+    // 가까이 보기 점 표시: 지금 보이는 사진 위치를 따라간다
+    var strip = document.querySelector('.work-strip');
+    if(strip){
+      var cards = strip.querySelectorAll('.work-zoom');
+      var dots = document.createElement('div');
+      dots.className = 'work-dots';
+      dots.setAttribute('aria-hidden', 'true');
+      for(var d = 0; d < cards.length; d++) dots.appendChild(document.createElement('span'));
+      strip.parentNode.insertBefore(dots, strip.nextSibling);
+      var mark = function(){
+        var step = cards.length > 1 ? cards[1].offsetLeft - cards[0].offsetLeft : 1;
+        var maxScroll = strip.scrollWidth - strip.clientWidth;
+        var i = strip.scrollLeft >= maxScroll - 2 ? cards.length - 1 : Math.round(strip.scrollLeft / step);
+        Array.prototype.forEach.call(dots.children, function(el, k){ el.classList.toggle('on', k === i); });
+      };
+      var ticking = false;
+      strip.addEventListener('scroll', function(){
+        if(ticking) return;
+        ticking = true;
+        setTimeout(function(){ ticking = false; mark(); }, 60);
+      }, { passive: true });
+      mark();
+    }
     document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && !viewer.hidden) close(); });
   })();
 
