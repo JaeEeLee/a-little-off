@@ -650,6 +650,12 @@ dd .sub{
 .board-loading{ align-self:center; font-size:.85rem; color: var(--ink-soft) }
 
 /* 전시가 끝난 뒤 열리는 작가 도슨트 */
+.work-docent-note{
+  margin:18px 0 0; padding:10px 12px; border-radius: var(--radius);
+  background: rgba(30,86,184,.05); font-size:.8rem; line-height:1.65; color: var(--ink-soft);
+  text-align:center; word-break: keep-all;
+}
+.work-docent-note strong{ color: var(--ink); font-weight:600 }
 .after-lead{ margin:16px 0 0; font-size:.86rem; color: var(--ink-soft) }
 .after-body{ margin-top:16px; display:grid; gap:12px }
 .after-body p{ margin:0; font-family:"Hahmlet", serif; font-weight:300; font-size:1rem; line-height:1.9; word-break: keep-all }
@@ -1105,6 +1111,8 @@ try{
       </figcaption>
     </figure>
 
+    <p class="work-docent-note" id="docentSoon">이 작품의 <strong>도슨트</strong>는 전시가 끝난 뒤(11월 17일 20:00 이후) 이 페이지에서 글로 공개돼요. 그 전에는 전시장 QR로 들을 수 있어요.</p>
+
     <p class="work-label">가까이 보기</p>
     <div class="work-strip" tabindex="0" aria-label="그림의 부분들. 옆으로 넘겨 보세요">
       <button class="work-zoom" type="button" data-src="/works/jessie/02.jpg"><img src="/works/jessie/02.jpg" alt="흰 양귀비와 떨어지는 작은 사람들" loading="lazy"></button>
@@ -1449,6 +1457,8 @@ try{
           body.appendChild(p);
         });
         sec.hidden = false;
+        var soon = document.getElementById('docentSoon');
+        if(soon) soon.hidden = true;     // 공개된 뒤에는 '곧 공개' 안내를 치운다
       })
       .catch(function(){});
 
