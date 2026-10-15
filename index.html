@@ -262,12 +262,18 @@ h1 em{
   mask-image: radial-gradient(ellipse closest-side at center, #000 30%, transparent 100%);
 }
 /* 작가 전용 페이지: 맨 위 여백을 줄이고, 디데이는 카드 대신 초대 문구와 포스터 사이에 글자로 */
-.artist-page .hero{ padding-top: 30px }
+.artist-page .hero{ padding-top: 30px; padding-bottom: 0 }
+/* 인사말과 그림 카드 사이를 좁힌다 (원래 약 96px → 약 32px) */
+.artist-page .hero .title-block{ padding-bottom: 12px }
+.artist-page #workSection{ margin-top: 20px }
 .artist-page .hero .dday{ display:none }
 .dday-text{
   margin:0 0 18px; text-align:center;
   font-family:"Hahmlet", serif; font-weight:700; font-size:1.5rem; letter-spacing:-.01em;
-  color:#fff; text-shadow: 0 1px 12px rgba(16,22,44,.45);
+}
+.dday-text .dday-num{
+  font-size:1.5rem;
+  text-shadow: 0 0 12px rgba(255,255,255,.8), 0 0 3px rgba(255,255,255,.6);   /* 밝은 빛 번짐 */
 }
 /* 작가 전용 페이지: 맨 위 소개 자리에 흰 글씨 인사말 */
 .artist-page .title-copy::before{
@@ -1502,6 +1508,8 @@ try{
       el.textContent = prefix + Math.round(target * eased);
       if(p < 1) requestAnimationFrame(step);
     });
+    // 화면에 보이지 않는 탭에서는 애니메이션이 멈추므로, 시간이 지나면 최종 숫자를 확실히 넣는다
+    setTimeout(function(){ el.textContent = prefix + target; }, dur + 300);
   }
 
   function updateDday(){
