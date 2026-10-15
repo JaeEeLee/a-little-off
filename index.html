@@ -618,6 +618,7 @@ dd .sub{
 .sticky.is-new{ animation: stickIn .5s cubic-bezier(.22,.61,.36,1) both }
 @keyframes stickIn{ from{ opacity:0; scale:1.25 } to{ opacity:1; scale:1 } }
 @media (min-width: 560px){ .sticky{ width: calc(33.333% - 10px) } }
+.board-secret{ margin:0 0 4px; text-align:center; font-size:.7rem; color:#ECE8E1; user-select:text }   /* 거의 안 보이게. 드래그하면 보인다 */
 .board-tip{ margin:0 0 6px; font-size:.78rem; line-height:1.6; color: var(--ink-soft); text-align:center; text-wrap: balance; word-break: keep-all }
 .board-more{ display:flex; justify-content:center; margin-top:14px }
 .board-more .btn{ flex:0 0 auto }
@@ -700,18 +701,25 @@ dd .sub{
   display:flex;
   align-items:center;
   justify-content:center;
-  transition: opacity .4s ease;
 }
-.quest-text.fading{ opacity:0 }
+/* 질문이 바뀔 때: 살짝 위로 사라지고(.q-out) → 아래에서 떠오른다(.q-in 을 떼는 순간) */
+.quest-text, .quest-by{
+  transition: opacity .3s ease, transform .3s cubic-bezier(.22,.61,.36,1);
+  will-change: opacity, transform;
+}
+.quest-text.q-out, .quest-by.q-out{ opacity:0; transform: translateY(-8px); transition-duration:.2s }
+.quest-text.q-in,  .quest-by.q-in { opacity:0; transform: translateY(8px); transition:none }
 .quest-by{
   margin:0;
-  height: 1.6em;
+  /* 긴 출처가 두 줄이 되어도 버튼과 겹치지 않게, 가장 긴 출처 높이를 JS가 --quest-by-h 로 넣는다 */
+  min-height: var(--quest-by-h, 1.6em);
   font-size:.74rem;
+  line-height:1.6;
   letter-spacing:.02em;
   color: var(--ink-soft);
-  transition: opacity .4s ease;
+  text-wrap: balance;
+  word-break: keep-all;
 }
-.quest-by.fading{ opacity:0 }
 .quest .btn{ flex:0 0 auto; margin-top:8px }
 .quest-count{
   font-size:.68rem;
@@ -720,7 +728,7 @@ dd .sub{
   font-variant-numeric: tabular-nums;
 }
 @media (prefers-reduced-motion: reduce){
-  .quest-text{ transition:none }
+  .quest-text, .quest-by{ transition:none !important; transform:none !important }
 }
 
 /* ── 작가에게 한마디 ──────────────────────── */
@@ -1054,7 +1062,7 @@ try{
 
   <section class="card reveal work" id="workSection" hidden>
     <div class="section-head">
-      <h2>재이의 그림</h2>
+      <h2>이번 전시 작품</h2>
       <span class="en">THE WORK</span>
     </div>
 
@@ -1085,7 +1093,7 @@ try{
 
   <section class="card reveal" id="afterDocent" hidden>
     <div class="section-head">
-      <h2>재이의 도슨트</h2>
+      <h2>작품 도슨트</h2>
       <span class="en">DOCENT</span>
     </div>
     <p class="after-lead">전시장에서 흘러나오던 도슨트를 이제 여기서도 읽을 수 있어요.</p>
@@ -1094,7 +1102,7 @@ try{
 
   <section class="card reveal" id="boardSection" hidden>
     <div class="section-head">
-      <h2>재이에게 온 쪽지</h2>
+      <h2>남겨 주신 쪽지</h2>
       <span class="en">NOTES</span>
       <span class="count" id="boardCount"></span>
     </div>
@@ -1105,6 +1113,7 @@ try{
     </div>
     <div class="board-write" id="boardWriteSlot">
       <p class="board-tip">살짝 귀띔하자면, 칭찬 위주로 써 주면 저는 춤추면서 엄청 신나할 거예요 💃</p>
+      <p class="board-secret">(칭찬 받으면 정말 짜릿해요)</p>
     </div>
   </section>
 
@@ -1709,6 +1718,12 @@ try{
     function notePrivacy(name){
       var open = !!BOARD_ARTISTS[name];
       var label = artistLabel(name);
+      if(open && PAGE_ARTIST === name){
+        // 작가 전용 페이지에서는 자기 이름을 부르지 않는다
+        if(privacyEl) privacyEl.textContent = '남겨 주신 쪽지는 이 페이지 게시판에 붙어요.';
+        if(doneSubEl) doneSubEl.textContent = '게시판에 붙었어요. 고마워요!';
+        return;
+      }
       if(privacyEl) privacyEl.textContent = open
         ? label + ' 작가에게 남긴 쪽지는 ' + label + ' 작가 페이지의 쪽지 게시판에 붙어요.'
         : PRIVATE_TEXT;
@@ -1721,7 +1736,9 @@ try{
       var first = body.hidden;
 
       form.artist.value = name;
-      if(toEl){
+      if(toEl && PAGE_ARTIST && name === PAGE_ARTIST){
+        toEl.textContent = '작가에게 한마디';   // 작가 전용 페이지에서는 자기 이름을 부르지 않는다
+      } else if(toEl){
         toEl.innerHTML = '';
         var em = document.createElement('em');
         em.textContent = (name === '전체') ? '참여 작가 모두' : artistLabel(name);
@@ -2230,6 +2247,17 @@ try{
       textEl.textContent = saved;
       textEl.style.height = '';
       if(max > 0) root.style.setProperty('--quest-h', max + 'px');
+
+      if(byEl){
+        var savedBy = byEl.textContent, maxBy = 0;
+        root.style.removeProperty('--quest-by-h');
+        for(var j = 0; j < QUESTIONS.length; j++){
+          byEl.textContent = QUESTIONS[j].by || '';
+          if(byEl.offsetHeight > maxBy) maxBy = byEl.offsetHeight;
+        }
+        byEl.textContent = savedBy;
+        if(maxBy > 0) root.style.setProperty('--quest-by-h', maxBy + 'px');
+      }
     }
 
     function render(){
@@ -2239,16 +2267,26 @@ try{
       if(byEl) byEl.textContent = item.by || '';
     }
 
+    var busy = false;
+    var parts = byEl ? [textEl, byEl] : [textEl];
     function next(){
+      if(busy) return;                       // 바뀌는 도중에 또 누르면 무시한다 (겹침 방지)
       cursor = (cursor + 1) % order.length;
-      if(!ANIM){ render(); return; }
-      textEl.classList.add('fading');
-      if(byEl) byEl.classList.add('fading');
+      if(!ANIM || matchMedia('(prefers-reduced-motion: reduce)').matches){ render(); return; }
+      busy = true;
+      btn.setAttribute('aria-busy', 'true');
+      parts.forEach(function(el){ el.classList.add('q-out'); });
       setTimeout(function(){
         render();
-        textEl.classList.remove('fading');
-        if(byEl) byEl.classList.remove('fading');
-      }, 380);
+        // 아래쪽에서 시작하도록 위치를 옮긴 뒤(전환 없이), 다음 프레임에 떠오르게 한다
+        parts.forEach(function(el){ el.classList.remove('q-out'); el.classList.add('q-in'); });
+        void textEl.offsetWidth;
+        // 화면에 보이지 않는 탭에서도 멈추지 않도록 requestAnimationFrame 대신 짧은 타이머를 쓴다
+        setTimeout(function(){
+          parts.forEach(function(el){ el.classList.remove('q-in'); });
+        }, 20);
+        setTimeout(function(){ busy = false; btn.removeAttribute('aria-busy'); }, 320);
+      }, 210);
     }
 
     render();
