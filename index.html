@@ -195,10 +195,10 @@ body::before{
   background: inherit;                 /* 같은 그림을 한 장 더 겹쳐 흐리게 */
   border:0;
   filter: blur(3px);
-  /* 오른쪽 아래 ↔ 왼쪽 위 모서리를 잇는 대각선을 기준으로 오른쪽 위 절반을 덮는다.
-     '모서리 방향' 그라디언트의 50% 선은 정확히 그 대각선이라, 거기서 0 → 오른쪽 위 모서리에서 가장 진하게 */
-  -webkit-mask-image: linear-gradient(to top right, transparent 50%, rgba(0,0,0,.45) 66%, rgba(0,0,0,.85) 84%, #000 100%);
-          mask-image: linear-gradient(to top right, transparent 50%, rgba(0,0,0,.45) 66%, rgba(0,0,0,.85) 84%, #000 100%);
+  /* 오른쪽 위 ↔ 왼쪽 아래 모서리를 잇는 대각선을 기준으로 오른쪽 아래 절반을 덮는다.
+     '모서리 방향' 그라디언트의 50% 선은 정확히 그 대각선이라, 거기서 0 → 오른쪽 아래 모서리에서 가장 진하게 */
+  -webkit-mask-image: linear-gradient(to bottom right, transparent 50%, rgba(0,0,0,.45) 66%, rgba(0,0,0,.85) 84%, #000 100%);
+          mask-image: linear-gradient(to bottom right, transparent 50%, rgba(0,0,0,.45) 66%, rgba(0,0,0,.85) 84%, #000 100%);
 }
 @media (prefers-reduced-motion: reduce){
   .frame, .frame:hover{ transition:none; transform: rotate(-1.2deg) }
@@ -260,6 +260,14 @@ h1 em{
   backdrop-filter: blur(6px);
   -webkit-mask-image: radial-gradient(ellipse closest-side at center, #000 30%, transparent 100%);
   mask-image: radial-gradient(ellipse closest-side at center, #000 30%, transparent 100%);
+}
+/* 작가 전용 페이지: 맨 위 여백을 줄이고, 디데이는 카드 대신 초대 문구와 포스터 사이에 글자로 */
+.artist-page .hero{ padding-top: 30px }
+.artist-page .hero .dday{ display:none }
+.dday-text{
+  margin:0 0 18px; text-align:center;
+  font-family:"Hahmlet", serif; font-weight:700; font-size:1.5rem; letter-spacing:-.01em;
+  color:#fff; text-shadow: 0 1px 12px rgba(16,22,44,.45);
 }
 /* 작가 전용 페이지: 맨 위 소개 자리에 흰 글씨 인사말 */
 .artist-page .title-copy::before{
@@ -1367,6 +1375,16 @@ try{
     var workSec = document.getElementById('workSection');
     if(workSec) workSec.hidden = false;
     document.documentElement.classList.add('artist-page');
+
+    // 디데이 숫자를 카드에서 꺼내 '초대합니다' 문구 바로 아래에 글자로 둔다 (숫자는 그대로 매일 바뀐다)
+    var ddayNum = document.getElementById('ddayNum');
+    var invite = document.getElementById('inviteLine');
+    if(ddayNum && invite){
+      var ddayText = document.createElement('p');
+      ddayText.className = 'dday-text hero-el';
+      ddayText.appendChild(ddayNum);
+      invite.parentNode.insertBefore(ddayText, invite.nextSibling);
+    }
 
     // 작가 인사말은 그림 카드가 아니라 맨 위 소개 문구 자리에 둔다
     var hello = document.querySelector('#workSection .work-hello');
