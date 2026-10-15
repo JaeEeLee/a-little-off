@@ -670,8 +670,7 @@ dd .sub{
 .sticky.is-new{ animation: stickIn .5s cubic-bezier(.22,.61,.36,1) both }
 @keyframes stickIn{ from{ opacity:0; scale:1.25 } to{ opacity:1; scale:1 } }
 @media (min-width: 560px){ .sticky{ width: calc(33.333% - 10px) } }
-.board-secret{ margin:0 0 4px; text-align:center; font-size:.7rem; color:#ECE8E1; user-select:text }   /* 거의 안 보이게. 드래그하면 보인다 */
-.board-tip{ margin:0 0 6px; font-size:.78rem; line-height:1.6; color: var(--ink-soft); text-align:center; text-wrap: balance; word-break: keep-all }
+.board-secret{ margin:0 0 6px; text-align:center; font-size:.78rem; color:#C9C3BA; letter-spacing:.01em }   /* 옅은 회색 한마디 */
 .board-more{ display:flex; justify-content:center; margin-top:14px }
 .board-more .btn{ flex:0 0 auto }
 .board-write{ margin-top:26px; padding-top:22px; border-top:1px dashed var(--line) }
@@ -1172,8 +1171,7 @@ try{
       <button class="btn" type="button" id="boardMore">쪽지 더 보기</button>
     </div>
     <div class="board-write" id="boardWriteSlot">
-      <p class="board-tip">살짝 귀띔하자면, 칭찬 위주로 써 주면 저는 춤추면서 엄청 신나할 거예요 💃</p>
-      <p class="board-secret">(칭찬은 항상 짜릿해요)</p>
+      <p class="board-secret">칭찬은 언제나 짜릿해</p>
     </div>
   </section>
 

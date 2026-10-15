@@ -2,7 +2,7 @@
  * 전시가 끝난 뒤에만 작가의 도슨트 글을 내준다. (/jessie 같은 작가 전용 페이지에서 불러간다)
  *
  *  GET /after-docent?artist=이재이
- *   - 전시 종료(OPEN_AT) 전: 404, 글을 내보내지 않는다 (페이지 소스에도 남지 않게 서버에 둔다)
+ *   - 전시 종료(OPEN_AT) 전: { ok:false }, 글을 내보내지 않는다 (페이지 소스에도 남지 않게 서버에 둔다)
  *   - 종료 후: { artist, title, paragraphs: [...] }
  *  미리 확인: ?k=<DOCENT_KEY> 를 붙이면 종료 전에도 내준다
  *
@@ -36,7 +36,8 @@ export async function onRequest({ request, env }) {
 
   const headers = { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex' };
   if (!doc || (!preview && new Date() < OPEN_AT)) {
-    return new Response(JSON.stringify({ ok: false, openAt: OPEN_AT.toISOString() }), { status: 404, headers });
+    // 아직 공개 전이어도 정상 응답(200)으로 알려 준다. 404로 답하면 브라우저 콘솔에 오류처럼 찍힌다
+    return new Response(JSON.stringify({ ok: false, openAt: OPEN_AT.toISOString() }), { status: 200, headers });
   }
   return new Response(JSON.stringify({ ok: true, artist, title: doc.title, paragraphs: doc.paragraphs }), { status: 200, headers });
 }
