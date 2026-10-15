@@ -670,6 +670,11 @@ dd .sub{
 .sticky.is-new{ animation: stickIn .5s cubic-bezier(.22,.61,.36,1) both }
 @keyframes stickIn{ from{ opacity:0; scale:1.25 } to{ opacity:1; scale:1 } }
 @media (min-width: 560px){ .sticky{ width: calc(33.333% - 10px) } }
+/* 내용이 거의 없는 쪽지(ㅋㅋㅋ, 자판 두드리기 등)는 한 치수 작게 붙인다 */
+.sticky.is-small{ width: calc(40% - 10px); max-width: 160px; padding: 16px 11px 9px }
+.sticky.is-small .sticky-msg{ font-size:.9rem }
+.sticky.is-small .sticky-meta{ font-size:.8rem; margin-top:7px }
+@media (min-width: 560px){ .sticky.is-small{ width: calc(26% - 10px) } }
 .board-secret{ margin:0 0 6px; text-align:center; font-size:.78rem; color:#C9C3BA; letter-spacing:.01em }   /* 옅은 회색 한마디 */
 .board-more{ display:flex; justify-content:center; margin-top:14px }
 .board-more .btn{ flex:0 0 auto }
@@ -2064,9 +2069,28 @@ try{
       return Math.abs(h);
     }
 
+    /* 내용이 거의 없는 쪽지인지 가늠한다. 지우지는 않고 작게만 붙인다.
+       - ㅋㅋ·ㅎㅎ·ㅠㅠ 같은 자음·모음, 문장부호, 이모지를 걷어 내고 남는 글자가 3자 미만
+       - 몇 글자만 계속 되풀이 (하하하하하, 와와와와)
+       - 영문 자판 두드리기 (asdf, qwerty, 모음 없는 영문 덩어리) */
+    function isFluff(text){
+      var s = (text || '').replace(/\s+/g, '');
+      if(!s) return true;
+      var core = s.replace(/[^가-힣a-zA-Z0-9]/g, '');
+      if(core.length < 3) return true;
+      var uniq = {}, n = 0;
+      for(var i = 0; i < core.length; i++){ if(!uniq[core[i]]){ uniq[core[i]] = 1; n++; } }
+      if(core.length >= 5 && n <= 2) return true;
+      if(/^[a-zA-Z]+$/.test(core)){
+        if(/asdf|sdfg|qwer|wert|zxcv|hjkl|jkl/i.test(core)) return true;
+        if(core.length >= 4 && !/[aeiouy]/i.test(core)) return true;
+      }
+      return false;
+    }
+
     function note(n, fresh){
       var el = document.createElement('article');
-      el.className = 'sticky' + (fresh ? ' is-new' : '');
+      el.className = 'sticky' + (fresh ? ' is-new' : '') + (isFluff(n.message) ? ' is-small' : '');
       var k = seed((n.message || '') + (n.at || ''));
       el.style.setProperty('--paper', PAPERS[k % PAPERS.length]);
       el.style.setProperty('--r', ((k % 9) - 4) + 'deg');
