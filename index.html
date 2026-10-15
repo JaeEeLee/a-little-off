@@ -670,13 +670,15 @@ dd .sub{
 .sticky.is-new{ animation: stickIn .5s cubic-bezier(.22,.61,.36,1) both }
 @keyframes stickIn{ from{ opacity:0; scale:1.25 } to{ opacity:1; scale:1 } }
 @media (min-width: 560px){ .sticky{ width: calc(33.333% - 10px) } }
-/* 하트 쪽지: 종이를 하트 모양으로 오려 붙인 느낌. 글이 길면 하트가 세로로 늘어난다 */
+/* 하트 쪽지: 종이를 하트 모양으로 오려 붙인 느낌.
+   다른 쪽지와 같은 폭, 늘 같은 비율의 하트. 글이 길면 하트 안에 들어가도록 글씨가 작아진다 */
 .sticky.is-heart{
   background:none; box-shadow:none;
   isolation:isolate;
-  width: calc(72% - 10px); max-width: 260px;
-  padding: 34px 30px 64px;
-  min-height: 170px;
+  aspect-ratio: 100 / 90;
+  padding: 20px 20px 38px;   /* % 는 게시판 폭 기준이라 안 맞는다. 하트 폭(140~210px)에 맞춘 고정값 */
+  display:flex; flex-direction:column;
+  overflow:hidden;
   text-align:center;
   filter: drop-shadow(0 6px 8px rgba(110,40,60,.18)) drop-shadow(0 1px 1px rgba(110,40,60,.12));
 }
@@ -684,12 +686,13 @@ dd .sub{
 .sticky.is-heart::after{
   content:""; position:absolute; inset:0; z-index:-1;
   background:#FFC2D1;
-  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 90' preserveAspectRatio='none'%3E%3Cpath d='M50 89C20 67 1 49 1 28C1 12 13 1 27 1c10 0 18 6 23 15C55 7 63 1 73 1c14 0 26 11 26 27 0 21-19 39-49 61z'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
-          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 90' preserveAspectRatio='none'%3E%3Cpath d='M50 89C20 67 1 49 1 28C1 12 13 1 27 1c10 0 18 6 23 15C55 7 63 1 73 1c14 0 26 11 26 27 0 21-19 39-49 61z'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 90'%3E%3Cpath d='M50 89C20 67 1 49 1 28C1 12 13 1 27 1c10 0 18 6 23 15C55 7 63 1 73 1c14 0 26 11 26 27 0 21-19 39-49 61z'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 90'%3E%3Cpath d='M50 89C20 67 1 49 1 28C1 12 13 1 27 1c10 0 18 6 23 15C55 7 63 1 73 1c14 0 26 11 26 27 0 21-19 39-49 61z'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
 }
-.sticky.is-heart .sticky-msg{ word-break:keep-all; overflow-wrap:anywhere }
-@media (min-width: 560px){ .sticky.is-heart{ width: calc(45% - 10px) } }
-.sticky.is-heart .sticky-meta{ justify-content:center; flex-direction:column; align-items:center; gap:0 }
+/* 위아래 여백을 auto로 두어 가운데에 놓되, 넘칠 때는 아래로 넘치게 해서 글씨 줄이기 계산이 맞도록 한다 */
+.sticky.is-heart > *{ flex-shrink:0 }
+.sticky.is-heart .sticky-msg{ margin-top:auto; font-size:var(--heart-fs, 1rem); line-height:1.3; word-break:keep-all; overflow-wrap:anywhere }
+.sticky.is-heart .sticky-meta{ margin-bottom:auto; justify-content:center; gap:6px; margin-top:5px; font-size:.74rem; white-space:nowrap }
 /* 20자가 넘어 접혀 있는 쪽지: 누르면 펼쳐진다 */
 .sticky.is-clamped{ cursor:pointer; -webkit-tap-highlight-color:transparent }
 .sticky.is-clamped:focus-visible{ outline:2px solid rgba(59,46,34,.45); outline-offset:3px }
@@ -2119,7 +2122,33 @@ try{
       var rest = all.length - shown;
       moreRow.hidden = rest <= 0;
       if(rest > 0) moreBtn.textContent = '쪽지 더 보기';
+      fitHearts();
     }
+
+    // 하트는 크기가 정해져 있으니, 글이 넘치면 넘치지 않을 때까지 글씨를 조금씩 줄인다
+    function fitHearts(){
+      var hs = board.querySelectorAll('.sticky.is-heart');
+      for(var i = 0; i < hs.length; i++){
+        var h = hs[i];
+        if(h.hidden) continue;
+        var fs = 1.0;
+        h.style.removeProperty('width'); h.style.removeProperty('max-width');
+        h.style.setProperty('--heart-fs', fs + 'rem');
+        while(h.scrollHeight > h.clientHeight + 1 && fs > 0.74){
+          fs = Math.round((fs - 0.04) * 100) / 100;
+          h.style.setProperty('--heart-fs', fs + 'rem');
+        }
+        // 글씨를 더 줄이면 읽기 어려우니, 그래도 넘치면 비율은 그대로 두고 하트를 조금씩 키운다
+        var w = h.offsetWidth, limit = board.clientWidth - 20;
+        while(h.scrollHeight > h.clientHeight + 1 && w < limit){
+          w = Math.min(limit, w + 12);
+          h.style.width = w + 'px'; h.style.maxWidth = 'none';
+        }
+      }
+    }
+    var fitTimer = null;
+    window.addEventListener('resize', function(){ clearTimeout(fitTimer); fitTimer = setTimeout(fitHearts, 150); });
+    if(document.fonts && document.fonts.ready) document.fonts.ready.then(fitHearts).catch(function(){});
     moreBtn.addEventListener('click', function(){ shown += PAGE; paginate(); });
 
     // 같은 쪽지는 늘 같은 색·기울기로 붙도록 글자로 값을 정한다
