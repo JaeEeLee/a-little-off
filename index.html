@@ -670,6 +670,10 @@ dd .sub{
 .sticky.is-new{ animation: stickIn .5s cubic-bezier(.22,.61,.36,1) both }
 @keyframes stickIn{ from{ opacity:0; scale:1.25 } to{ opacity:1; scale:1 } }
 @media (min-width: 560px){ .sticky{ width: calc(33.333% - 10px) } }
+/* 20자가 넘어 접혀 있는 쪽지: 누르면 펼쳐진다 */
+.sticky.is-clamped{ cursor:pointer; -webkit-tap-highlight-color:transparent }
+.sticky.is-clamped:focus-visible{ outline:2px solid rgba(59,46,34,.45); outline-offset:3px }
+.sticky.is-open{ rotate:0deg; z-index:3 }
 /* 내용이 거의 없는 쪽지(ㅋㅋㅋ, 자판 두드리기 등)는 한 치수 작게 붙인다 */
 .sticky.is-small{ width: calc(40% - 10px); max-width: 160px; padding: 16px 11px 9px }
 .sticky.is-small .sticky-msg{ font-size:.9rem }
@@ -2084,6 +2088,7 @@ try{
     var total = 0;
     var PAGE = 12;          // 처음에 보여 줄 장수, '더 보기'를 누를 때마다 이만큼 더
     var shown = PAGE;
+    var CLAMP = 20;         // 이 글자 수를 넘는 쪽지는 접어 두고, 누르면 펼친다
     var moreRow = document.getElementById('boardMoreRow');
     var moreBtn = document.getElementById('boardMore');
 
@@ -2132,7 +2137,29 @@ try{
       el.style.setProperty('--y', ((k % 5) * 3) + 'px');
       var msg = document.createElement('p');
       msg.className = 'sticky-msg';
-      msg.textContent = n.message;
+      // 20자가 넘으면 앞부분만 보이고 말줄임표를 붙인다. 쪽지를 누르면 펼치고, 다시 누르면 접는다
+      var full = n.message || '';
+      var chars = Array.from(full);                 // 이모지가 반쪽으로 잘리지 않게 글자 단위로 센다
+      if(chars.length > CLAMP){
+        var short = chars.slice(0, CLAMP).join('').replace(/\s+$/, '') + '…';
+        msg.textContent = short;
+        el.classList.add('is-clamped');
+        el.tabIndex = 0;
+        el.setAttribute('role', 'button');
+        el.setAttribute('aria-expanded', 'false');
+        el.setAttribute('aria-label', full);
+        var toggle = function(){
+          var open = el.classList.toggle('is-open');
+          msg.textContent = open ? full : short;
+          el.setAttribute('aria-expanded', open ? 'true' : 'false');
+        };
+        el.addEventListener('click', toggle);
+        el.addEventListener('keydown', function(e){
+          if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); toggle(); }
+        });
+      } else {
+        msg.textContent = full;
+      }
       var meta = document.createElement('div');
       meta.className = 'sticky-meta';
       var who = document.createElement('span');
