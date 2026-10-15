@@ -2053,7 +2053,7 @@ try{
       for(var i = 0; i < all.length; i++) all[i].hidden = i >= shown;
       var rest = all.length - shown;
       moreRow.hidden = rest <= 0;
-      if(rest > 0) moreBtn.textContent = '쪽지 더 보기 (' + rest + '장 더)';
+      if(rest > 0) moreBtn.textContent = '쪽지 더 보기';
     }
     moreBtn.addEventListener('click', function(){ shown += PAGE; paginate(); });
 
@@ -2087,7 +2087,7 @@ try{
     }
 
     function setCount(){
-      countEl.textContent = total ? total + '장' : '';
+      // 쪽지 수는 보여 주지 않는다
       empty.hidden = total > 0;
     }
 
