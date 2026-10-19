@@ -2089,7 +2089,7 @@ try{
     var root = document.documentElement;
     var FADE = 450;                    // 장면이 바뀌는 페이드 시간 (CSS --scene-fade 와 같은 값)
     root.style.setProperty('--scene-fade', FADE + 'ms');
-    var AUTO_HIDE = 2400 - FADE;      // 표지가 나타나 머무는 시간. 사라지는 FADE 까지 합쳐 2.4초 (사진·글꼴을 다 받은 뒤부터)
+    var AUTO_HIDE = 3000 - FADE;      // 표지가 나타나 머무는 시간. 사라지는 FADE 까지 합쳐 3초 (사진·글꼴을 다 받은 뒤부터)
     var current = -1, busyUntil = 0, autoTimer = null, loading = true;
 
     // 오른쪽 점: 지금 몇 번째 장면인지. 누르면 그 장면으로
