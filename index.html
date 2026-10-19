@@ -630,7 +630,9 @@ dd .sub{
 }
 
 /* 예약 페이지는 포스터가 작으니 전시 제목도 한 단계 작게 (원래 2.2–3.5rem) */
-.visit-page h1{ font-size: clamp(1.8rem, 7.8vw, 2.8rem); margin-bottom:12px }
+.visit-page h1{ font-size: clamp(1.44rem, 6.24vw, 2.24rem); margin-bottom:12px }   /* 한 번 더 20% 줄임 */
+/* 제목 뒤 어두운 베일이 아래 전시 안내 카드 윗면까지 번져 흐릿하게 보여서, 예약 페이지에서는 뺀다 */
+.visit-page .title-copy::before{ display:none }
 /* 인사말 카드: 질문(.q)만 한 줄로 띄우고, 본문 속 굵은 글씨 뒤에는 여백을 두지 않는다 (쉼표가 떨어지지 않게) */
 #helloSection .work-notice strong{ margin-right:0 }
 #helloSection .work-notice .q{ display:block; margin:0 0 4px }
@@ -659,7 +661,7 @@ dd .sub{
 .visit-top .dday-text, .visit-top .dday-text .dday-num{ font-size:1.2rem }
 .visit-page .hero{ padding-top: 22px }
 .visit-page .hero .title-block{ margin-top: 6px; padding-top: 18px; padding-bottom: 6px }
-.visit-page #infoSection{ margin-top: 12px }
+.visit-page #infoSection{ margin-top: 8px }   /* 'Everyone Is a Little off' 글자 아래 ~ 카드 윗면 = 32px */
 .visit-page .frame-work{ border-width:3px }
 .quest-lead{
   margin:14px 0 4px; text-align:center;
