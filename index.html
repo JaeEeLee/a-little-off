@@ -798,6 +798,19 @@ html.visit-loading *, html.visit-loading *::before, html.visit-loading *::after{
   border-radius:50%; background: var(--accent);
 }
 .cal-day.today b{ text-decoration: underline 2px; text-underline-offset: 4px }
+.cal-tip{
+  display:flex; align-items:center; gap:3px; margin:0 0 8px;
+  font-size:.8rem; font-weight:600; color: var(--accent);
+}
+.cal-tip svg{ width:14px; height:14px; animation: hintFloat 2s ease-in-out infinite }
+@media (prefers-reduced-motion: reduce){ .cal-tip svg{ animation:none } }
+button.cal-day{ border:0; background:none; padding:0; margin:0; font:inherit; cursor:pointer; -webkit-tap-highlight-color:transparent }
+button.cal-day:hover b{ box-shadow: 0 0 0 2px rgba(30,86,184,.35); border-radius:50% }
+button.cal-day b{ width:30px; height:30px; display:grid; place-items:center; border-radius:50%; transition: box-shadow .2s ease, background .2s ease }
+button.cal-day:focus-visible{ outline:none }
+button.cal-day:focus-visible b{ box-shadow: 0 0 0 2px var(--accent) }
+.cal-day.picked b{ box-shadow: 0 0 0 2px var(--accent); background:#fff }
+.cal-day.start.picked b, .cal-day.end.picked b{ box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--accent); background: linear-gradient(135deg, var(--ember), #D9708A 45%, var(--accent)) }
 .cal-legend{ margin:10px 0 0; font-size:.74rem; color: var(--ink-soft); display:flex; align-items:center; gap:6px }
 .cal-dot{ width:5px; height:5px; border-radius:50%; background: var(--accent); display:inline-block }
 /* 장소 줄: 이름 옆 주소 복사 버튼 */
@@ -817,6 +830,28 @@ html.visit-loading *, html.visit-loading *::before, html.visit-loading *::after{
 .board-link svg{ width:14px; height:14px }
 .board-link{ white-space:nowrap }
 .visit-stay{ font-weight:600; color: var(--accent) }
+/* 예약 폼: 함께 오는 사람 펼치기 */
+.party-toggle{
+  justify-self:start; border:0; background:none; padding:2px 0; cursor:pointer;
+  font: inherit; font-size:.84rem; font-weight:500; color: var(--accent);
+}
+.party-toggle:hover{ text-decoration: underline; text-underline-offset:3px }
+/* 화면 아래 떠 있는 예약 버튼 */
+.visit-cta{
+  position:fixed; left:50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); z-index:25;
+  transform: translate(-50%, 16px); opacity:0; visibility:hidden; pointer-events:none;
+  padding: 12px 26px; border:0; border-radius:999px; cursor:pointer;
+  font: inherit; font-size:.92rem; font-weight:600; color:#fff; white-space:nowrap;
+  background: linear-gradient(135deg, var(--ember) 0%, #D9708A 45%, var(--accent) 100%);
+  box-shadow: 0 8px 22px rgba(60,40,90,.28), 0 2px 6px rgba(60,40,90,.18);
+  text-shadow: 0 1px 2px rgba(40,20,40,.25);
+  transition: opacity .35s ease, transform .35s ease, visibility 0s linear .35s;
+}
+.cta-on .visit-cta{ opacity:1; visibility:visible; pointer-events:auto; transform: translate(-50%, 0); transition: opacity .35s ease, transform .35s ease, visibility 0s }
+.is-typing .visit-cta, .visit-loading .visit-cta{ opacity:0 !important; visibility:hidden !important; pointer-events:none !important }
+.visit-cta.is-done{ background: rgba(255,255,255,.95); color: var(--accent); text-shadow:none; box-shadow: 0 6px 18px rgba(60,40,90,.16), inset 0 0 0 1.5px rgba(30,86,184,.35) }
+/* 버튼에 가리지 않도록 장면 아래쪽에 자리를 비워 둔다 */
+.cta-on .scene:not(.scene-cover){ padding-bottom: 72px }
 .note-ask{ font-weight:600; color: var(--accent) }
 .visit-page .scene .note{ word-break:keep-all }   /* 안내 문구가 낱말 중간에서 끊기지 않게 */
 /* 전시 안내 장소 줄 아래: 지도 아이콘(왼쪽) + 예약으로 넘기라는 안내(오른쪽) */
@@ -824,13 +859,6 @@ html.visit-loading *, html.visit-loading *::before, html.visit-loading *::after{
 .map-links.icon-only{ display:flex !important; flex-wrap:nowrap; flex:0 0 auto; gap:6px; margin:0; grid-column:auto }
 .map-links.icon-only a{ width:32px; height:32px; padding:0 !important; justify-content:center; border-radius:9px }
 .map-links.icon-only .map-ico{ width:20px; height:20px; font-size:.74rem }
-.to-visit{
-  display:inline-flex; align-items:flex-end; gap:2px; text-align:right;   /* 화살표는 둘째 줄 끝에 */
-  border:0; background:none; padding:4px 0; cursor:pointer;
-  font: inherit; font-size:.78rem; line-height:1.4; color: var(--spark); word-break:keep-all;
-}
-.to-visit svg{ width:15px; height:15px; flex:0 0 auto; margin-bottom:3px; animation: hintFloat 2s ease-in-out infinite }
-@media (prefers-reduced-motion: reduce){ .to-visit svg{ animation:none } }
 /* 예약 페이지 카드의 위아래 여백을 맞춘다.
    - 빈 안내 줄(오류 메시지 자리)이 버튼 아래 여백을 늘리고 있어서, 비어 있을 때는 자리를 차지하지 않게
    - 위: 카드 윗면 ~ 제목 글자 = 26px + 제목 줄 여유 5px ≈ 31px, 아래도 마지막 요소 ~ 카드 아랫면 31px */
@@ -1963,16 +1991,9 @@ try{
             Array.prototype.slice.call(a.childNodes).forEach(function(n){ if(n.nodeType === 3) n.remove(); });
             a.title = a.getAttribute('aria-label') || '';
           });
-          // 비워진 자리에: 다음 장면(예약)으로 넘기라는 안내
-          var toVisit = document.createElement('button');
-          toVisit.type = 'button';
-          toVisit.className = 'to-visit';
-          toVisit.innerHTML = '<span>오실 날이 정해졌다면,<br>넘겨서 예약해 주세요</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-          toVisit.addEventListener('click', function(){ goToVisit(); });
           var mapRow = document.createElement('div');
           mapRow.className = 'map-row';
           mapRow.appendChild(maps);
-          mapRow.appendChild(toVisit);
           placeRow.appendChild(mapRow);
         }
         addrRow.remove();
@@ -1990,18 +2011,23 @@ try{
       head.className = 'cal-head';
       head.innerHTML = '<span class="cal-month">2026. 11</span><span class="cal-range">12 (목) — 17 (화) · 엿새</span>';
       box.appendChild(head);
+      var tip = document.createElement('p');
+      tip.className = 'cal-tip';
+      tip.innerHTML = '오실 날짜를 누르면 바로 예약으로 넘어가요<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 13l5 5 5-5M12 6v12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      box.appendChild(tip);
       var grid = document.createElement('div');
       grid.className = 'cal-grid';
-      grid.setAttribute('aria-hidden', 'true');
       '일월화수목금토'.split('').forEach(function(d, i){
         var s = document.createElement('span');
+        s.setAttribute('aria-hidden', 'true');
         s.className = 'cal-dow' + (i === 0 ? ' sun' : '');
         s.textContent = d;
         grid.appendChild(s);
       });
       for(var d = FIRST; d <= LAST; d++){
         var col = (d - FIRST) % 7;
-        var c = document.createElement('span');
+        var inRange = d >= START && d <= END;
+        var c = document.createElement(inRange ? 'button' : 'span');
         var cls = ['cal-day'];
         if(col === 0) cls.push('sun');
         if(col === 6) cls.push('sat');
@@ -2012,6 +2038,14 @@ try{
         if(d === today) cls.push('today');
         c.className = cls.join(' ');
         c.innerHTML = '<b>' + d + '</b>';
+        if(inRange){
+          c.type = 'button';
+          c.dataset.day = d;
+          c.setAttribute('aria-label', '11월 ' + d + '일 ' + '일월화수목금토'[col] + '요일에 관람 예약하기' + (d === MEET_DAY ? ' (' + artistLabel(PAGE_ARTIST) + '가 하루 종일 있는 날)' : ''));
+          c.addEventListener('click', function(){ pickDate(+this.dataset.day, true); });
+        } else {
+          c.setAttribute('aria-hidden', 'true');
+        }
         grid.appendChild(c);
       }
       box.appendChild(grid);
@@ -2153,11 +2187,70 @@ try{
       });
       nav.classList.toggle('on-cover', i === 0);
       root.classList.toggle('cover-on', i === 0);
+      var vs = document.getElementById('visitSection');
+      root.classList.toggle('cta-on', i !== 0 && !(vs && scenes[i].contains(vs)));
       // 첫 진입의 표지에서는 '아래로 넘겨 보세요'를 숨겨 두고, 한 번 넘어간 뒤부터 보여 준다
       if(i !== 0 && prev === 0) root.classList.add('intro-done');
     }
     function next(){ go(current + 1); }
     function goToVisit(){ var k = scenes.indexOf(document.getElementById('visitSection').parentNode); if(k > -1) go(k, true); }
+
+    /* 달력에서 날짜를 누르면: 예약 폼의 방문 날짜를 그 날로 골라 두고 예약 장면으로 */
+    var dateSel = document.getElementById('visitDate');
+    function markPicked(){
+      var v = dateSel ? dateSel.value : '';
+      Array.prototype.forEach.call(document.querySelectorAll('.cal-day[data-day]'), function(c){
+        var on = !!v && v.indexOf('11/' + c.dataset.day + '(') === 0;
+        c.classList.toggle('picked', on);
+        c.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+    }
+    function pickDate(day, jump){
+      if(!dateSel) return;
+      for(var k = 0; k < dateSel.options.length; k++){
+        if(dateSel.options[k].value.indexOf('11/' + day + '(') === 0){ dateSel.selectedIndex = k; break; }
+      }
+      dateSel.dispatchEvent(new Event('change', { bubbles: true }));
+      if(jump) goToVisit();
+    }
+    if(dateSel) dateSel.addEventListener('change', markPicked);
+    // 방문 날짜는 처음부터 작가가 상주하는 날(MEET_DAY)로 골라 둔다.
+    // 날짜 목록은 아래 '관람 예약' 코드가 채우므로 그 뒤에 고른다
+    setTimeout(function(){ if(dateSel && !dateSel.value) pickDate(MEET_DAY, false); }, 0);
+    window.addEventListener('visit-reset', function(){ setTimeout(function(){ pickDate(MEET_DAY, false); }, 0); });
+
+    /* 예약 입력을 가볍게: 초대한 작가는 이미 정해져 있으니 숨기고,
+       함께 오는 사람은 접어 두었다가 누르면 펼친다 */
+    var artistField = document.getElementById('visitArtist');
+    if(artistField && artistField.closest('.field')) artistField.closest('.field').hidden = true;
+    var partySel = document.getElementById('visitParty');
+    var partyField = partySel && partySel.closest('.field');
+    if(partyField){
+      partyField.hidden = true;
+      var more = document.createElement('button');
+      more.type = 'button';
+      more.className = 'party-toggle';
+      more.textContent = '+ 함께 오는 사람이 있어요';
+      more.addEventListener('click', function(){
+        partyField.hidden = false;
+        more.hidden = true;
+        partySel.focus();
+      });
+      partyField.parentNode.insertBefore(more, partyField);
+      // '한 번 더 예약하기'로 폼을 비우면 다시 접는다
+      window.addEventListener('visit-reset', function(){ partyField.hidden = true; more.hidden = false; markPicked(); });
+    }
+
+    /* 화면 아래에 떠 있는 '관람 예약하기' 버튼: 표지와 예약 장면을 뺀 모든 장면에서.
+       예약을 마치면 '예약 완료'로 바뀐다 */
+    var cta = document.createElement('button');
+    cta.type = 'button';
+    cta.className = 'visit-cta';
+    cta.textContent = '관람 예약하기';
+    cta.addEventListener('click', goToVisit);
+    document.body.appendChild(cta);
+    window.addEventListener('visit-done', function(){ cta.textContent = '예약 완료 ✓'; cta.classList.add('is-done'); });
+    window.addEventListener('visit-reset', function(){ cta.textContent = '관람 예약하기'; cta.classList.remove('is-done'); });
     function prev(){ go(current - 1); }
 
     function atTop(sc){ return sc.scrollTop <= 1; }
@@ -3032,6 +3125,7 @@ try{
       doneSub.textContent = (day ? day.label.split(' · ')[0] : date) + '에 오시는 걸로 적어 두었어요.';
       wrap.hidden = true;
       done.hidden = false;
+      window.dispatchEvent(new CustomEvent('visit-done', { detail: { date: date } }));
     }
 
     again.addEventListener('click', function(){
@@ -3041,6 +3135,7 @@ try{
       setStatus('');
       done.hidden = true;
       wrap.hidden = false;
+      window.dispatchEvent(new CustomEvent('visit-reset'));
     });
 
     form.addEventListener('submit', function(e){
