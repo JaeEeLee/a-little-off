@@ -816,6 +816,12 @@ html.visit-loading *, html.visit-loading *::before, html.visit-loading *::after{
 .board-link svg{ width:14px; height:14px }
 .board-link{ white-space:nowrap }
 .visit-stay{ font-weight:600; color: var(--accent) }
+/* 예약 페이지 카드의 위아래 여백을 맞춘다.
+   - 빈 안내 줄(오류 메시지 자리)이 버튼 아래 여백을 늘리고 있어서, 비어 있을 때는 자리를 차지하지 않게
+   - 위: 카드 윗면 ~ 제목 글자 = 26px + 제목 줄 여유 5px ≈ 31px, 아래도 마지막 요소 ~ 카드 아랫면 31px */
+.visit-page .scene .note-status:empty{ display:none }
+.visit-page .scene section.card:not(.thanks){ padding-top:26px; padding-bottom:31px }
+.visit-page #infoSection dl .row:last-child{ padding-bottom:0 }
 /* 휴대폰 폭에서는 영문 라벨을 빼서 링크가 제목과 한 줄에 들어가게 */
 @media (max-width: 420px){ .visit-page #boardSection .section-head .en{ display:none } }
 .board-link:hover{ background: rgba(30,86,184,.06) }
