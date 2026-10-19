@@ -649,12 +649,18 @@ dd .sub{
 /* ── 관람 예약 페이지 (/jessie/visit) ── */
 /* 포스터와 겹친 그림을 기존의 절반 크기로 (겹친 그림은 포스터 폭의 50%라 함께 줄어든다) */
 .visit-page .frame.has-work{
-  --fw: min(150px, calc((100vw - 32px) / 2.44));
+  --fw: min(120px, calc((100vw - 32px) / 3.05));   /* 원래 크기의 40% (절반에서 20% 더 줄임) */
   border-width:4px;
-  margin-bottom: 22px;
+  margin-bottom: 14px;
 }
+/* 초대 문구 · 디데이 한 줄 */
+.visit-top{ display:flex; justify-content:center; align-items:baseline; gap:12px; margin:0 0 16px; flex-wrap:wrap }
+.visit-top .invite-line, .visit-top .dday-text{ margin:0 }
+.visit-top .dday-text, .visit-top .dday-text .dday-num{ font-size:1.2rem }
+.visit-page .hero{ padding-top: 22px }
+.visit-page .hero .title-block{ margin-top: 6px; padding-top: 18px; padding-bottom: 6px }
+.visit-page #infoSection{ margin-top: 12px }
 .visit-page .frame-work{ border-width:3px }
-.visit-page #infoSection{ margin-top: 20px }
 .quest-lead{
   margin:14px 0 4px; text-align:center;
   font-size:.86rem; line-height:1.7; color: var(--ink-soft);
@@ -1585,6 +1591,14 @@ try{
       ddayText.className = 'dday-text hero-el';
       ddayText.appendChild(ddayNum);
       invite.parentNode.insertBefore(ddayText, invite.nextSibling);
+      // 예약 페이지: 초대 문구와 디데이를 위아래가 아니라 한 줄에 나란히 두어 첫 화면을 아낀다
+      if(IS_VISIT){
+        var topRow = document.createElement('div');
+        topRow.className = 'visit-top hero-el';
+        invite.parentNode.insertBefore(topRow, invite);
+        topRow.appendChild(invite);
+        topRow.appendChild(ddayText);
+      }
     }
 
     // 작가 인사말은 그림 카드가 아니라 맨 위 소개 문구 자리에 둔다
