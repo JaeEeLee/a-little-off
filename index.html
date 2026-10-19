@@ -1016,6 +1016,7 @@ html.visit-loading *, html.visit-loading *::before, html.visit-loading *::after{
   letter-spacing:-.015em;
   text-wrap: balance;
   white-space: pre-line;   /* 온점·반점 뒤에서 JS가 넣은 줄바꿈을 그대로 보여 준다 */
+  word-break: keep-all;    /* 낱말 중간(문장/을)에서 끊지 않는다 */
   /* 질문마다 길이가 달라 아래 카드가 들썩이지 않도록 높이를 고정한다.
      실제 값은 가장 긴 질문을 재어 JS가 --quest-h 로 넣는다 */
   height: var(--quest-h, 6.6em);
@@ -1267,6 +1268,22 @@ html.visit-loading *, html.visit-loading *::before, html.visit-loading *::after{
   color:#fff; opacity:.92;
 }
 #visitSubmit:disabled, #noteSubmit:disabled{ opacity:.6 }
+/* 다른 질문 보기: 카드 폭을 꽉 채우는 버튼, 흰 바탕에 빨강 → 파랑 2px 그라데이션 테두리 */
+#questNext, .artist-page #questNext{
+  align-self:stretch; width:100%;
+  border: 2px solid transparent;
+  background:
+    linear-gradient(#fff, #fff) padding-box,
+    linear-gradient(135deg, var(--ember) 0%, #D9708A 45%, var(--accent) 100%) border-box;
+  color: var(--accent); font-weight:600;
+}
+#questNext:hover, .artist-page #questNext:hover{
+  background:
+    linear-gradient(rgba(30,86,184,.05), rgba(30,86,184,.05)) padding-box,
+    linear-gradient(#fff, #fff) padding-box,
+    linear-gradient(135deg, var(--ember) 0%, #D9708A 45%, var(--accent) 100%) border-box;
+  color: var(--accent); border-color: transparent;
+}
 
 /* ── 푸터 ─────────────────────────────────── */
 footer{
