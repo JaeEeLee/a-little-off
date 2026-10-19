@@ -817,6 +817,8 @@ html.visit-loading *, html.visit-loading *::before, html.visit-loading *::after{
 .board-link svg{ width:14px; height:14px }
 .board-link{ white-space:nowrap }
 .visit-stay{ font-weight:600; color: var(--accent) }
+.note-ask{ font-weight:600; color: var(--accent) }
+.visit-page .scene .note{ word-break:keep-all }   /* 안내 문구가 낱말 중간에서 끊기지 않게 */
 /* 전시 안내 장소 줄 아래: 지도 아이콘(왼쪽) + 예약으로 넘기라는 안내(오른쪽) */
 .map-row{ grid-column: 1 / -1; display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:12px }
 .map-links.icon-only{ display:flex !important; flex-wrap:nowrap; flex:0 0 auto; gap:6px; margin:0; grid-column:auto }
@@ -2595,7 +2597,19 @@ try{
       var label = artistLabel(name);
       if(open && PAGE_ARTIST === name){
         // 작가 전용 페이지에서는 자기 이름을 부르지 않는다
-        if(privacyEl) privacyEl.textContent = IS_VISIT ? '남겨 주신 쪽지는 작가 페이지의 쪽지 게시판에 붙어요.' : '남겨 주신 쪽지는 이 페이지 게시판에 붙어요.';
+        if(privacyEl){
+          if(IS_VISIT){
+            // 예약 페이지: 게시판 안내 아래 줄에 감상평 부탁을 덧붙인다
+            privacyEl.textContent = '남겨 주신 쪽지는 작가 페이지의 쪽지 게시판에 붙어요.';
+            privacyEl.appendChild(document.createElement('br'));
+            var ask = document.createElement('span');
+            ask.className = 'note-ask';
+            ask.textContent = '전시를 보고 난 뒤에 감상평을 남겨 주시면 정말 기쁠 거예요!';
+            privacyEl.appendChild(ask);
+          } else {
+            privacyEl.textContent = '남겨 주신 쪽지는 이 페이지 게시판에 붙어요.';
+          }
+        }
         if(doneSubEl) doneSubEl.textContent = IS_VISIT ? '작가 페이지 게시판에 붙었어요. 고마워요!' : '게시판에 붙었어요. 고마워요!';
         return;
       }
