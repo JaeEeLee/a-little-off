@@ -9,10 +9,10 @@
  * 글은 전시 도슨트 원고 수정본에서 가져왔다. 공개할 작가만 DOCENTS 에 넣는다.
  */
 
-const OPEN_AT = new Date('2026-11-17T20:00:00+09:00');   // 전시 마감 시각
+const OPEN_AT = new Date('2026-11-17T20:00:00+09:00'); // 전시 마감 시각
 
 const DOCENTS = {
-  '이재이': {
+  이재이: {
     title: '어디에 둘까요?',
     paragraphs: [
       '앞선 작품에서 우리는 무엇이든 될 수 있다고 믿었던 어린아이의 세계를 만났습니다. 하지만 어른이 된 우리는 왜 자신이 원하는 것을 선택하는 일조차 어려워졌을까요?',
@@ -34,10 +34,17 @@ export async function onRequest({ request, env }) {
   const doc = DOCENTS[artist];
   const preview = env.DOCENT_KEY && url.searchParams.get('k') === env.DOCENT_KEY;
 
-  const headers = { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex' };
+  const headers = {
+    'Content-Type': 'application/json; charset=utf-8',
+    'Cache-Control': 'no-store',
+    'X-Robots-Tag': 'noindex'
+  };
   if (!doc || (!preview && new Date() < OPEN_AT)) {
     // 아직 공개 전이어도 정상 응답(200)으로 알려 준다. 404로 답하면 브라우저 콘솔에 오류처럼 찍힌다
     return new Response(JSON.stringify({ ok: false, openAt: OPEN_AT.toISOString() }), { status: 200, headers });
   }
-  return new Response(JSON.stringify({ ok: true, artist, title: doc.title, paragraphs: doc.paragraphs }), { status: 200, headers });
+  return new Response(JSON.stringify({ ok: true, artist, title: doc.title, paragraphs: doc.paragraphs }), {
+    status: 200,
+    headers
+  });
 }

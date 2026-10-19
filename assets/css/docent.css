@@ -1,0 +1,351 @@
+/* 도슨트 플레이어 (/docent) */
+/* 본 사이트와 같은 색. 라이트 모드 고정 */
+:root {
+  --wall: #fafafa;
+  --surface: #ffffff;
+  --ink: #332519;
+  --ink-soft: #6e6254;
+  --line: #e2dfd8;
+  --accent: #1e56b8;
+  --on-accent: #fcfaf6;
+  --shadow: rgba(53, 37, 24, 0.13);
+  --radius: 10px;
+  --player-h: 168px;
+  color-scheme: light;
+}
+* {
+  box-sizing: border-box;
+}
+html {
+  -webkit-text-size-adjust: 100%;
+}
+body {
+  margin: 0;
+  background: var(--wall);
+  color: var(--ink);
+  font:
+    15px/1.6 'IBM Plex Sans KR',
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+  padding-bottom: calc(var(--player-h) + env(safe-area-inset-bottom, 0px) + 24px);
+}
+button {
+  font: inherit;
+  color: inherit;
+}
+.wrap {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+/* ── 머리 ── */
+header {
+  padding: 44px 0 18px;
+  text-align: center;
+}
+.eyebrow {
+  margin: 0 0 10px;
+  font-size: 0.7rem;
+  letter-spacing: 0.24em;
+  color: var(--ink-soft);
+}
+h1 {
+  margin: 0;
+  font-family: 'Hahmlet', serif;
+  font-weight: 700;
+  font-size: 1.9rem;
+  letter-spacing: -0.03em;
+}
+.lead {
+  margin: 10px 0 0;
+  font-size: 0.86rem;
+  color: var(--ink-soft);
+}
+.play-all {
+  margin-top: 22px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 22px;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 500;
+  font-size: 0.9rem;
+  box-shadow: 0 8px 22px rgba(30, 86, 184, 0.25);
+}
+.play-all svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* ── 목록 ── */
+.chapter {
+  margin-top: 30px;
+}
+.chapter-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 0 4px 10px;
+  border-bottom: 1px solid var(--line);
+}
+.chapter-no {
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  color: var(--ink-soft);
+}
+.chapter-head {
+  flex-wrap: wrap;
+  row-gap: 2px;
+}
+.chapter-title {
+  margin: 0;
+  font-family: 'Hahmlet', serif;
+  font-weight: 500;
+  font-size: 1.05rem;
+}
+.chapter-sub {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+}
+.chapter-sub:empty {
+  display: none;
+}
+.track.is-extra .track-name {
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+.tracks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.track {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 30px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 6px;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.track:hover {
+  background: rgba(30, 86, 184, 0.04);
+}
+.track:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+.track-no {
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+.track-name {
+  display: block;
+  font-family: 'Hahmlet', serif;
+  font-size: 1.02rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.track-work {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+}
+.track-time {
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+.track.is-current .track-name {
+  color: var(--accent);
+  font-weight: 700;
+}
+.track.is-missing {
+  opacity: 0.45;
+}
+/* 재생 중 표시: 소리 막대 세 개 */
+.bars {
+  display: none;
+  gap: 2px;
+  height: 14px;
+  align-items: flex-end;
+  justify-content: center;
+}
+.bars i {
+  width: 3px;
+  background: var(--accent);
+  border-radius: 1px;
+  animation: bar 1s ease-in-out infinite;
+}
+.bars i:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.bars i:nth-child(3) {
+  animation-delay: 0.4s;
+}
+@keyframes bar {
+  0%,
+  100% {
+    height: 30%;
+  }
+  50% {
+    height: 100%;
+  }
+}
+.track.is-current .track-no .num {
+  display: none;
+}
+.track.is-current .track-no .bars {
+  display: flex;
+}
+.track.is-current.is-paused .bars i {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bars i {
+    animation: none;
+    height: 70%;
+  }
+}
+
+.foot {
+  margin: 34px 0 0;
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+}
+
+/* ── 아래 고정 플레이어 ── */
+.player {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid var(--line);
+  box-shadow: 0 -10px 30px var(--shadow);
+  padding: 14px 16px calc(14px + env(safe-area-inset-bottom, 0px));
+}
+.player-in {
+  max-width: 560px;
+  margin: 0 auto;
+}
+.now {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  min-height: 2.6em;
+}
+.now-label {
+  display: block;
+  font-size: 0.66rem;
+  letter-spacing: 0.18em;
+  color: var(--ink-soft);
+}
+.now-name {
+  display: block;
+  font-family: 'Hahmlet', serif;
+  font-weight: 700;
+  font-size: 1.08rem;
+  letter-spacing: -0.015em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.speed {
+  flex: 0 0 auto;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.72rem;
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+}
+.seek {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 10px;
+  align-items: center;
+  margin: 8px 0 6px;
+  font-size: 0.7rem;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+.seek input {
+  width: 100%;
+  accent-color: var(--accent);
+  margin: 0;
+}
+.controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 26px;
+}
+.ctl {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  background: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.ctl svg {
+  width: 22px;
+  height: 22px;
+}
+.ctl.main {
+  width: 58px;
+  height: 58px;
+  background: var(--accent);
+  color: var(--on-accent);
+  box-shadow: 0 6px 18px rgba(30, 86, 184, 0.3);
+}
+.ctl.main svg {
+  width: 22px;
+  height: 22px;
+}
+.ctl:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.ctl svg[hidden] {
+  display: none;
+} /* svg에는 hidden 속성이 기본으로 먹지 않는다 */
+.ctl:focus-visible,
+.speed:focus-visible,
+.play-all:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.hint {
+  margin: 6px 0 0;
+  text-align: center;
+  font-size: 0.74rem;
+  color: var(--accent);
+  min-height: 1.2em;
+}

@@ -1,3702 +1,499 @@
-<!doctype html><html><head><meta charset=utf8><meta name=color-scheme content="light only"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
-<title>조금 이상한 우리들</title>
-<meta name="description" content="취미로 그림을 배우는 스무 명이 모여 만든 단체전. 2026.11.12 – 11.17, 홍대 피시스 아카이브">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="preload" as="image" href="/poster-hero.jpg" fetchpriority="high">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://a-little-off.pages.dev/">
-<meta property="og:title" content="조금 이상한 우리들 · Everyone Is a Little off">
-<meta property="og:description" content="취미로 그림을 배우는 스무 명이 모여 만든 단체전. 2026.11.12 – 11.17, 홍대 피시스 아카이브">
-<meta property="og:image" content="https://a-little-off.pages.dev/og-image.jpg">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="붉은 튤립 사이에 흰 튤립 한 송이가 핀 전시 포스터와 전시 제목">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://a-little-off.pages.dev/og-image.jpg">
-</head><body>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@300;500;700&family=IBM+Plex+Sans+KR:wght@300;400;500;600&display=swap">
-
-<style>
-/* 레이아웃: 원목 액자 한 점이 벽에 걸리고, 그 아래로 정보가 한 줄씩 내려앉는다 */
-:root{
-  --wall:       #FAFAFA;   /* 눈이 편한 중성 오프화이트 */
-  --wall-deep:  #F0EFEC;
-  --surface:    #FFFFFF;
-  --ink:        #332519;   /* 2번 다크 액자의 월넛 */
-  --ink-soft:   #6E6254;
-  --line:       #E2DFD8;
-  --radius:     7px;
-  --surface-rgb: 255,255,255;
-  --card-shadow: rgba(48,38,28,.13);
-  --accent:     #1E56B8;   /* 포스터의 코발트 하늘 */
-  --spark:      #1E56B8;
-  --ember:      #C8401B;   /* 포스터의 튤립 */
-  --on-accent:  #FCFAF6;
-  --shadow:     rgba(53,37,24,.15);
-  --grain:      rgba(83,58,38,.032);
-  --vignette:   rgba(83,58,38,.055);
-  --frame-wood: linear-gradient(142deg, #FFFFFF 0%, #FBFBFA 42%, #F1F0ED 74%, #E4E3DF 100%);
-  --poster-blur: url("data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwgHBgoICAgLCgoLDhgQDg0NDh0VFhEYIx8lJCIfIiEmKzcvJik0KSEiMEExNDk7Pj4+JS5ESUM8SDc9Pjv/2wBDAQoLCw4NDhwQEBw7KCIoOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozv/wAARCAAUAA4DASIAAhEBAxEB/8QAGAAAAgMAAAAAAAAAAAAAAAAAAAUBAwT/xAAeEAACAgICAwAAAAAAAAAAAAABAgADBAURMRNBcf/EABYBAQEBAAAAAAAAAAAAAAAAAAYBBf/EABwRAAICAgMAAAAAAAAAAAAAAAABAgQDIQUSMf/aAAwDAQACEQMRAD8AX1a45IIXqYsjV+Kwho31tz0qfcpzb1e3lpMd5wrpR0aWXj+9xue0ThMTUfkU7Gxhd3CEPISy8Z//2Q==");
-  --poster-img: url("/poster-hero.jpg");   /* 페이지 안에 넣지 않고 따로 받아 휴대폰에 저장해 쓴다 */
-}
-
-*{ box-sizing: border-box }
-
-/* 휴대폰에서 페이지가 흔들리지 않게
-   - 화면 밖으로 퍼지는 장식(소개 글 뒤 베일 등) 때문에 페이지가 옆으로 몇 px 밀리던 것을 잘라 낸다
-   - 맨 위·맨 아래에서 더 당길 때 출렁이는 고무줄 효과를 끈다 */
-html, body{ overflow-x: clip; overscroll-behavior-y: none }
-/* 글자 크기는 기기·브라우저 설정에 따라 달라지지 않게 고정한다
-   - 기준 글자 크기를 16px 로 못 박아 rem 이 늘 같은 값이 되게 하고
-   - 휴대폰 브라우저가 글자를 제멋대로 키우는 자동 확대를 끈다
-   - 화면 폭(vw)에 따라 바뀌던 제목·질문 크기도 390px 휴대폰에서 보이던 값으로 고정했다 */
-html{ font-size:16px; -webkit-text-size-adjust:100%; text-size-adjust:100% }
-@supports not (overflow: clip){ body{ overflow-x: hidden } }
-
-body{
-  position:relative;
-  margin:0;
-  background: var(--wall);
-  color: var(--ink);
-  font-family:"IBM Plex Sans KR", system-ui, -apple-system, "Apple SD Gothic Neo", sans-serif;
-  font-weight:400;
-  line-height:1.75;
-  -webkit-font-smoothing: antialiased;
-}
-
-/* 포스터가 페이지 전체에 번진다 — 위는 짙게, 아래로 갈수록 바탕에 녹는다 */
-.backdrop{
-  position:absolute;
-  inset:0;
-  z-index:0;
-  pointer-events:none;
-  background-image: var(--poster-blur, none);
-  background-size: 100% 100%;
-  background-repeat: no-repeat;
-  filter: blur(80px) saturate(1.34);
-  opacity:.82;
-  /* --hero-h 까지는 색을 꽉 채우고, 포스터·D-DAY를 지난 뒤부터 바탕으로 풀린다 */
-  -webkit-mask-image: linear-gradient(to bottom,
-    rgba(0,0,0,1) 0,
-    rgba(0,0,0,1)   var(--hero-h, 900px),
-    rgba(0,0,0,.72) calc(var(--hero-h, 900px) + 260px),
-    rgba(0,0,0,.40) calc(var(--hero-h, 900px) + 680px),
-    rgba(0,0,0,.16) calc(var(--hero-h, 900px) + 1200px),
-    rgba(0,0,0,0)   100%);
-  mask-image: linear-gradient(to bottom,
-    rgba(0,0,0,1) 0,
-    rgba(0,0,0,1)   var(--hero-h, 900px),
-    rgba(0,0,0,.72) calc(var(--hero-h, 900px) + 260px),
-    rgba(0,0,0,.40) calc(var(--hero-h, 900px) + 680px),
-    rgba(0,0,0,.16) calc(var(--hero-h, 900px) + 1200px),
-    rgba(0,0,0,0)   100%);
-}
-
-/* 아주 얕은 나뭇결 */
-body::before{
-  content:"";
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  z-index:1;
-  background: repeating-linear-gradient(93deg,
-    transparent 0 4px,
-    var(--grain) 4px 5px,
-    transparent 5px 13px);
-}
-
-.wrap{
-  position:relative;
-  z-index:2;
-  max-width: 760px;
-  margin-inline:auto;
-  padding-inline: 20px;
-  padding-block: 0 80px;
-}
-
-/* ── 히어로 ───────────────────────────────── */
-.hero{
-  position:relative;
-  padding-block: 60px 52px;
-}
-.hero > *{ position:relative; z-index:1 }
-
-.eyebrow{
-  font-size:.68rem;
-  letter-spacing:.26em;
-  color: var(--ink-soft);
-  font-weight:500;
-  margin:0 0 32px;
-  text-align:center;
-}
-.eyebrow .brand{
-  color:#FFFFFF;
-  text-shadow: 0 1px 10px rgba(16,22,44,.35);
-}
-.eyebrow .eyebrow-sub{
-  font-weight:300;
-  color:#332519;
-}
-
-/* 학원 링크: 상단 학원 이름 바로 아래, 포스터 위에 가볍게 */
-.studio-links{
-  display:flex; justify-content:center; flex-wrap:wrap; gap:8px;
-  margin:-20px 0 30px;
-}
-.studio-links a{
-  display:inline-flex; align-items:center; gap:6px;
-  padding:6px 14px 6px 10px; border-radius:999px;
-  font-size:.82rem; font-weight:500; letter-spacing:.01em; text-decoration:none;
-  color: var(--ink);
-  background: rgba(255,255,255,.62);
-  border:1px solid rgba(255,255,255,.75);
-  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
-  transition: background .2s ease, transform .2s ease;
-}
-.studio-links a:hover{ background: rgba(255,255,255,.9); transform: translateY(-1px) }
-.studio-links a:focus-visible{ outline:2px solid var(--spark); outline-offset:2px }
-.studio-links svg{ width:17px; height:17px; flex:0 0 auto }
-
-/* ── 액자 ─────────────────────────────────── */
-.frame{
-  width:min(318px, 76vw);
-  margin-inline:auto;
-  aspect-ratio: 842 / 1191;   /* 포스터 원본 비율 */
-  max-width:100%;
-  background: var(--surface);
-  background-image: var(--poster-img, none);
-  background-size: cover;
-  background-position: center;
-  border: 6px solid transparent;
-  border-image: var(--frame-wood) 1;
-  box-shadow: 0 2px 4px var(--shadow), 0 18px 40px -16px var(--shadow);
-  transform: rotate(-1.2deg);
-  transition: transform .6s cubic-bezier(.22,.61,.36,1);
-}
-.frame:hover{ transform: rotate(0deg) }
-/* 작가 전용 페이지: 포스터 오른쪽 아래에 작가의 그림을 살짝 겹쳐 둔다 (포스터 넓이의 약 1/4) */
-.frame.has-work{
-  /* 겹친 그림이 오른쪽으로 약 16% 삐져나오므로, 둘을 한 덩어리(포스터 넓이의 약 1.2배)로 보고
-     화면 좌우 16px 안에 들어가게 줄인 뒤, 덩어리가 가운데 오도록 왼쪽으로 옮긴다 (375px 화면에서 좌우 21px로 측정) */
-  --fw: min(300px, calc((100vw - 32px) / 1.22));
-  width: var(--fw);
-  position:relative;
-  right: calc(var(--fw) * .077);
-  margin-bottom: 34px;
-}
-.frame-work{
-  position:absolute; right:-16%; bottom:-9%;
-  width:50%; aspect-ratio: 1135 / 1600;
-  background-size: cover; background-position: center;
-  border: 5px solid #fff;
-  box-shadow: 0 10px 24px rgba(40,28,18,.28), 0 2px 4px rgba(40,28,18,.18);
-  transform: rotate(6deg);
-  filter: brightness(1.14) saturate(1.04);   /* 포스터 옆에서 어둡게 보이지 않도록 살짝 밝게 */
-  transition: transform .6s cubic-bezier(.22,.61,.36,1);
-  pointer-events:none;
-}
-.frame:hover .frame-work{ transform: rotate(3deg) translate(4px, -2px) }
-/* 겹친 그림의 오른쪽 아래 모서리에서 시작해 안쪽으로 옅어지는 블러. 흰 테두리 안쪽만 흐리게 한다 */
-.frame-work{ overflow:hidden }
-.frame-work::after{
-  content:""; position:absolute; inset:0;
-  background: inherit;                 /* 같은 그림을 한 장 더 겹쳐 흐리게 */
-  border:0;
-  filter: blur(3px);
-  /* 오른쪽 위 ↔ 왼쪽 아래 모서리를 잇는 대각선을 기준으로 오른쪽 아래 절반을 덮는다.
-     '모서리 방향' 그라디언트의 50% 선은 정확히 그 대각선이라, 거기서 0 → 오른쪽 아래 모서리에서 가장 진하게 */
-  -webkit-mask-image: linear-gradient(to bottom right, transparent 50%, rgba(0,0,0,.45) 66%, rgba(0,0,0,.85) 84%, #000 100%);
-          mask-image: linear-gradient(to bottom right, transparent 50%, rgba(0,0,0,.45) 66%, rgba(0,0,0,.85) 84%, #000 100%);
-}
-@media (prefers-reduced-motion: reduce){
-  .frame, .frame:hover{ transition:none; transform: rotate(-1.2deg) }
-}
-
-/* ── 타이틀 ───────────────────────────────── */
-/* 제목이 배경색에 묻히지 않도록 둥근 베일을 깔고, 흐려서 가장자리를 풀어 놓는다 */
-.title-block{
-  position:relative;
-  margin-top: 34px;
-  padding: 32px 30px 36px;
-  text-align:center;
-}
-.title-block > *{ position:relative; z-index:1 }
-@media (max-width: 420px){
-  .title-block{ padding: 26px 14px 30px }
-}
-h1{
-  font-family:"Hahmlet", serif;
-  font-weight:700;
-  font-size: 37px;
-  line-height:1.26;
-  letter-spacing:-.035em;
-  margin:0 0 16px;
-  text-wrap: balance;
-  color:#FFFFFF;
-  text-shadow: 0 2px 20px rgba(16,22,44,.45);
-}
-h1 em{
-  font-style:normal;
-  color:#FFFFFF;
-}
-.en-title{
-  margin:0 0 18px;
-  font-family:"Hahmlet", serif;
-  font-weight:300;
-  font-size:.86rem;
-  letter-spacing:.12em;
-  color: var(--spark);
-}
-/* 영문 제목·소개 문구 뒤로 가운데서 바깥으로 사라지는 밝은 블러 */
-.title-copy{
-  position:relative;
-  isolation:isolate;
-}
-.title-copy::before{
-  content:"";
-  position:absolute;
-  inset:-80px -40px;
-  transform: translateY(32px);
-  z-index:-1;
-  pointer-events:none;
-  background: radial-gradient(ellipse closest-side at center,
-    rgba(255,255,255,.4) 0%,
-    rgba(255,255,255,.28) 35%,
-    rgba(255,255,255,.1) 70%,
-    rgba(255,255,255,0) 100%);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
-  -webkit-mask-image: radial-gradient(ellipse closest-side at center, #000 30%, transparent 100%);
-  mask-image: radial-gradient(ellipse closest-side at center, #000 30%, transparent 100%);
-}
-/* 작가 전용 페이지: 맨 위 여백을 줄이고, 디데이는 카드 대신 초대 문구와 포스터 사이에 글자로 */
-.artist-page .hero{ padding-top: 30px; padding-bottom: 0 }
-/* 인사말과 그림 카드 사이를 좁힌다 (원래 약 96px → 약 32px) */
-.artist-page .hero .title-block{ padding-bottom: 12px }
-.artist-page #workSection{ margin-top: 20px }
-.artist-page .hero .dday{ display:none }
-.dday-text{
-  margin:0 0 18px; text-align:center;
-  font-family:"Hahmlet", serif; font-weight:700; font-size:1.5rem; letter-spacing:-.01em;
-}
-.dday-text .dday-num{
-  font-size:1.5rem;
-  text-shadow: 0 0 12px rgba(255,255,255,.8), 0 0 3px rgba(255,255,255,.6);   /* 밝은 빛 번짐 */
-}
-/* 작가 전용 페이지: 맨 위 소개 자리에 흰 글씨 인사말 */
-.artist-page .title-copy::before{
-  background: radial-gradient(ellipse closest-side at center,
-    rgba(16,22,44,.32) 0%, rgba(16,22,44,.2) 45%, rgba(16,22,44,0) 100%);
-}
-.artist-page .title-copy .work-hello{
-  margin-top:6px; gap:12px; color:#fff; text-align:center;
-  text-shadow: 0 1px 12px rgba(16,22,44,.55);
-  word-break: keep-all;
-}
-.artist-page .title-copy .work-hello p{ margin:0; font-size:1.1rem; line-height:1.75; color:#fff }   /* 기본 소개 문구의 약 1.2배 */
-.artist-page .title-copy .work-notice{ background:none; border:0; padding:14px 0 }   /* 질문 덩어리마다 위아래 여백 */
-/* 작가 그림은 모두 같은 밝기로 (포스터에 겹친 그림과 맞춤) */
-.artist-page .work-zoom img,
-.artist-page .work-viewer img{ filter: brightness(1.14) saturate(1.04) }
-.artist-page .title-copy .work-notice strong{ margin-right:0; color:#fff; font-weight:600 }
-.artist-page .title-copy .work-notice .q{ display:block; margin:0 0 4px }
-.artist-page .title-copy .work-notice em{ color:#fff }
-.subtitle{
-  margin:0;
-  color: #332519;
-  font-weight:300;
-  font-size:.92rem;
-  text-wrap: balance;
-}
-
-/* ── D-DAY ────────────────────────────────── */
-.dday{
-  margin: 40px auto 0;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:4px;
-  padding: 20px 32px;
-  background: var(--surface);
-  border:1px solid var(--line);
-  border-radius: calc(var(--radius) + 3px);
-  width:fit-content;
-  max-width:100%;
-}
-.dday-num{
-  font-family:"Hahmlet", serif;
-  font-size: 2.5rem;
-  line-height:1.05;
-  font-weight:700;
-  letter-spacing:-.03em;
-  color: var(--ember);
-  font-variant-numeric: tabular-nums;
-}
-.dday-label{
-  font-size:.7rem;
-  letter-spacing:.16em;
-  color: var(--ink-soft);
-  font-weight:500;
-}
-
-/* ── 섹션 ─────────────────────────────────── */
-section{ margin-top: 52px }
-
-/* 카드: 가운데는 불투명하고 가장자리로 갈수록 바탕에 녹아든다.
-   drop-shadow 는 실제로 그려진 모양을 따라가므로 그림자도 같이 흐려진다. */
-.card{
-  padding: 32px 26px 36px;
-  border-radius: 18px;
-  background: radial-gradient(128% 118% at 50% 42%,
-    rgba(var(--surface-rgb), 1)   0%,
-    rgba(var(--surface-rgb), .99) 48%,
-    rgba(var(--surface-rgb), .92) 70%,
-    rgba(var(--surface-rgb), .62) 85%,
-    rgba(var(--surface-rgb), .22) 94%,
-    rgba(var(--surface-rgb), 0)   100%);
-  filter: drop-shadow(0 6px 14px var(--card-shadow))
-          drop-shadow(0 18px 36px var(--card-shadow));
-}
-@media (max-width: 420px){
-  .card{ padding: 26px 18px 30px; border-radius: 15px }
-}
-h2{
-  font-family:"Hahmlet", serif;
-  font-size:1.1rem;
-  font-weight:500;
-  letter-spacing:-.01em;
-  margin:0;
-}
-.section-head{
-  position:relative;
-  display:flex;
-  align-items:baseline;
-  gap:12px;
-  flex-wrap:wrap;
-  padding-bottom:12px;
-  margin-bottom: 26px;
-}
-.section-head::after{
-  content:"";
-  position:absolute;
-  left:0; right:0; bottom:0;
-  height:1px;
-  background: var(--line);
-  transform-origin: left center;
-}
-.section-head .en{
-  font-size:.58rem;
-  letter-spacing:.3em;
-  color: var(--ink-soft);
-  font-weight:500;
-}
-.count{
-  margin-left:auto;
-  font-size:.7rem;
-  color: var(--ink-soft);
-  font-variant-numeric: tabular-nums;
-}
-
-/* 라벨–값 행 */
-dl{ margin:0 }
-.row{
-  display:grid;
-  grid-template-columns: 96px 1fr;
-  gap: 4px 20px;
-  padding-block:15px;
-  border-bottom:1px solid var(--line);
-  align-items:baseline;
-}
-.row:last-child{ border-bottom:0 }
-dt{
-  font-size:.74rem;
-  color: var(--ink-soft);
-  font-weight:500;
-  letter-spacing:.04em;
-  min-width:0;
-}
-dd{
-  margin:0;
-  min-width:0;
-  font-size:.98rem;
-  font-variant-numeric: tabular-nums;
-}
-.place-link{
-  color:inherit; text-decoration:none;
-  border-bottom:1px solid var(--line);
-  transition: border-color .2s ease, color .2s ease;
-}
-.place-link:hover{ color: var(--spark); border-color: var(--spark) }
-.place-link svg{ width:.8em; height:.8em; margin-left:3px; vertical-align:-.05em; opacity:.6 }
-.icon-copy{
-  display:inline-grid; place-items:center; vertical-align:-.3em;
-  width:28px; height:28px; margin-left:6px; padding:0;
-  border:1px solid var(--line); border-radius:7px; background: var(--surface);
-  color: var(--ink-soft); cursor:pointer;
-  transition: color .2s ease, border-color .2s ease;
-}
-.icon-copy:hover{ color: var(--spark); border-color: var(--spark) }
-.icon-copy:focus-visible{ outline:2px solid var(--spark); outline-offset:2px }
-.icon-copy svg{ width:15px; height:15px }
-/* 주소 아래 지도 앱: 색 있는 작은 표시 + 짧은 이름 */
-.map-links{ grid-column: 2; display:flex; flex-wrap:wrap; gap:6px; margin-top:6px }
-@media (max-width: 420px){
-  .map-links{ grid-column: 1 / -1; display:grid; grid-template-columns: repeat(3, 1fr); margin-top:10px }
-  .map-links a{ justify-content:center; padding:7px 6px }
-}
-.map-links a{
-  display:inline-flex; align-items:center; gap:5px;
-  padding:4px 9px 4px 5px; border:1px solid var(--line); border-radius:999px;
-  background: var(--surface); color: var(--ink); text-decoration:none;
-  font-size:.82rem; font-weight:500; white-space:nowrap;
-  transition: border-color .2s ease, transform .2s ease;
-}
-.map-links a:hover{ border-color: var(--spark); transform: translateY(-1px) }
-.map-links a:focus-visible{ outline:2px solid var(--spark); outline-offset:2px }
-.map-ico{
-  display:inline-grid; place-items:center; width:18px; height:18px; border-radius:5px;
-  font-style:normal; font-size:.7rem; font-weight:800; line-height:1; font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-}
-.map-ico.naver{ background:#03C75A; color:#fff }
-.map-ico.kakao{ background:#FEE500; color:#3C1E1E }
-.map-ico.google{ background:#fff; color:#4285F4; box-shadow: inset 0 0 0 1px var(--line) }
-dd .sub{
-  display:block;
-  font-size:.79rem;
-  color: var(--ink-soft);
-  margin-top:4px;
-  font-variant-numeric: normal;
-}
-.row.highlight dd{
-  font-family:"Hahmlet", serif;
-  font-weight:500;
-  font-size:1.08rem;
-  letter-spacing:-.01em;
-}
-@media (max-width: 420px){
-  .row{ grid-template-columns: 78px 1fr; gap: 4px 14px }
-}
-
-/* ── 참여 작가 ────────────────────────────── */
-.artists{
-  display:grid;
-  grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
-  gap: 24px 10px;
-  margin:0;
-  padding: 8px 6px;
-  list-style:none;
-}
-.artists li{
-  font-family:"Hahmlet", serif;
-  font-weight:300;
-  font-size:1rem;
-  letter-spacing:-.01em;
-  min-width:0;
-  cursor:pointer;
-  transition: color .2s ease;
-}
-.artists li:hover{ color: var(--spark) }
-.artists li:focus-visible{
-  outline:2px solid var(--spark);
-  outline-offset:3px;
-  border-radius:3px;
-}
-.artists li.picked{
-  color: var(--spark);
-  font-weight:700;
-}
-/* 이름들이 종이 위에 흩뿌려진 것처럼 — 칸 안에서 쏠리고, 기울고, 크기가 다르다.
-   서로 다른 주기의 규칙이 겹치면서 불규칙하게 보인다.
-   translate·rotate 속성은 등장 애니메이션의 transform과 따로 놀아 겹치지 않는다 */
-.artists li{
-  justify-self: var(--j, center);
-  translate: var(--dx, 0) var(--dy, 0);
-  rotate: var(--r, 0deg);
-  font-size: var(--fs, 1rem);
-  line-height:1.2;
-}
-.artists li:nth-child(2n)  { --r:-4deg }
-.artists li:nth-child(3n)  { --r:5deg;  --dy:-9px }
-.artists li:nth-child(3n+1){ --j:start; --dx:6px;  --dy:8px }
-.artists li:nth-child(4n+2){ --j:end;   --dx:-4px }
-.artists li:nth-child(5n)  { --fs:1.22rem; --dy:5px }
-.artists li:nth-child(5n+3){ --fs:.9rem;  --r:-7deg }
-.artists li:nth-child(6n+5){ --fs:1.12rem; --dx:-10px }
-.artists li:nth-child(7n+4){ --j:center; --dy:-12px; --r:3deg }
-
-/* 공유 링크(#이름)로 들어왔을 때 그 작가만 크게 도드라진다.
-   흩어진 이름들 사이에서 두 칸을 차지하고, 기울기·쏠림은 거둬 가운데 선다 */
-.artists li.spotlight{
-  --fs: 1.85rem;
-  --r: -3deg;
-  --dx: 0;
-  --dy: 0;
-  --j: center;
-  grid-column: span 2;
-  font-weight:700;
-  position:relative;
-  z-index:1;
-  text-shadow: 0 0 18px rgba(var(--surface-rgb), .9);
-  transition: font-size .35s cubic-bezier(.22,.61,.36,1);
-}
-.artists li.spotlight.picked{ color: inherit }
-
-.host-line{ margin:14px 0 0; font-size:.76rem }
-.host-line a{ margin-left:4px }
-/* ── 작가 전용 페이지의 작품 ─────────────── */
-.work-notice{
-  margin:20px 0 0; padding:12px 14px; border-radius: var(--radius);
-  background: rgba(30,86,184,.06); border:1px solid rgba(30,86,184,.18);
-  font-size:.86rem; line-height:1.65; color: var(--ink);
-}
-.work-notice strong{ margin-right:6px; color: var(--accent); font-weight:600 }
-.work-notice em{ font-style:normal; font-weight:600 }
-.work-main{ margin:22px 0 0; display:grid; gap:16px; justify-items:center }
-.work-zoom{
-  display:block; padding:0; border:0; background:none; cursor:zoom-in;
-  border-radius:4px; overflow:hidden;
-}
-.work-main .work-zoom{
-  width:min(100%, 420px);
-  border:10px solid #fff;
-  box-shadow: 0 18px 40px var(--card-shadow);
-}
-.work-zoom img{ display:block; width:100%; height:auto }
-.work-main figcaption{ display:grid; gap:6px; text-align:center }
-.work-title{ font-family:"Hahmlet", serif; font-weight:500; font-size:1.15rem; letter-spacing:-.01em }
-.work-q{ font-family:"Hahmlet", serif; font-weight:300; font-size:.95rem; color: var(--ink-soft) }
-.work-label{
-  margin:30px 0 10px; font-size:.72rem; letter-spacing:.18em; color: var(--ink-soft);
-}
-/* 가까이 보기: 스크롤바 대신 점 표시, 한 번 밀면 한 장씩, 다음 사진이 살짝 보이게 */
-.work-strip{
-  display:flex; gap:10px; overflow-x:auto;
-  scroll-snap-type:x mandatory;
-  overscroll-behavior-x: contain;          /* 끝까지 밀어도 페이지가 밀리거나 뒤로 가기가 되지 않게 */
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;                   /* 스크롤바 숨김 (Firefox) */
-  margin-inline:-4px; padding: 2px 4px 4px;
-  scroll-padding-inline: 4px;
-}
-.work-strip::-webkit-scrollbar{ display:none }   /* 스크롤바 숨김 (Chrome·Safari) */
-.work-strip .work-zoom{
-  flex:0 0 64%; max-width:240px;
-  scroll-snap-align:start;
-  scroll-snap-stop: always;                /* 세게 튕겨도 한 장씩 멈춘다 */
-}
-.work-dots{ display:flex; justify-content:center; gap:6px; margin-top:12px }
-.work-dots span{
-  width:6px; height:6px; border-radius:50%;
-  background: var(--line); transition: background .2s ease, width .2s ease;
-}
-.work-dots span.on{ width:16px; border-radius:3px; background: var(--ink-soft) }
-.work-strip .work-zoom:focus-visible, .work-main .work-zoom:focus-visible{ outline:2px solid var(--spark); outline-offset:2px }
-/* 크게 보기: 미디어 뷰어처럼 옆으로 밀어서 넘긴다 */
-.work-viewer{
-  position:fixed; inset:0; z-index:50;
-  background: rgba(20,16,12,.94);
-  overscroll-behavior: contain;
-}
-.work-viewer[hidden]{ display:none }
-.viewer-track{
-  position:absolute; inset:0;
-  display:flex; overflow-x:auto; overflow-y:hidden;
-  scroll-snap-type:x mandatory; overscroll-behavior-x: contain;
-  scrollbar-width:none;
-}
-.viewer-track::-webkit-scrollbar{ display:none }
-.viewer-slide{
-  flex:0 0 100%; height:100%;
-  display:flex; align-items:center; justify-content:center;
-  padding: 56px 16px;
-  scroll-snap-align:center; scroll-snap-stop: always;
-}
-.viewer-slide img{ max-width:100%; max-height:100%; object-fit:contain; box-shadow:0 20px 60px rgba(0,0,0,.5) }
-.viewer-count{
-  position:absolute; top:22px; left:0; right:0; margin:0; text-align:center;
-  color: rgba(255,255,255,.85); font-size:.8rem; letter-spacing:.08em; font-variant-numeric: tabular-nums;
-  pointer-events:none;
-}
-.viewer-nav{
-  position:absolute; top:50%; translate:0 -50%;
-  width:44px; height:44px; border-radius:50%; border:0;
-  background: rgba(255,255,255,.14); color:#fff; font-size:1.6rem; line-height:1; cursor:pointer;
-}
-.viewer-nav.prev{ left:12px } .viewer-nav.next{ right:12px }
-.viewer-nav:disabled{ opacity:0; pointer-events:none }
-@media (hover: none){ .viewer-nav{ display:none } }   /* 휴대폰은 손가락으로 밀어 넘긴다 */
-.work-close{
-  position:absolute; top:14px; right:14px; width:40px; height:40px; border-radius:50%;
-  border:0; background: rgba(255,255,255,.9); font-size:1rem; cursor:pointer;
-}
-
-/* 예약 페이지는 포스터가 작으니 전시 제목도 한 단계 작게 (원래 2.2–3.5rem) */
-.visit-page h1{ font-size: 24px; margin-bottom:12px }
-/* 제목 뒤 어두운 베일이 아래 전시 안내 카드 윗면까지 번져 흐릿하게 보여서, 예약 페이지에서는 뺀다 */
-.visit-page .title-copy::before{ display:none }
-/* 인사말 카드: 질문(.q)만 한 줄로 띄우고, 본문 속 굵은 글씨 뒤에는 여백을 두지 않는다 (쉼표가 떨어지지 않게) */
-#helloSection .work-notice strong{ margin-right:0 }
-#helloSection .work-notice .q{ display:block; margin:0 0 4px }
-/* 관람 예약 카드: 포스터의 튤립 빨강 → 코발트 하늘로 이어지는 1px 그라데이션 테두리 */
-#visitSection{ position:relative }
-#visitSection::before{
-  content:""; position:absolute; inset:0; pointer-events:none;
-  border-radius: inherit;
-  padding:1px;                          /* 이 두께만큼만 남기고 안쪽은 지운다 */
-  background: linear-gradient(135deg, var(--ember) 0%, #D9708A 45%, var(--accent) 100%);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-          mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
-}
-
-/* ── 관람 예약 페이지 (/jessie/visit) ── */
-/* 포스터와 겹친 그림을 기존의 절반 크기로 (겹친 그림은 포스터 폭의 50%라 함께 줄어든다) */
-.visit-page .frame.has-work{
-  --fw: min(120px, calc((100vw - 32px) / 3.05));   /* 원래 크기의 40% (절반에서 20% 더 줄임) */
-  border-width:4px;
-  margin-bottom: 14px;
-}
-/* 초대 문구 · 디데이 한 줄 */
-.visit-top{ display:flex; flex-direction:column; align-items:center; gap:calc(var(--cover-gap, 18px) - 3px); margin:0; text-align:center }   /* 제목 위, 초대 문구 아래. 제목의 줄 높이 여유(약 3px)만큼 빼서 위아래가 같아 보이게 */
-.visit-top h1{ margin:0; text-align:center; white-space:nowrap; font-size: 21px }
-.visit-top .invite-line{ margin:0; text-align:center; white-space:nowrap; font-size:.78rem }
-/* 전시 안내 카드 제목줄 오른쪽 끝의 디데이 */
-.section-head .info-dday{ margin:0 0 0 auto; font-size:1.05rem; line-height:1 }
-.section-head .info-dday .dday-num{ font-size:1.05rem; color: var(--ember); text-shadow:none }
-.visit-page .hero{ padding-top: 22px }
-.visit-page .hero .title-block{ margin-top: 6px; padding-top: 18px; padding-bottom: 6px }
-.visit-page .frame-work{ border-width:3px }
-/* ── 장면 넘기기: 장면이 화면에 겹쳐 고정되고, 한 번에 하나만 페이드로 보인다 ──
-   페이지 자체는 스크롤되지 않는다. 화면보다 긴 장면은 장면 안에서 스크롤된다 */
-html.visit-page, html.visit-page body{ height:100%; overflow:hidden; overscroll-behavior:none }
-.visit-page .wrap{ padding-bottom: 0 }
-.scene{
-  position:fixed; inset:0; z-index:5;
-  display:flex; flex-direction:column;
-  padding: 16px max(20px, calc((100vw - 720px) / 2));
-  box-sizing:border-box;
-  overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling: touch;
-  opacity:0; visibility:hidden;
-  transition: opacity var(--scene-fade, 450ms) ease, visibility 0s linear var(--scene-fade, 450ms);
-}
-.scene.is-active{
-  opacity:1; visibility:visible; z-index:6;
-  transition: opacity var(--scene-fade, 450ms) ease, visibility 0s;
-}
-/* 세로 가운데 정렬. 장면이 화면보다 길어지면 위가 잘리지 않고 위에서부터 스크롤된다 */
-.scene > :first-child{ margin-top:auto !important }
-.scene > :last-child{ margin-bottom:auto !important }
-.visit-page .scene > section.card{ margin:0 }
-/* 장면 전환 끊김 방지: 카드의 drop-shadow 필터 두 겹은 페이드되는 동안 매 프레임 다시 그려져
-   크롬에서 프레임이 50~80ms씩 밀렸다. 예약 페이지에서는 같은 느낌의 box-shadow 로 바꾼다 (전환 중 끊김 0) */
-.visit-page .scene section.card{
-  filter:none; background:#fff;
-  box-shadow: 0 6px 14px rgba(48,38,28,.10), 0 18px 36px rgba(48,38,28,.10);
-}
-.visit-page .scene > section.card + section.card{ margin-top: 18px }
-/* 받아지는 중: 뒷배경만. 모든 애니메이션은 0초 지점에 멈춰 둔다 */
-html.visit-loading .wrap, html.visit-loading .scene-dots{ visibility:hidden }
-html.visit-loading *, html.visit-loading *::before, html.visit-loading *::after{ animation-play-state: paused !important }
-/* 받아지는 동안: 표지 진행 막대와 같은 자리에 '불러오는 중' 안내와 흐르는 1px 막대.
-   다 받아지면 이 자리에 '잠시 뒤 전시 안내로 넘어가요'와 차오르는 막대가 이어서 나온다 */
-html.visit-loading body::before{
-  content:"포스터를 불러오는 중이에요"; position:fixed; left:0; right:0; bottom:66px; z-index:40;
-  text-align:center; font-size:.78rem; letter-spacing:.02em; color:#fff;
-  text-shadow: 0 1px 8px rgba(80,30,30,.35);
-}
-html.visit-loading body::after{
-  content:""; position:fixed; left:50%; bottom:54px; z-index:40; transform: translateX(-50%);
-  width: min(max(50vw, 280px), calc(100% - 40px)); height:1px; border-radius:1px;
-  background:
-    linear-gradient(90deg, rgba(255,255,255,0), #fff 50%, rgba(255,255,255,0)) no-repeat,
-    rgba(255,255,255,.3);
-  background-size: 40% 100%, 100% 100%;
-  animation: loaderSlide 1.2s ease-in-out infinite;
-  animation-play-state: running !important;
-}
-@keyframes loaderSlide{ from{ background-position: -70% 0, 0 0 } to{ background-position: 170% 0, 0 0 } }
-@media (prefers-reduced-motion: reduce){ html.visit-loading body::after{ animation:none; background: rgba(255,255,255,.6) } }
-@media (prefers-reduced-motion: reduce){
-  .scene, .scene.is-active{ transition:none }
-}
-/* ① 표지 */
-.scene-cover{ padding-block: 0 }
-.scene-cover .hero{
-  flex:1; display:flex; flex-direction:column; padding: 22px 0 18px;
-}
-/* 제목 · 초대 문구 · 포스터를 한 덩어리로 화면 가운데에 두고,
-   초대 문구 위(제목까지)와 아래(포스터까지)의 여백을 같게(--cover-gap) 맞춘다 */
-.scene-cover .hero{ --cover-gap: 18px }
-.scene-cover .visit-top{ margin-top:auto; margin-bottom:0 }
-.scene-cover .frame.has-work{
-  --fw: min(250px, calc((100vw - 32px) / 1.22), calc((100svh - 230px) / 1.62));
-  margin-block: var(--cover-gap) 0;
-}
-.scene-hint{
-  margin: auto auto 0; display:flex; flex-direction:column; align-items:center; gap:2px;
-  border:0; background:none; padding:6px 10px; cursor:pointer;
-  font: inherit; font-size:.74rem; letter-spacing:.04em; color: var(--spark);
-}
-/* 첫 진입 진행 막대: 화면 아래쪽 가운데, 1px 높이의 가는 선이 차오른다 */
-.intro-bar{
-  position:absolute; left:50%; bottom:54px; transform: translateX(-50%);
-  /* 화면 폭의 절반 정도. 단 포스터(약 250px)보다는 길게, 화면 가장자리에는 닿지 않게 */
-  width: min(max(50vw, 280px), calc(100% - 40px)); height:1px; background: rgba(255,255,255,.3); overflow:hidden; border-radius:1px;
-}
-.intro-bar i{
-  display:block; height:100%; width:100%;
-  background:#fff;                       /* 아래쪽이 붉은 배경이라 흰 선이 가장 잘 보인다 */
-  transform: scaleX(0); transform-origin:left center;
-}
-.intro-run .intro-bar i{ transform: scaleX(1); transition: transform var(--intro-ms, 1950ms) linear }
-.intro-done .intro-bar, .intro-done .intro-text{ display:none }     /* 표지로 다시 돌아왔을 때는 없다 */
-/* 진행 막대 바로 위의 안내 한 줄 */
-.intro-text{
-  position:absolute; left:0; right:0; bottom:66px; margin:0; text-align:center;
-  font-size:.78rem; letter-spacing:.02em; color:#fff;
-  text-shadow: 0 1px 8px rgba(80,30,30,.35);
-}
-/* 첫 진입 때 잠깐 보이는 표지에서는 넘기기 안내를 숨긴다 (다시 표지로 돌아오면 보인다) */
-.visit-page:not(.intro-done) .scene-hint{ visibility:hidden }
-/* 촘촘히 겹친 셰브론 3개: 덩어리째 아래로 둥둥 떠내려가고, 위에서부터 차례로 밝아진다 */
-.chevrons{ display:flex; flex-direction:column; align-items:center; margin-top:4px; animation: hintFloat 2s ease-in-out infinite }
-.chevrons svg{ width:22px; height:11px; margin-top:-4px; overflow:visible }
-.chevrons svg:first-child{ margin-top:0 }
-.chevrons path{ fill:none; stroke:currentColor; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round }
-.chevrons svg{ animation: hintFade 2s ease-in-out infinite }
-.chevrons svg:nth-child(1){ animation-delay: 0s }
-.chevrons svg:nth-child(2){ animation-delay: .2s }
-.chevrons svg:nth-child(3){ animation-delay: .4s }
-@keyframes hintFloat{ 0%,100%{ transform: translateY(0) } 50%{ transform: translateY(7px) } }
-@keyframes hintFade{ 0%,100%{ opacity:.25 } 40%{ opacity:1 } }
-@media (prefers-reduced-motion: reduce){
-  .chevrons, .chevrons svg{ animation:none }
-  .chevrons svg:nth-child(1){ opacity:.35 } .chevrons svg:nth-child(2){ opacity:.65 }
-}
-/* 오른쪽 장면 점 */
-.scene-dots{
-  position:fixed; right:2px; top:50%; transform: translateY(-50%); z-index:20;
-  display:flex; flex-direction:column; gap:4px;
-}
-.scene-dots button{
-  width:16px; height:18px; padding:0; border:0; background:none; cursor:pointer;
-  display:grid; place-items:center;
-}
-.scene-dots button::before{
-  content:""; width:6px; height:6px; border-radius:50%;
-  background: rgba(110,98,84,.35); box-shadow: 0 0 0 1.5px rgba(255,255,255,.7);
-  transition: transform .25s ease, background .25s ease;
-}
-.scene-dots button.on::before{
-  background: linear-gradient(135deg, var(--ember), var(--accent)); transform: scale(1.45);
-}
-.scene-dots.on-cover button::before{ background: rgba(255,255,255,.55); box-shadow:none }
-.scene-dots.on-cover button.on::before{ background:#fff }
-.scene-dots button:focus-visible{ outline:2px solid var(--spark); outline-offset:1px; border-radius:50% }
-
-/* 전시 기간 달력 */
-.cal{ margin: -4px 0 6px; padding-bottom: 14px; border-bottom:1px solid var(--line) }
-.cal-head{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px }
-.cal-month{ font-family:"Hahmlet", serif; font-weight:600; font-size:1.05rem }
-.cal-range{ font-size:.8rem; color: var(--ink-soft) }
-.cal-grid{ display:grid; grid-template-columns: repeat(7, 1fr); row-gap:4px; text-align:center }
-.cal-dow{ font-size:.66rem; color: var(--ink-soft); padding-bottom:4px; letter-spacing:.04em }
-.cal-dow.sun, .cal-day.sun{ color: var(--ember) }
-.cal-day{
-  position:relative; height:36px; display:grid; place-items:center;
-  font-size:.9rem; color: #A69C90; font-variant-numeric: tabular-nums;
-}
-.cal-day b{ position:relative; z-index:1; font-weight:500 }
-.cal-day.in{ color: var(--ink) }
-.cal-day.in.sun{ color: var(--ember) }
-.cal-day.in::before{                        /* 전시 기간을 잇는 띠 */
-  content:""; position:absolute; inset:4px 0; background: rgba(217,112,138,.16);
-}
-.cal-day.in.sat::before{ right:3px; border-radius: 0 999px 999px 0 }
-.cal-day.in.sun::before{ left:3px; border-radius: 999px 0 0 999px }
-.cal-day.start::before{ left:50% }
-.cal-day.end::before{ right:50% }
-.cal-day.start b, .cal-day.end b{           /* 첫날 · 마지막 날 */
-  width:30px; height:30px; display:grid; place-items:center; border-radius:50%;
-  background: linear-gradient(135deg, var(--ember), #D9708A 45%, var(--accent)); color:#fff; font-weight:700;
-}
-.cal-day.meet::after{
-  content:""; position:absolute; bottom:1px; left:50%; width:5px; height:5px; margin-left:-2.5px;
-  border-radius:50%; background: var(--accent);
-}
-.cal-day.today b{ text-decoration: underline 2px; text-underline-offset: 4px }
-.cal-tip{
-  display:flex; align-items:center; gap:3px; margin:0 0 8px;
-  font-size:.8rem; font-weight:600; color: var(--accent);
-}
-.cal-tip svg{ width:14px; height:14px; animation: hintFloat 2s ease-in-out infinite }
-@media (prefers-reduced-motion: reduce){ .cal-tip svg{ animation:none } }
-button.cal-day{ border:0; background:none; padding:0; margin:0; font:inherit; cursor:pointer; -webkit-tap-highlight-color:transparent }
-button.cal-day:hover b{ box-shadow: 0 0 0 2px rgba(30,86,184,.35); border-radius:50% }
-button.cal-day b{ width:30px; height:30px; display:grid; place-items:center; border-radius:50%; transition: box-shadow .2s ease, background .2s ease }
-button.cal-day:focus-visible{ outline:none }
-button.cal-day:focus-visible b{ box-shadow: 0 0 0 2px var(--accent) }
-.cal-day.picked b{ box-shadow: 0 0 0 2px var(--accent); background:#fff }
-.cal-day.start.picked b, .cal-day.end.picked b{ box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--accent); background: linear-gradient(135deg, var(--ember), #D9708A 45%, var(--accent)) }
-.cal-legend{ margin:10px 0 0; font-size:.74rem; color: var(--ink-soft); display:flex; align-items:center; gap:6px }
-.cal-dot{ width:5px; height:5px; border-radius:50%; background: var(--accent); display:inline-block }
-/* 장소 줄: 이름 옆 주소 복사 버튼 */
-.visit-page #infoSection .place-link + .icon-copy{ margin-left:8px }
-/* 줄 상자의 글자 위·아래 여유가 달라(위 4px, 아래 5.5px) 위 13 · 아래 11 로 맞추면 글자가 선 사이 한가운데 온다 */
-.visit-page #infoSection .row{ padding-block: 13px 11px }
-.visit-page #infoSection .cal{ margin-top:-12.5px; margin-bottom:0 }   /* '2026. 11' 줄이 위 선과 아래 안내 사이 가운데(각 18.5px) · 달력 아래 선과 '관람 시간' 사이도 다른 줄과 같게 */
-/* 장면 안에 들어가도록 조금씩 촘촘하게 */
-.visit-page .scene{ padding-block: 16px }
-.visit-page .scene-cover{ padding-block: 0 }
-.visit-page .scene .note-form{ gap:14px; margin-top:16px }
-.visit-page .scene .field{ gap:5px }
-/* ⑤ 쪽지 장면 제목줄 오른쪽 끝: 작가 페이지 게시판으로 가는 링크 */
-.board-link{
-  margin-left:auto; display:inline-flex; align-items:center; gap:2px;
-  font-size:.78rem; font-weight:500; color: var(--spark); text-decoration:none;
-  padding:4px 4px 4px 10px; border-radius:999px; border:1px solid rgba(30,86,184,.28);
-}
-.board-link svg{ width:14px; height:14px }
-.board-link{ white-space:nowrap }
-.visit-stay{ font-weight:600; color: var(--accent) }
-/* 예약 폼: 함께 오는 사람 펼치기 */
-.party-toggle{
-  justify-self:start; border:0; background:none; padding:2px 0; cursor:pointer;
-  font: inherit; font-size:.84rem; font-weight:500; color: var(--accent);
-}
-.party-toggle:hover{ text-decoration: underline; text-underline-offset:3px }
-/* 화면 아래 떠 있는 예약 버튼 */
-.visit-cta{
-  align-self:center; flex:0 0 auto;
-  margin-top:16px !important;                 /* 카드 아랫면과 16px */
-  padding: 12px 32px; border:2px solid #fff; border-radius:999px; cursor:pointer;   /* 흰 테두리 2px */
-  font: inherit; font-size:1.06rem; font-weight:700; letter-spacing:-.01em; color:#fff; white-space:nowrap;
-  background: linear-gradient(135deg, var(--ember) 0%, #D9708A 45%, var(--accent) 100%) padding-box;
-  box-shadow: 0 8px 22px rgba(60,40,90,.28), 0 2px 6px rgba(60,40,90,.18);
-  text-shadow: 0 1px 2px rgba(40,20,40,.25);
-  transition: transform .2s ease, opacity .2s ease;
-}
-.visit-cta:hover{ transform: translateY(-1px); opacity:.95 }
-.visit-cta.is-done{ background: rgba(255,255,255,.95); color: var(--accent); text-shadow:none; box-shadow: 0 6px 18px rgba(60,40,90,.16), inset 0 0 0 1.5px rgba(30,86,184,.35) }
-.note-ask{ font-weight:600; color: var(--accent) }
-.visit-page .scene .note{ word-break:keep-all }   /* 안내 문구가 낱말 중간에서 끊기지 않게 */
-/* 전시 안내 장소 줄 아래: 지도 아이콘(왼쪽) + 예약으로 넘기라는 안내(오른쪽) */
-.map-row{ grid-column: 1 / -1; display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:12px }
-.map-links.icon-only{ display:flex !important; flex-wrap:nowrap; flex:0 0 auto; gap:6px; margin:0; grid-column:auto }
-.map-links.icon-only.in-dd{ margin-top:10px }
-.map-links.icon-only a{ width:32px; height:32px; padding:0 !important; justify-content:center; border-radius:9px }
-.map-links.icon-only .map-ico{ width:20px; height:20px; font-size:.74rem }
-/* 예약 페이지 카드의 위아래 여백을 맞춘다.
-   - 빈 안내 줄(오류 메시지 자리)이 버튼 아래 여백을 늘리고 있어서, 비어 있을 때는 자리를 차지하지 않게
-   - 위: 카드 윗면 ~ 제목 글자 = 26px + 제목 줄 여유 5px ≈ 31px, 아래도 마지막 요소 ~ 카드 아랫면 31px */
-.visit-page .scene .note-status:empty{ display:none }
-.visit-page .scene section.card:not(.thanks){ padding-top:26px; padding-bottom:31px }
-.visit-page #infoSection dl .row:last-child{ padding-bottom:0 }
-/* 휴대폰 폭에서는 영문 라벨을 빼서 링크가 제목과 한 줄에 들어가게 */
-@media (max-width: 420px){ .visit-page #boardSection .section-head .en{ display:none } }
-.board-link:hover{ background: rgba(30,86,184,.06) }
-.board-link:focus-visible{ outline:2px solid var(--spark); outline-offset:2px }
-/* ⑤ 쪽지: 게시판이 없으니 점선 구분선과 위 여백을 없애고, 제목과 겹치는 '○○ 작가에게' 줄은 숨긴다 */
-.visit-page #boardSection .board-write{ margin-top:0; padding-top:0; border-top:0 }
-.visit-page #boardSection .board-secret{ display:none }
-.visit-page #boardSection .note-to{ display:none }
-.visit-page #boardSection #notePrivacy{ margin-top:0 !important }
-/* ⑦ 마지막 장면: 가운데 감사 인사, 맨 아래 하단 정보 */
-.visit-page .scene-last{ padding-bottom: 0 }
-.visit-page .scene-last .thanks{ margin-block: auto 0 !important }
-.visit-page .scene-last footer{ margin-top:auto; padding-top:22px; padding-bottom:18px }
-.visit-page .scene-last > footer:last-child{ margin-bottom:0 !important }
-.quest-lead{
-  margin:14px 0 4px; text-align:center;
-  font-size:.86rem; line-height:1.7; color: var(--ink-soft);
-  word-break: keep-all;
-}
-.thanks{ text-align:center; padding-block: 34px 30px }
-.thanks-title{
-  margin:0 0 12px;
-  font-family:"Hahmlet", serif; font-weight:700; font-size:1.35rem; letter-spacing:-.01em;
-}
-.thanks-body{ margin:0; font-size:.95rem; line-height:1.8; word-break: keep-all }
-
-/* 재이 페이지 인사말 */
-.work-hello{ display:grid; gap:10px; margin-top:20px }
-.work-hello > p:first-child{ margin:0; font-size:.92rem; line-height:1.75 }
-.work-extra{ margin:0; font-size:.9rem; line-height:1.75 }
-.work-extra strong{ font-weight:600 }
-
-/* ── 쪽지 게시판: 메모지가 여기저기 붙은 느낌 ── */
-.board{
-  display:flex; flex-wrap:wrap; justify-content:center; align-items:flex-start;
-  gap:2px; margin-top:20px; padding:18px 6px 22px;
-  border-radius: var(--radius);
-  background-color:#F6F1E7;
-  background-image: radial-gradient(rgba(120,95,60,.12) 1px, transparent 1.2px);
-  background-size: 14px 14px;
-  min-height: 120px;
-}
-.sticky{
-  position:relative;
-  width: calc(50% - 10px); max-width: 210px;
-  margin: 6px 4px -2px;
-  padding: 20px 14px 12px;
-  background: var(--paper, #FFF4A8);
-  box-shadow: 0 6px 14px rgba(70,50,30,.16), 0 1px 2px rgba(70,50,30,.12);
-  rotate: var(--r, -2deg);
-  translate: 0 var(--y, 0);
-  font-family: "Gaegu", "Hahmlet", sans-serif;
-  color:#3B2E22;
-  transition: rotate .25s ease, scale .25s ease;
-}
-.sticky:hover{ rotate:0deg; scale:1.03; z-index:2 }
-.sticky::before{   /* 위에 붙인 테이프 */
-  content:""; position:absolute; top:-9px; left:50%; width:54px; height:18px;
-  translate:-50% 0; rotate: var(--t, 3deg);
-  background: rgba(255,255,255,.55);
-  box-shadow: 0 1px 2px rgba(0,0,0,.08);
-}
-.sticky-msg{ margin:0; font-size:1.08rem; line-height:1.45; white-space:pre-line; word-break:break-word }
-.sticky-meta{ display:flex; justify-content:space-between; gap:8px; margin-top:10px; font-size:.92rem; opacity:.75 }
-.sticky.is-new{ animation: stickIn .5s cubic-bezier(.22,.61,.36,1) both }
-@keyframes stickIn{ from{ opacity:0; scale:1.25 } to{ opacity:1; scale:1 } }
-@media (min-width: 560px){ .sticky{ width: calc(33.333% - 10px) } }
-/* 하트 쪽지: 종이를 하트 모양으로 오려 붙인 느낌.
-   다른 쪽지와 같은 폭, 늘 같은 비율의 하트. 글이 길면 하트 안에 들어가도록 글씨가 작아진다 */
-.sticky.is-heart{
-  background:none; box-shadow:none;
-  isolation:isolate;
-  aspect-ratio: 100 / 90;
-  padding: 20px 20px 38px;   /* % 는 게시판 폭 기준이라 안 맞는다. 하트 폭(140~210px)에 맞춘 고정값 */
-  display:flex; flex-direction:column;
-  overflow:hidden;
-  text-align:center;
-  filter: drop-shadow(0 6px 8px rgba(110,40,60,.18)) drop-shadow(0 1px 1px rgba(110,40,60,.12));
-}
-.sticky.is-heart::before{ display:none }   /* 테이프 없음 */
-.sticky.is-heart::after{
-  content:""; position:absolute; inset:0; z-index:-1;
-  background:#FFC2D1;
-  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 90'%3E%3Cpath d='M50 89C20 67 1 49 1 28C1 12 13 1 27 1c10 0 18 6 23 15C55 7 63 1 73 1c14 0 26 11 26 27 0 21-19 39-49 61z'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
-          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 90'%3E%3Cpath d='M50 89C20 67 1 49 1 28C1 12 13 1 27 1c10 0 18 6 23 15C55 7 63 1 73 1c14 0 26 11 26 27 0 21-19 39-49 61z'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
-}
-/* 위아래 여백을 auto로 두어 가운데에 놓되, 넘칠 때는 아래로 넘치게 해서 글씨 줄이기 계산이 맞도록 한다 */
-.sticky.is-heart > *{ flex-shrink:0 }
-.sticky.is-heart .sticky-msg{ margin-top:auto; font-size:var(--heart-fs, 1rem); line-height:1.3; word-break:keep-all; overflow-wrap:anywhere }
-.sticky.is-heart .sticky-meta{ margin-bottom:auto; justify-content:center; gap:6px; margin-top:5px; font-size:.74rem; white-space:nowrap }
-/* 20자가 넘어 접혀 있는 쪽지: 누르면 펼쳐진다 */
-.sticky.is-clamped{ cursor:pointer; -webkit-tap-highlight-color:transparent }
-.sticky.is-clamped:focus-visible{ outline:2px solid rgba(59,46,34,.45); outline-offset:3px }
-.sticky.is-open{ rotate:0deg; z-index:3 }
-/* 내용이 거의 없는 쪽지(ㅋㅋㅋ, 자판 두드리기 등)는 한 치수 작게 붙인다 */
-.sticky.is-small{ width: calc(40% - 10px); max-width: 160px; padding: 16px 11px 9px }
-.sticky.is-small .sticky-msg{ font-size:.9rem }
-.sticky.is-small .sticky-meta{ font-size:.8rem; margin-top:7px }
-@media (min-width: 560px){ .sticky.is-small{ width: calc(26% - 10px) } }
-.board-secret{ margin:0 0 6px; text-align:center; font-size:.78rem; color:#C9C3BA; letter-spacing:.01em }   /* 옅은 회색 한마디 */
-.board-more{ display:flex; justify-content:center; margin-top:14px }
-.board-more .btn{ flex:0 0 auto }
-.board-write{ margin-top:26px; padding-top:22px; border-top:1px dashed var(--line) }
-.board-empty{ margin:12px 0 0; text-align:center; font-size:.86rem; color: var(--ink-soft) }
-.board-loading{ align-self:center; font-size:.85rem; color: var(--ink-soft) }
-
-/* 전시가 끝난 뒤 열리는 작가 도슨트 */
-.work-docent-note{
-  margin:18px 0 0; padding:10px 12px; border-radius: var(--radius);
-  background: rgba(30,86,184,.05); font-size:.8rem; line-height:1.65; color: var(--ink-soft);
-  text-align:center; word-break: keep-all;
-}
-.work-docent-note strong{ color: var(--ink); font-weight:600 }
-.after-lead{ margin:16px 0 0; font-size:.86rem; color: var(--ink-soft) }
-.after-body{ margin-top:16px; display:grid; gap:12px }
-.after-body p{ margin:0; font-family:"Hahmlet", serif; font-weight:300; font-size:1rem; line-height:1.9; word-break: keep-all }
-.after-body p.after-q{ margin-top:6px; font-weight:500; text-align:center }
-
-/* 초대 문구 */
-.invite-line{
-  margin:0 0 10px;
-  text-align:center;
-  font-size:.84rem;
-  color: var(--spark);
-  font-weight:500;
-  letter-spacing:.02em;
-}
-
-/* ── 지금 전시장에는 ──────────────────────── */
-.onduty-list{
-  display:grid;
-  gap:10px;
-  margin:0;
-  padding:0;
-  list-style:none;
-}
-.onduty-list li{
-  display:flex;
-  align-items:baseline;
-  gap:12px;
-  min-width:0;
-}
-.onduty-area{
-  flex:0 0 auto;
-  font-size:.7rem;
-  letter-spacing:.06em;
-  color: var(--on-accent);
-  background: var(--spark);
-  padding: 3px 9px;
-  border-radius: 999px;
-}
-.onduty-name{
-  font-family:"Hahmlet", serif;
-  font-size:1rem;
-  min-width:0;
-}
-.onduty-foot{
-  margin: 18px 0 0;
-  font-size:.76rem;
-  color: var(--ink-soft);
-}
-
-/* ── 조금 이상한 질문 ─────────────────────── */
-.quest{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:14px;
-  text-align:center;
-  padding-block: 10px 4px;
-}
-.quest-text{
-  margin:0;
-  width:100%;
-  font-family:"Hahmlet", serif;
-  font-weight:300;
-  font-size: 18px;
-  line-height:1.65;
-  letter-spacing:-.015em;
-  text-wrap: balance;
-  white-space: pre-line;   /* 온점·반점 뒤에서 JS가 넣은 줄바꿈을 그대로 보여 준다 */
-  word-break: keep-all;    /* 낱말 중간(문장/을)에서 끊지 않는다 */
-  /* 질문마다 길이가 달라 아래 카드가 들썩이지 않도록 높이를 고정한다.
-     실제 값은 가장 긴 질문을 재어 JS가 --quest-h 로 넣는다 */
-  height: var(--quest-h, 6.6em);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-/* 질문이 바뀔 때: 살짝 위로 사라지고(.q-out) → 아래에서 떠오른다(.q-in 을 떼는 순간) */
-.quest-text, .quest-by{
-  transition: opacity .3s ease, transform .3s cubic-bezier(.22,.61,.36,1);
-  will-change: opacity, transform;
-}
-.quest-text.q-out, .quest-by.q-out{ opacity:0; transform: translateY(-8px); transition-duration:.2s }
-.quest-text.q-in,  .quest-by.q-in { opacity:0; transform: translateY(8px); transition:none }
-.quest-by{
-  margin:0;
-  /* 긴 출처가 두 줄이 되어도 버튼과 겹치지 않게, 가장 긴 출처 높이를 JS가 --quest-by-h 로 넣는다 */
-  min-height: var(--quest-by-h, 1.6em);
-  font-size:.74rem;
-  line-height:1.6;
-  letter-spacing:.02em;
-  color: var(--ink-soft);
-  text-wrap: balance;
-  word-break: keep-all;
-}
-.quest .btn{ flex:0 0 auto; margin-top:8px }
-.quest-count{
-  font-size:.68rem;
-  letter-spacing:.14em;
-  color: var(--ink-soft);
-  font-variant-numeric: tabular-nums;
-}
-@media (prefers-reduced-motion: reduce){
-  .quest-text, .quest-by{ transition:none !important; transform:none !important }
-}
-
-/* ── 작가에게 한마디 ──────────────────────── */
-/* 작가를 고르기 전에는 안내만 보이고, 고르면 본문이 펼쳐진다 */
-.note-intro{
-  display:flex;
-  align-items:center;
-  gap:9px;
-}
-.note-intro::before{
-  content:"↑";
-  flex:0 0 auto;
-  font-size:.9rem;
-  color: var(--spark);
-}
-#noteBody{ will-change: height }
-
-.note-to{
-  display:flex;
-  align-items:baseline;
-  justify-content:space-between;
-  gap:12px;
-  flex-wrap:wrap;
-  margin-top:22px;
-  padding-bottom:14px;
-  border-bottom:1px solid var(--line);
-}
-.note-to-name{
-  margin:0;
-  font-family:"Hahmlet", serif;
-  font-size:1.12rem;
-  font-weight:500;
-  letter-spacing:-.015em;
-}
-.note-to-name em{ font-style:normal; color: var(--spark) }
-.note-change{
-  flex:0 0 auto;
-  font: inherit;
-  font-size:.75rem;
-  color: var(--ink-soft);
-  background:none;
-  border:0;
-  border-bottom:1px solid var(--line);
-  padding:0 0 1px;
-  cursor:pointer;
-  transition: color .2s ease, border-color .2s ease;
-}
-.note-change:hover{ color: var(--spark); border-color: var(--spark) }
-/* 명단 아래 보조 동작이라 조용히 둔다 */
-.all-row{
-  display:flex;
-  justify-content:center;
-  margin-top:26px;
-}
-
-.note-form{
-  display:grid;
-  gap:18px;
-  margin-top:22px;
-}
-.field{
-  display:grid;
-  gap:7px;
-  position:relative;
-  min-width:0;
-}
-.field label{
-  font-size:.76rem;
-  font-weight:500;
-  letter-spacing:.03em;
-  color: var(--ink-soft);
-}
-.field label .opt{ font-weight:400; opacity:.75 }
-.field select,
-.field textarea,
-.field input[type="text"]{
-  width:100%;
-  min-width:0;
-  font: inherit;
-  font-size:.95rem;
-  color: var(--ink);
-  background: var(--surface);
-  border:1px solid var(--line);
-  border-radius: var(--radius);
-  padding: 11px 13px;
-  transition: border-color .2s ease;
-}
-.field textarea{
-  resize: vertical;
-  min-height: 104px;
-  line-height:1.7;
-}
-.field select{
-  appearance:none;
-  background-image: linear-gradient(45deg, transparent 50%, var(--ink-soft) 50%),
-                    linear-gradient(135deg, var(--ink-soft) 50%, transparent 50%);
-  background-position: calc(100% - 18px) 50%, calc(100% - 13px) 50%;
-  background-size: 5px 5px, 5px 5px;
-  background-repeat: no-repeat;
-  padding-right: 34px;
-  cursor:pointer;
-}
-.field select:focus,
-.field textarea:focus,
-.field input[type="text"]:focus{
-  outline:none;
-  border-color: var(--spark);
-}
-.field-count{
-  justify-self:end;
-  font-size:.7rem;
-  color: var(--ink-soft);
-  font-variant-numeric: tabular-nums;
-}
-.field input[type="text"]::placeholder{ color: var(--ink-soft); opacity:.6 }
-#visitSubmit[disabled]{ opacity:.55; cursor:default }
-/* 자동 프로그램을 거르는 칸 — 화면에서 완전히 치운다 */
-.trap{
-  position:absolute;
-  left:-9999px;
-  width:1px;
-  height:1px;
-  overflow:hidden;
-}
-.note-status{
-  margin:0;
-  min-height:1.4em;
-  font-size:.8rem;
-  color: var(--ember);
-}
-#noteSubmit[disabled]{ opacity:.55; cursor:default }
-
-.note-done{
-  display:grid;
-  gap:10px;
-  justify-items:center;
-  text-align:center;
-  padding-block: 26px 10px;
-}
-.note-done-title{
-  margin:0;
-  font-family:"Hahmlet", serif;
-  font-size:1.3rem;
-  font-weight:500;
-  letter-spacing:-.015em;
-}
-.note-done-sub{
-  margin:0;
-  font-size:.84rem;
-  color: var(--ink-soft);
-}
-.note-done .btn{ flex:0 0 auto; margin-top:10px }
-
-/* ── 버튼 ─────────────────────────────────── */
-.note{
-  margin:0;
-  color: var(--ink-soft);
-  font-size:.88rem;
-}
-.btn-row{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  margin-top:22px;
-}
-.btn{
-  flex: 1 1 auto;
-  min-width:0;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  padding: 12px 16px;
-  font: inherit;
-  font-size:.81rem;
-  font-weight:500;
-  letter-spacing:.01em;
-  text-decoration:none;
-  color: var(--ink);
-  background: var(--surface);
-  border:1px solid var(--line);
-  border-radius: var(--radius);
-  cursor:pointer;
-  transition: border-color .25s ease, color .25s ease, transform .25s ease;
-}
-.btn:hover{ border-color: var(--spark); color: var(--spark); transform: translateY(-1px) }
-.btn:focus-visible{ outline:2px solid var(--spark); outline-offset:2px }
-.btn.primary{
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--on-accent);
-  flex-basis:100%;
-  padding-block:15px;
-  border-radius: calc(var(--radius) + 2px);
-}
-.btn.primary:hover{ opacity:.9; color: var(--on-accent); border-color: var(--accent) }
-/* 작가 전용 페이지: 친근한 톤에 맞춰 채운 버튼 대신 테두리 버튼 */
-.artist-page .btn.primary{
-  background: transparent;
-  color: var(--accent);
-  border: 1.5px solid var(--accent);
-}
-.artist-page .btn.primary:hover{ opacity:1; background: rgba(30,86,184,.06); color: var(--accent) }
-/* 예약하기 · 전하기 버튼: 예약 카드 테두리와 같은 빨강 → 분홍 → 파랑 대각선 그라데이션, 흰 글씨 */
-#visitSubmit, .artist-page #visitSubmit,
-#noteSubmit, .artist-page #noteSubmit{
-  background: linear-gradient(135deg, var(--ember) 0%, #D9708A 45%, var(--accent) 100%);
-  color:#fff;
-  border: 0;
-  font-weight:600;
-  text-shadow: 0 1px 2px rgba(40,20,40,.25);   /* 분홍 가운데에서도 흰 글씨가 묻히지 않게 */
-}
-#visitSubmit:hover, .artist-page #visitSubmit:hover,
-#noteSubmit:hover, .artist-page #noteSubmit:hover{
-  background: linear-gradient(135deg, var(--ember) 0%, #D9708A 45%, var(--accent) 100%);
-  color:#fff; opacity:.92;
-}
-#visitSubmit:disabled, #noteSubmit:disabled{ opacity:.6 }
-/* 다른 질문 보기: 카드 폭을 꽉 채우는 버튼, 흰 바탕에 빨강 → 파랑 2px 그라데이션 테두리 */
-#questNext, .artist-page #questNext{
-  align-self:stretch; width:100%;
-  border: 2px solid transparent;
-  background:
-    linear-gradient(#fff, #fff) padding-box,
-    linear-gradient(135deg, var(--ember) 0%, #D9708A 45%, var(--accent) 100%) border-box;
-  color: var(--accent); font-weight:600;
-}
-#questNext:hover, .artist-page #questNext:hover{
-  background:
-    linear-gradient(rgba(30,86,184,.05), rgba(30,86,184,.05)) padding-box,
-    linear-gradient(#fff, #fff) padding-box,
-    linear-gradient(135deg, var(--ember) 0%, #D9708A 45%, var(--accent) 100%) border-box;
-  color: var(--accent); border-color: transparent;
-}
-
-/* ── 푸터 ─────────────────────────────────── */
-footer{
-  margin-top: 72px;
-  padding-top: 26px;
-  border-top:1px solid var(--line);
-  font-size:.77rem;
-  color: var(--ink-soft);
-  line-height:1.9;
-  letter-spacing:.01em;
-}
-footer a{ color: var(--spark) }
-
-.toast{
-  position:fixed;
-  left:50%;
-  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
-  transform: translateX(-50%);
-  max-width: calc(100vw - 40px);
-  text-align:center;
-  background: var(--ink);
-  color: var(--wall);
-  font-size:.79rem;
-  padding: 11px 20px;
-  border-radius: var(--radius);
-  box-shadow: 0 6px 22px var(--shadow);
-  z-index:50;
-  animation: toastIn .32s cubic-bezier(.22,.61,.36,1) both;
-}
-
-/* ── 모션 ─────────────────────────────────── */
-@keyframes riseIn{
-  from{ opacity:0; transform: translateY(16px) }
-  to  { opacity:1; transform: none }
-}
-@keyframes framePlace{
-  from{ opacity:0; transform: translateY(30px) rotate(-3.8deg) }
-  to  { opacity:1; transform: translateY(0) rotate(-1.2deg) }
-}
-@keyframes drift{
-  0%,100%{ transform: translate3d(0,0,0) scale(1) }
-  50%    { transform: translate3d(2.5%, -2%, 0) scale(1.07) }
-}
-@keyframes toastIn{
-  from{ opacity:0; transform: translate(-50%, 10px) }
-  to  { opacity:1; transform: translate(-50%, 0) }
-}
-
-.anim .hero-el{ animation: riseIn .85s cubic-bezier(.22,.61,.36,1) both }
-.anim .eyebrow{ animation-delay: .06s }
-.anim .title-block{ animation-delay: .62s }
-.anim .dday{ animation-delay: .78s }
-.anim .frame{ animation: framePlace 1.15s cubic-bezier(.22,.61,.36,1) .16s both }
-.anim .frame.placed{ animation:none }
-.anim .hero::before{ animation: drift 48s ease-in-out infinite }
-
-.anim .reveal{
-  opacity:0;
-  transform: translateY(18px);
-  transition: opacity .85s cubic-bezier(.22,.61,.36,1),
-              transform .85s cubic-bezier(.22,.61,.36,1);
-}
-.anim .reveal.in{ opacity:1; transform:none }
-.anim .reveal .section-head::after{
-  transform: scaleX(0);
-  transition: transform 1s cubic-bezier(.22,.61,.36,1) .12s;
-}
-.anim .reveal.in .section-head::after{ transform: scaleX(1) }
-
-.anim .stagger > *{ opacity:0 }
-.anim .stagger.in > *{
-  animation: riseIn .62s cubic-bezier(.22,.61,.36,1) both;
-  animation-delay: var(--i, 0ms);
-}
-
-@media (prefers-reduced-motion: reduce){
-  .anim *, .anim *::before, .anim *::after{
-    animation:none !important;
-    transition:none !important;
-  }
-  .anim .reveal,
-  .anim .stagger > *{ opacity:1 !important; transform:none !important }
-  .anim .section-head::after{ transform:none !important }
-}
-</style>
-
-<script>
-/* 개발자도구 콘솔을 열면 인사 한마디 */
-try{
-  console.log('%c' + [
-    "     ███████████  ████                  ████",
-    "     ███████████  ████      ███████     ████",
-    "     ███████████  ████    ██████████    ████",
-    "     ███████████  ████    ████   ████   ████",
-    "   ██████████████ ████   ████     ███   ████",
-    "   ██████████████ ████   ████     ███   ████",
-    "       ████   ████████    ████   ████   ████",
-    "        ███   ████████    ███████████   ████",
-    "        ███ █████ ████     █████████    ████",
-    "          █████████          █████      ████",
-    "      █████████████████                 ████",
-    "      ██████     ██████                 ████",
-    "",
-    "     ████████████████      ████████████████         ███       ████                  ████",
-    "     ████████████████      ████████████████    █████████████  ████    ███████████   ████",
-    "                 ████                  ████    █████████████  ████    ███████████   ████",
-    "                 ████                  ████        █████      ████    ████          ████",
-    "   ████████████████████                ████      █████████  ██████    ████          ████",
-    "   ████████████████████  ████████████████████   ████   ████ ██████    ████          ████",
-    "           ████          ████████████████████   ███████████   ████    ████          ████",
-    "        ██████████         ████████████████      █████████    ████    █████████████ ████",
-    "      ██████████████       ████████████████        ████       ████    █████████████ ████",
-    "     █████      █████      ████        ████        ████                             ████",
-    "     ████████████████      ████████████████        ███████████████                  ████",
-    "       ████████████        ████████████████        ███████████████                  ████"
-  ].join('\n'), 'color:#E3708C; font-family:monospace; line-height:1.05; font-size:10px');
-  console.log('%c뭣이 궁금헌디 🐇', 'color:#3B2E22; font-size:20px; font-weight:800; padding:6px 0');
-}catch(e){}
-</script>
-
-<script>
-/* 모션은 선택 — 꺼져 있으면 CSS가 전부 정적으로 남는다 */
-try{
-  if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
-    document.documentElement.classList.add('anim');
-  }
-}catch(e){}
-/* 예약 페이지(/jessie/visit): 사진·글꼴이 다 받아질 때까지는 뒷배경만 보여 주고,
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <meta name="color-scheme" content="light only" />
+    <title>조금 이상한 우리들</title>
+    <meta name="description" content="취미로 그림을 배우는 스무 명이 모여 만든 단체전. 2026.11.12 – 11.17, 홍대 피시스 아카이브" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="preload" as="image" href="/assets/img/poster-hero.jpg" fetchpriority="high" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://a-little-off.pages.dev/" />
+    <meta property="og:title" content="조금 이상한 우리들 · Everyone Is a Little off" />
+    <meta property="og:description" content="취미로 그림을 배우는 스무 명이 모여 만든 단체전. 2026.11.12 – 11.17, 홍대 피시스 아카이브" />
+    <meta property="og:image" content="https://a-little-off.pages.dev/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="붉은 튤립 사이에 흰 튤립 한 송이가 핀 전시 포스터와 전시 제목" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://a-little-off.pages.dev/og-image.jpg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@300;500;700&family=IBM+Plex+Sans+KR:wght@300;400;500;600&display=swap"
+    />
+    <link rel="stylesheet" href="/assets/css/site.css" />
+    <!-- 첫 화면이 그려지기 전에 <html> 에 상태 class 를 붙여야 깜빡임이 없어서, 이 짧은 스크립트만 인라인으로 둔다 -->
+    <script>
+      /* 모션은 선택 — 꺼져 있으면 CSS가 전부 정적으로 남는다 */
+      try {
+        if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          document.documentElement.classList.add('anim');
+        }
+      } catch (e) {}
+      /* 예약 페이지(/jessie/visit): 사진·글꼴이 다 받아질 때까지는 뒷배경만 보여 주고,
    표지 등장 애니메이션은 멈춰 둔다. 다 받아지면 JS가 이 표시를 떼고 처음부터 재생한다 */
-try{
-  if(/^\/?jessie\/visit\/?$/i.test(location.pathname)){
-    document.documentElement.classList.add('visit-loading');
-  }
-}catch(e){}
-</script>
+      try {
+        if (/^\/?jessie\/visit\/?$/i.test(location.pathname)) {
+          document.documentElement.classList.add('visit-loading');
+        }
+      } catch (e) {}
+    </script>
+    <script src="/assets/js/console-greeting.js" defer></script>
+  </head>
+  <body>
+    <div class="backdrop" aria-hidden="true"></div>
 
-<div class="backdrop" aria-hidden="true"></div>
+    <div class="wrap">
+      <header class="hero">
+        <p class="invite-line hero-el" id="inviteLine" hidden></p>
+        <p class="eyebrow hero-el"><span class="brand">이즈드로잉</span> <span class="eyebrow-sub">취미미술학원 단체전</span></p>
+        <p class="studio-links hero-el">
+          <a href="https://www.instagram.com/izdrawing.studio/" target="_blank" rel="noopener" aria-label="이즈드로잉 인스타그램">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="3.5" y="3.5" width="17" height="17" rx="5" fill="none" stroke="currentColor" stroke-width="1.8" />
+              <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8" />
+              <circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" />
+            </svg>
+            izdrawing.studio
+          </a>
+          <a href="https://naver.me/xOdwxlom" target="_blank" rel="noopener" aria-label="이즈드로잉 네이버">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="3" y="3" width="18" height="18" rx="4" fill="currentColor" />
+              <path d="M8.5 7.5v9h2.6v-4.6l3.3 4.6h2.1v-9h-2.6v4.6L10.6 7.5z" fill="#fff" />
+            </svg>
+            네이버
+          </a>
+        </p>
 
-<div class="wrap">
+        <div
+          class="frame"
+          role="img"
+          aria-label="전시 포스터 — 붉은 튤립 사이에 흰 튤립 한 송이가 피어 있고 위쪽에 Everyone Is a Little off 라고 적혀 있습니다"
+        ></div>
 
-  <header class="hero">
-    <p class="invite-line hero-el" id="inviteLine" hidden></p>
-    <p class="eyebrow hero-el"><span class="brand">이즈드로잉</span> <span class="eyebrow-sub">취미미술학원 단체전</span></p>
-    <p class="studio-links hero-el">
-      <a href="https://www.instagram.com/izdrawing.studio/" target="_blank" rel="noopener" aria-label="이즈드로잉 인스타그램">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor"/></svg>
-        izdrawing.studio
-      </a>
-      <a href="https://naver.me/xOdwxlom" target="_blank" rel="noopener" aria-label="이즈드로잉 네이버">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4" fill="currentColor"/><path d="M8.5 7.5v9h2.6v-4.6l3.3 4.6h2.1v-9h-2.6v4.6L10.6 7.5z" fill="#fff"/></svg>
-        네이버
-      </a>
-    </p>
-
-    <div class="frame" role="img" aria-label="전시 포스터 — 붉은 튤립 사이에 흰 튤립 한 송이가 피어 있고 위쪽에 Everyone Is a Little off 라고 적혀 있습니다"></div>
-
-    <div class="title-block hero-el">
-      <h1>조금 <em>이상한</em> 우리들</h1>
-      <div class="title-copy">
-        <p class="en-title">Everyone Is a Little off</p>
-        <p class="subtitle">취미로 그림을 배우는 스무 명이 모여 만든 단체전입니다.<br>엿새간 홍대 피시스 아카이브에서 열립니다.</p>
-      </div>
-    </div>
-
-    <div class="dday hero-el">
-      <span class="dday-num" id="ddayNum">D-30</span>
-      <span class="dday-label" id="ddayLabel">전시 오픈까지</span>
-    </div>
-  </header>
-
-  <section class="card reveal work" id="workSection" hidden>
-    <div class="section-head">
-      <h2>이번 전시 작품</h2>
-      <span class="en">THE WORK</span>
-    </div>
-
-    <div class="work-hello">
-      <p>취미 미술 학원에서 틈틈이 그려 온 그림으로 단체전을 열게 됐어요. 전시 소식을 편하게 전하고 싶어서 이 페이지를 따로 만들었어요. 꼭 와야 한다는 부담은 갖지 않아도 괜찮아요. 제가 전시를 한다는 걸 알아 주는 것만으로도 충분히 기뻐요. 오기 어려운 분들을 위해 여기에 그림을 걸어 두었으니, 작은 온라인 전시장이라 생각하고 편하게 둘러보세요.</p>
-      <p class="work-notice"><strong class="q">언제 가면 만날 수 있나요?</strong> <em>11월 14일 토요일</em>에는 하루 종일 전시장에 있어요. 다른 날도 집이 가까워서 퇴근하고 언제든 달려갈 수 있어요.</p>
-      <p class="work-notice work-extra"><strong class="q">전시장에서는 또 뭘 즐길 수 있나요?</strong> 전시장에 오면 저를 포함해 <strong>스무 명의 그림</strong>을 한 번에 즐길 수 있어요. 작가들의 이야기를 담은 <strong>도슨트</strong>도 준비돼 있어서, 전시장 QR을 찍으면 그림마다 들으며 볼 수 있어요. <strong>키링이나 엽서 같은 굿즈</strong>도 팔고, 사진 찍기 좋은 <strong>포토 스팟</strong>도 있어요. 가볍게 마실 <strong>웰컴 드링크</strong>도 준비해 둘게요!</p>
-    </div>
-
-    <figure class="work-main">
-      <button class="work-zoom" type="button" data-src="/works/jessie/01.jpg" aria-label="그림 크게 보기">
-        <img src="/works/jessie/01-s.jpg" alt="체스판 위 분홍 나이트 말 곁에 선 소녀, 잠든 흰 토끼와 녹아내린 시계, 하늘로 피어오른 양귀비들" width="638" height="900" decoding="async" loading="lazy">
-      </button>
-      <figcaption>
-        <span class="work-title">〈어디에 둘까요?〉</span>
-        <span class="work-q">당신의 다음 수는 어디에 두고 싶나요?</span>
-      </figcaption>
-    </figure>
-
-    <p class="work-docent-note" id="docentSoon">이 작품의 <strong>도슨트</strong>는 전시가 끝난 뒤(11월 17일 20:00 이후) 이 페이지에서 글로 공개돼요.<br>그 전에는 전시장 QR로 들을 수 있어요.</p>
-
-    <p class="work-label">가까이 보기</p>
-    <div class="work-strip" tabindex="0" aria-label="그림의 부분들. 옆으로 넘겨 보세요">
-      <button class="work-zoom" type="button" data-src="/works/jessie/02.jpg"><img src="/works/jessie/02-s.jpg" alt="흰 양귀비와 떨어지는 작은 사람들" width="638" height="900" decoding="async" loading="lazy"></button>
-      <button class="work-zoom" type="button" data-src="/works/jessie/03.jpg"><img src="/works/jessie/03-s.jpg" alt="하늘을 향한 붉은 양귀비와 꼬인 기둥" width="638" height="900" decoding="async" loading="lazy"></button>
-      <button class="work-zoom" type="button" data-src="/works/jessie/04.jpg"><img src="/works/jessie/04-s.jpg" alt="붉은 열매 덩굴과 분홍 꽃잎" width="638" height="900" decoding="async" loading="lazy"></button>
-      <button class="work-zoom" type="button" data-src="/works/jessie/06.jpg"><img src="/works/jessie/06-s.jpg" alt="나이트 말을 감싸 안은 소녀" width="638" height="900" decoding="async" loading="lazy"></button>
-    </div>
-  </section>
-
-  <section class="card reveal" id="afterDocent" hidden>
-    <div class="section-head">
-      <h2>작품 도슨트</h2>
-      <span class="en">DOCENT</span>
-    </div>
-    <p class="after-lead">전시장에서 흘러나오던 도슨트를 이제 여기서도 읽을 수 있어요.</p>
-    <div class="after-body" id="afterDocentBody"></div>
-  </section>
-
-  <section class="card reveal" id="boardSection" hidden>
-    <div class="section-head">
-      <h2>남겨 주신 쪽지</h2>
-      <span class="en">NOTES</span>
-      <span class="count" id="boardCount"></span>
-    </div>
-    <div class="board" id="board" aria-live="polite"></div>
-    <p class="board-empty" id="boardEmpty" hidden>아직 붙은 쪽지가 없어요. 첫 번째 쪽지를 붙여 주세요!</p>
-    <div class="board-more" id="boardMoreRow" hidden>
-      <button class="btn" type="button" id="boardMore">쪽지 더 보기</button>
-    </div>
-    <div class="board-write" id="boardWriteSlot">
-      <p class="board-secret">칭찬은 언제나 짜릿해</p>
-    </div>
-  </section>
-
-  <div class="work-viewer" id="workViewer" hidden role="dialog" aria-modal="true" aria-label="작품 크게 보기">
-    <div class="viewer-track" id="viewerTrack"></div>
-    <p class="viewer-count" id="viewerCount" aria-live="polite"></p>
-    <button class="viewer-nav prev" type="button" id="viewerPrev" aria-label="이전 사진">‹</button>
-    <button class="viewer-nav next" type="button" id="viewerNext" aria-label="다음 사진">›</button>
-    <button class="work-close" type="button" aria-label="닫기">✕</button>
-  </div>
-
-  <section class="card reveal" id="questSection">
-    <div class="section-head">
-      <h2>조금 이상한 질문</h2>
-      <span class="en">A LITTLE OFF</span>
-    </div>
-    <p class="quest-lead" id="questLead" hidden>전시장에서 그림을 조금 더 깊이 볼 수 있도록, 질문 하나를 미리 건네 드려요.<br>마음에 걸리는 질문을 품고 오시면, 같은 그림도 조금 다르게 보일 거예요.</p>
-    <div class="quest">
-      <p class="quest-text" id="questText">전시장에 들어서기 전에, 잠깐 이 질문을 들고 가 보세요.</p>
-      <p class="quest-by" id="questBy"></p>
-      <button class="btn" type="button" id="questNext">다른 질문 보기</button>
-    </div>
-  </section>
-
-  <!-- 예약 페이지(/jessie/visit)에서만 열린다. 인사말은 JS가 그림 카드에서 옮겨 온다 -->
-  <section class="card reveal" id="helloSection" hidden>
-    <div class="section-head">
-      <h2>인사말</h2>
-      <span class="en">HELLO</span>
-    </div>
-  </section>
-
-  <section class="card reveal" id="infoSection">
-    <div class="section-head">
-      <h2>전시 안내</h2>
-      <span class="en">INFORMATION</span>
-    </div>
-    <dl class="stagger">
-      <div class="row highlight">
-        <dt>전시 기간</dt>
-        <dd>2026. 11. 12 (목) — 11. 17 (화)
-          <span class="sub">엿새간 열립니다</span>
-        </dd>
-      </div>
-      <div class="row">
-        <dt>관람 시간</dt>
-        <dd>11:00 — 21:00
-          <span class="sub">첫날 12일 (목)은 13:00 개관 · 마지막 날 17일 (화)은 20:00 마감</span>
-        </dd>
-      </div>
-      <div class="row">
-        <dt>입장료</dt>
-        <dd>5,000원</dd>
-      </div>
-      <div class="row">
-        <dt>장소</dt>
-        <dd><a class="place-link" href="https://www.pieces-archive.com/" target="_blank" rel="noopener">홍대 피시스 아카이브<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-          <span class="sub">Pieces Archive</span>
-        </dd>
-      </div>
-      <div class="row">
-        <dt>주소</dt>
-        <dd>서울 마포구 신촌로 48<button class="icon-copy" type="button" id="copyAddr" aria-label="주소 복사" title="주소 복사"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 15V6a2 2 0 0 1 2-2h9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
-        </dd>
-        <div class="map-links">
-            <a href="https://naver.me/5noe91xs" target="_blank" rel="noopener" aria-label="네이버지도에서 보기"><i class="map-ico naver" aria-hidden="true">N</i>네이버</a>
-            <a href="https://map.kakao.com/link/search/%EC%84%9C%EC%9A%B8%20%EB%A7%88%ED%8F%AC%EA%B5%AC%20%EC%8B%A0%EC%B4%8C%EB%A1%9C%2048" target="_blank" rel="noopener" aria-label="카카오맵에서 보기"><i class="map-ico kakao" aria-hidden="true">K</i>카카오</a>
-            <a href="https://www.google.com/maps/search/?api=1&amp;query=%EC%84%9C%EC%9A%B8%20%EB%A7%88%ED%8F%AC%EA%B5%AC%20%EC%8B%A0%EC%B4%8C%EB%A1%9C%2048" target="_blank" rel="noopener" aria-label="구글 지도에서 보기"><i class="map-ico google" aria-hidden="true">G</i>구글</a>
-        </div>
-      </div>
-    </dl>
-  </section>
-
-  <section class="card reveal" id="visitSection">
-    <div class="section-head">
-      <h2>관람 예약</h2>
-      <span class="en">RESERVATION</span>
-    </div>
-    <p class="note" id="visitLead">언제 오실지 남겨 주시면 미리 기다리고 있을게요.<br>예약하지 않아도 관람할 수 있습니다.</p>
-
-    <div id="visitFormWrap">
-      <form class="note-form" id="visitForm" novalidate>
-        <div class="field">
-          <label for="visitName">예약자 성함</label>
-          <input id="visitName" name="name" type="text" maxlength="20" autocomplete="name" placeholder="입구에서 확인할 이름" required>
+        <div class="title-block hero-el">
+          <h1>조금 <em>이상한</em> 우리들</h1>
+          <div class="title-copy">
+            <p class="en-title">Everyone Is a Little off</p>
+            <p class="subtitle">취미로 그림을 배우는 스무 명이 모여 만든 단체전입니다.<br />엿새간 홍대 피시스 아카이브에서 열립니다.</p>
+          </div>
         </div>
 
-        <div class="field">
-          <label for="visitDate">방문 날짜</label>
-          <select id="visitDate" name="date" required>
-            <option value="">날짜 고르기</option>
-          </select>
+        <div class="dday hero-el">
+          <span class="dday-num" id="ddayNum">D-30</span>
+          <span class="dday-label" id="ddayLabel">전시 오픈까지</span>
+        </div>
+      </header>
+
+      <section class="card reveal work" id="workSection" hidden>
+        <div class="section-head">
+          <h2>이번 전시 작품</h2>
+          <span class="en">THE WORK</span>
         </div>
 
-        <div class="field">
-          <label for="visitArtist">초대한 작가 <span class="opt">(선택)</span></label>
-          <select id="visitArtist" name="artist">
-            <option value="">따로 없어요</option>
-          </select>
+        <div class="work-hello">
+          <p>
+            취미 미술 학원에서 틈틈이 그려 온 그림으로 단체전을 열게 됐어요. 전시 소식을 편하게 전하고 싶어서 이 페이지를 따로 만들었어요.
+            꼭 와야 한다는 부담은 갖지 않아도 괜찮아요. 제가 전시를 한다는 걸 알아 주는 것만으로도 충분히 기뻐요. 오기 어려운 분들을 위해
+            여기에 그림을 걸어 두었으니, 작은 온라인 전시장이라 생각하고 편하게 둘러보세요.
+          </p>
+          <p class="work-notice">
+            <strong class="q">언제 가면 만날 수 있나요?</strong> <em>11월 14일 토요일</em>에는 하루 종일 전시장에 있어요. 다른 날도 집이
+            가까워서 퇴근하고 언제든 달려갈 수 있어요.
+          </p>
+          <p class="work-notice work-extra">
+            <strong class="q">전시장에서는 또 뭘 즐길 수 있나요?</strong> 전시장에 오면 저를 포함해 <strong>스무 명의 그림</strong>을 한
+            번에 즐길 수 있어요. 작가들의 이야기를 담은 <strong>도슨트</strong>도 준비돼 있어서, 전시장 QR을 찍으면 그림마다 들으며 볼 수
+            있어요. <strong>키링이나 엽서 같은 굿즈</strong>도 팔고, 사진 찍기 좋은 <strong>포토 스팟</strong>도 있어요. 가볍게 마실
+            <strong>웰컴 드링크</strong>도 준비해 둘게요!
+          </p>
         </div>
 
-        <div class="field">
-          <label for="visitParty">함께 오는 사람 <span class="opt">(선택 · 예약자 제외)</span></label>
-          <select id="visitParty" name="companions">
-            <option value="">고르지 않음</option>
-            <option value="0">혼자 관람해요</option>
-            <option value="1">1명</option>
-            <option value="2">2명</option>
-            <option value="3">3명</option>
-            <option value="4">4명</option>
-            <option value="5">5명</option>
-          </select>
+        <figure class="work-main">
+          <button class="work-zoom" type="button" data-src="/works/jessie/01.jpg" aria-label="그림 크게 보기">
+            <img
+              src="/works/jessie/01-s.jpg"
+              alt="체스판 위 분홍 나이트 말 곁에 선 소녀, 잠든 흰 토끼와 녹아내린 시계, 하늘로 피어오른 양귀비들"
+              width="638"
+              height="900"
+              decoding="async"
+              loading="lazy"
+            />
+          </button>
+          <figcaption>
+            <span class="work-title">〈어디에 둘까요?〉</span>
+            <span class="work-q">당신의 다음 수는 어디에 두고 싶나요?</span>
+          </figcaption>
+        </figure>
+
+        <p class="work-docent-note" id="docentSoon">
+          이 작품의 <strong>도슨트</strong>는 전시가 끝난 뒤(11월 17일 20:00 이후) 이 페이지에서 글로 공개돼요.<br />그 전에는 전시장 QR로
+          들을 수 있어요.
+        </p>
+
+        <p class="work-label">가까이 보기</p>
+        <div class="work-strip" tabindex="0" aria-label="그림의 부분들. 옆으로 넘겨 보세요">
+          <button class="work-zoom" type="button" data-src="/works/jessie/02.jpg">
+            <img
+              src="/works/jessie/02-s.jpg"
+              alt="흰 양귀비와 떨어지는 작은 사람들"
+              width="638"
+              height="900"
+              decoding="async"
+              loading="lazy"
+            />
+          </button>
+          <button class="work-zoom" type="button" data-src="/works/jessie/03.jpg">
+            <img
+              src="/works/jessie/03-s.jpg"
+              alt="하늘을 향한 붉은 양귀비와 꼬인 기둥"
+              width="638"
+              height="900"
+              decoding="async"
+              loading="lazy"
+            />
+          </button>
+          <button class="work-zoom" type="button" data-src="/works/jessie/04.jpg">
+            <img src="/works/jessie/04-s.jpg" alt="붉은 열매 덩굴과 분홍 꽃잎" width="638" height="900" decoding="async" loading="lazy" />
+          </button>
+          <button class="work-zoom" type="button" data-src="/works/jessie/06.jpg">
+            <img src="/works/jessie/06-s.jpg" alt="나이트 말을 감싸 안은 소녀" width="638" height="900" decoding="async" loading="lazy" />
+          </button>
         </div>
+      </section>
 
-        <div class="trap" aria-hidden="true">
-          <label for="visitNickname">닉네임</label>
-          <input id="visitNickname" name="nickname" type="text" tabindex="-1" autocomplete="off">
+      <section class="card reveal" id="afterDocent" hidden>
+        <div class="section-head">
+          <h2>작품 도슨트</h2>
+          <span class="en">DOCENT</span>
         </div>
+        <p class="after-lead">전시장에서 흘러나오던 도슨트를 이제 여기서도 읽을 수 있어요.</p>
+        <div class="after-body" id="afterDocentBody"></div>
+      </section>
 
-        <button class="btn primary" type="submit" id="visitSubmit">예약하기</button>
-        <p class="note-status" id="visitStatus" role="status"></p>
-      </form>
-    </div>
+      <section class="card reveal" id="boardSection" hidden>
+        <div class="section-head">
+          <h2>남겨 주신 쪽지</h2>
+          <span class="en">NOTES</span>
+          <span class="count" id="boardCount"></span>
+        </div>
+        <div class="board" id="board" aria-live="polite"></div>
+        <p class="board-empty" id="boardEmpty" hidden>아직 붙은 쪽지가 없어요. 첫 번째 쪽지를 붙여 주세요!</p>
+        <div class="board-more" id="boardMoreRow" hidden>
+          <button class="btn" type="button" id="boardMore">쪽지 더 보기</button>
+        </div>
+        <div class="board-write" id="boardWriteSlot">
+          <p class="board-secret">칭찬은 언제나 짜릿해</p>
+        </div>
+      </section>
 
-    <div class="note-done" id="visitDone" hidden>
-      <p class="note-done-title">예약을 남겼습니다</p>
-      <p class="note-done-sub" id="visitDoneSub"></p>
-      <button class="btn" type="button" id="visitAgain">한 번 더 예약하기</button>
-    </div>
-  </section>
-
-  <!-- 전시 기간이 아니거나 오늘 일정이 없으면 통째로 숨는다 -->
-  <section class="card reveal" id="ondutySection" hidden>
-    <div class="section-head">
-      <h2>지금 전시장에는</h2>
-      <span class="en">ON DUTY</span>
-      <span class="count" id="ondutyTime"></span>
-    </div>
-    <ul class="onduty-list" id="ondutyList"></ul>
-    <p class="onduty-foot" id="ondutyFoot"></p>
-  </section>
-
-
-  <section class="card reveal" id="artistsSection">
-    <div class="section-head">
-      <h2>참여 작가</h2>
-      <span class="en">ARTISTS</span>
-      <span class="count">20명</span>
-    </div>
-    <ul class="artists stagger">
-      <li>김지현</li>
-      <li>남다름</li>
-      <li>남선주</li>
-      <li>노정균</li>
-      <li>박수룡</li>
-      <li>박정은</li>
-      <li data-name="배정연">정연</li>
-      <li>엄현서</li>
-      <li>윤혜진</li>
-      <li>이경도</li>
-      <li>이서현</li>
-      <li data-name="이재이">재이</li>
-      <li>이희지</li>
-      <li>임소라</li>
-      <li>조수연</li>
-      <li>최윤아</li>
-      <li>최윤지</li>
-      <li>편해연</li>
-      <li>홍림</li>
-      <li>홍성호</li>
-    </ul>
-    <div class="all-row">
-      <button class="note-change" type="button" id="noteAll">모두에게 한마디 남기기</button>
-    </div>
-  </section>
-
-  <section class="card reveal" id="noteSection">
-    <div class="section-head">
-      <h2>작가에게 한마디</h2>
-      <span class="en">LEAVE A NOTE</span>
-    </div>
-
-    <p class="note note-intro" id="noteIntro">위 명단에서 작가 이름을 누르면 그 작가에게 글을 남길 수 있어요.<br>
-응원의 한마디나 그림을 본 소감을 자유롭게 들려주세요.</p>
-
-    <div class="note-body" id="noteBody" hidden>
-    <div id="noteFormWrap">
-      <div class="note-to">
-        <p class="note-to-name" id="noteTo"><em>—</em> 작가에게</p>
-        <button class="note-change" type="button" id="noteChange">다른 작가 고르기</button>
+      <div class="work-viewer" id="workViewer" hidden role="dialog" aria-modal="true" aria-label="작품 크게 보기">
+        <div class="viewer-track" id="viewerTrack"></div>
+        <p class="viewer-count" id="viewerCount" aria-live="polite"></p>
+        <button class="viewer-nav prev" type="button" id="viewerPrev" aria-label="이전 사진">‹</button>
+        <button class="viewer-nav next" type="button" id="viewerNext" aria-label="다음 사진">›</button>
+        <button class="work-close" type="button" aria-label="닫기">✕</button>
       </div>
 
-      <p class="note" style="margin-top:18px" id="notePrivacy">전시가 끝난 뒤 작가에게 그대로 전해집니다. 여기 적은 글은 사이트에 공개되지 않으며, 연락처나 링크는 넣을 수 없습니다.</p>
+      <section class="card reveal" id="questSection">
+        <div class="section-head">
+          <h2>조금 이상한 질문</h2>
+          <span class="en">A LITTLE OFF</span>
+        </div>
+        <p class="quest-lead" id="questLead" hidden>
+          전시장에서 그림을 조금 더 깊이 볼 수 있도록, 질문 하나를 미리 건네 드려요.<br />마음에 걸리는 질문을 품고 오시면, 같은 그림도 조금
+          다르게 보일 거예요.
+        </p>
+        <div class="quest">
+          <p class="quest-text" id="questText">전시장에 들어서기 전에, 잠깐 이 질문을 들고 가 보세요.</p>
+          <p class="quest-by" id="questBy"></p>
+          <button class="btn" type="button" id="questNext">다른 질문 보기</button>
+        </div>
+      </section>
 
-      <form class="note-form" id="noteForm" novalidate>
-        <input type="hidden" id="noteArtist" name="artist" value="전체">
+      <!-- 예약 페이지(/jessie/visit)에서만 열린다. 인사말은 JS가 그림 카드에서 옮겨 온다 -->
+      <section class="card reveal" id="helloSection" hidden>
+        <div class="section-head">
+          <h2>인사말</h2>
+          <span class="en">HELLO</span>
+        </div>
+      </section>
 
-        <div class="field">
-          <label for="noteMessage">남기고 싶은 말</label>
-          <textarea id="noteMessage" name="message" rows="4" maxlength="300"
-                    placeholder="짧아도 괜찮습니다."></textarea>
-          <span class="field-count" id="noteCount">0 / 300</span>
+      <section class="card reveal" id="infoSection">
+        <div class="section-head">
+          <h2>전시 안내</h2>
+          <span class="en">INFORMATION</span>
+        </div>
+        <dl class="stagger">
+          <div class="row highlight">
+            <dt>전시 기간</dt>
+            <dd>
+              2026. 11. 12 (목) — 11. 17 (화)
+              <span class="sub">엿새간 열립니다</span>
+            </dd>
+          </div>
+          <div class="row">
+            <dt>관람 시간</dt>
+            <dd>
+              11:00 — 21:00
+              <span class="sub">첫날 12일 (목)은 13:00 개관 · 마지막 날 17일 (화)은 20:00 마감</span>
+            </dd>
+          </div>
+          <div class="row">
+            <dt>입장료</dt>
+            <dd>5,000원</dd>
+          </div>
+          <div class="row">
+            <dt>장소</dt>
+            <dd>
+              <a class="place-link" href="https://www.pieces-archive.com/" target="_blank" rel="noopener"
+                >홍대 피시스 아카이브<svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    d="M7 17 17 7M9 7h8v8"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  /></svg
+              ></a>
+              <span class="sub">Pieces Archive</span>
+            </dd>
+          </div>
+          <div class="row">
+            <dt>주소</dt>
+            <dd>
+              서울 마포구 신촌로 48<button class="icon-copy" type="button" id="copyAddr" aria-label="주소 복사" title="주소 복사">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <rect x="9" y="9" width="11" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.8" />
+                  <path d="M5 15V6a2 2 0 0 1 2-2h9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                </svg>
+              </button>
+            </dd>
+            <div class="map-links">
+              <a href="https://naver.me/5noe91xs" target="_blank" rel="noopener" aria-label="네이버지도에서 보기"
+                ><i class="map-ico naver" aria-hidden="true">N</i>네이버</a
+              >
+              <a
+                href="https://map.kakao.com/link/search/%EC%84%9C%EC%9A%B8%20%EB%A7%88%ED%8F%AC%EA%B5%AC%20%EC%8B%A0%EC%B4%8C%EB%A1%9C%2048"
+                target="_blank"
+                rel="noopener"
+                aria-label="카카오맵에서 보기"
+                ><i class="map-ico kakao" aria-hidden="true">K</i>카카오</a
+              >
+              <a
+                href="https://www.google.com/maps/search/?api=1&amp;query=%EC%84%9C%EC%9A%B8%20%EB%A7%88%ED%8F%AC%EA%B5%AC%20%EC%8B%A0%EC%B4%8C%EB%A1%9C%2048"
+                target="_blank"
+                rel="noopener"
+                aria-label="구글 지도에서 보기"
+                ><i class="map-ico google" aria-hidden="true">G</i>구글</a
+              >
+            </div>
+          </div>
+        </dl>
+      </section>
+
+      <section class="card reveal" id="visitSection">
+        <div class="section-head">
+          <h2>관람 예약</h2>
+          <span class="en">RESERVATION</span>
+        </div>
+        <p class="note" id="visitLead">언제 오실지 남겨 주시면 미리 기다리고 있을게요.<br />예약하지 않아도 관람할 수 있습니다.</p>
+
+        <div id="visitFormWrap">
+          <form class="note-form" id="visitForm" novalidate>
+            <div class="field">
+              <label for="visitName">예약자 성함</label>
+              <input
+                id="visitName"
+                name="name"
+                type="text"
+                maxlength="20"
+                autocomplete="name"
+                placeholder="입구에서 확인할 이름"
+                required
+              />
+            </div>
+
+            <div class="field">
+              <label for="visitDate">방문 날짜</label>
+              <select id="visitDate" name="date" required>
+                <option value="">날짜 고르기</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="visitArtist">초대한 작가 <span class="opt">(선택)</span></label>
+              <select id="visitArtist" name="artist">
+                <option value="">따로 없어요</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="visitParty">함께 오는 사람 <span class="opt">(선택 · 예약자 제외)</span></label>
+              <select id="visitParty" name="companions">
+                <option value="">고르지 않음</option>
+                <option value="0">혼자 관람해요</option>
+                <option value="1">1명</option>
+                <option value="2">2명</option>
+                <option value="3">3명</option>
+                <option value="4">4명</option>
+                <option value="5">5명</option>
+              </select>
+            </div>
+
+            <div class="trap" aria-hidden="true">
+              <label for="visitNickname">닉네임</label>
+              <input id="visitNickname" name="nickname" type="text" tabindex="-1" autocomplete="off" />
+            </div>
+
+            <button class="btn primary" type="submit" id="visitSubmit">예약하기</button>
+            <p class="note-status" id="visitStatus" role="status"></p>
+          </form>
         </div>
 
-        <div class="field">
-          <label for="noteSender">보내는 사람 <span class="opt">(선택)</span></label>
-          <input id="noteSender" name="sender" type="text" maxlength="30"
-                 autocomplete="name" placeholder="익명으로 두셔도 됩니다">
+        <div class="note-done" id="visitDone" hidden>
+          <p class="note-done-title">예약을 남겼습니다</p>
+          <p class="note-done-sub" id="visitDoneSub"></p>
+          <button class="btn" type="button" id="visitAgain">한 번 더 예약하기</button>
+        </div>
+      </section>
+
+      <!-- 전시 기간이 아니거나 오늘 일정이 없으면 통째로 숨는다 -->
+      <section class="card reveal" id="ondutySection" hidden>
+        <div class="section-head">
+          <h2>지금 전시장에는</h2>
+          <span class="en">ON DUTY</span>
+          <span class="count" id="ondutyTime"></span>
+        </div>
+        <ul class="onduty-list" id="ondutyList"></ul>
+        <p class="onduty-foot" id="ondutyFoot"></p>
+      </section>
+
+      <section class="card reveal" id="artistsSection">
+        <div class="section-head">
+          <h2>참여 작가</h2>
+          <span class="en">ARTISTS</span>
+          <span class="count">20명</span>
+        </div>
+        <ul class="artists stagger">
+          <li>김지현</li>
+          <li>남다름</li>
+          <li>남선주</li>
+          <li>노정균</li>
+          <li>박수룡</li>
+          <li>박정은</li>
+          <li data-name="배정연">정연</li>
+          <li>엄현서</li>
+          <li>윤혜진</li>
+          <li>이경도</li>
+          <li>이서현</li>
+          <li data-name="이재이">재이</li>
+          <li>이희지</li>
+          <li>임소라</li>
+          <li>조수연</li>
+          <li>최윤아</li>
+          <li>최윤지</li>
+          <li>편해연</li>
+          <li>홍림</li>
+          <li>홍성호</li>
+        </ul>
+        <div class="all-row">
+          <button class="note-change" type="button" id="noteAll">모두에게 한마디 남기기</button>
+        </div>
+      </section>
+
+      <section class="card reveal" id="noteSection">
+        <div class="section-head">
+          <h2>작가에게 한마디</h2>
+          <span class="en">LEAVE A NOTE</span>
         </div>
 
-        <!-- 사람 눈에는 보이지 않는 칸. 자동 프로그램만 여기를 채운다 -->
-        <div class="trap" aria-hidden="true">
-          <label for="noteNickname">닉네임</label>
-          <input id="noteNickname" name="nickname" type="text" tabindex="-1" autocomplete="off">
+        <p class="note note-intro" id="noteIntro">
+          위 명단에서 작가 이름을 누르면 그 작가에게 글을 남길 수 있어요.<br />
+          응원의 한마디나 그림을 본 소감을 자유롭게 들려주세요.
+        </p>
+
+        <div class="note-body" id="noteBody" hidden>
+          <div id="noteFormWrap">
+            <div class="note-to">
+              <p class="note-to-name" id="noteTo"><em>—</em> 작가에게</p>
+              <button class="note-change" type="button" id="noteChange">다른 작가 고르기</button>
+            </div>
+
+            <p class="note" style="margin-top: 18px" id="notePrivacy">
+              전시가 끝난 뒤 작가에게 그대로 전해집니다. 여기 적은 글은 사이트에 공개되지 않으며, 연락처나 링크는 넣을 수 없습니다.
+            </p>
+
+            <form class="note-form" id="noteForm" novalidate>
+              <input type="hidden" id="noteArtist" name="artist" value="전체" />
+
+              <div class="field">
+                <label for="noteMessage">남기고 싶은 말</label>
+                <textarea id="noteMessage" name="message" rows="4" maxlength="300" placeholder="짧아도 괜찮습니다."></textarea>
+                <span class="field-count" id="noteCount">0 / 300</span>
+              </div>
+
+              <div class="field">
+                <label for="noteSender">보내는 사람 <span class="opt">(선택)</span></label>
+                <input id="noteSender" name="sender" type="text" maxlength="30" autocomplete="name" placeholder="익명으로 두셔도 됩니다" />
+              </div>
+
+              <!-- 사람 눈에는 보이지 않는 칸. 자동 프로그램만 여기를 채운다 -->
+              <div class="trap" aria-hidden="true">
+                <label for="noteNickname">닉네임</label>
+                <input id="noteNickname" name="nickname" type="text" tabindex="-1" autocomplete="off" />
+              </div>
+
+              <button class="btn primary" type="submit" id="noteSubmit">전하기</button>
+              <p class="note-status" id="noteStatus" role="status"></p>
+            </form>
+          </div>
+
+          <div class="note-done" id="noteDone" hidden>
+            <p class="note-done-title">잘 전해드리겠습니다.</p>
+            <p class="note-done-sub" id="noteDoneSub">전시가 끝나면 작가에게 그대로 전달됩니다.</p>
+            <button class="btn" type="button" id="noteAgain">한 번 더 쓰기</button>
+          </div>
         </div>
+      </section>
 
-        <button class="btn primary" type="submit" id="noteSubmit">전하기</button>
-        <p class="note-status" id="noteStatus" role="status"></p>
-      </form>
+      <section class="card reveal" id="shareSection">
+        <div class="section-head">
+          <h2>함께 보기</h2>
+          <span class="en">SHARE</span>
+        </div>
+        <p class="note">함께 보고 싶은 사람이 떠오른다면, 이 링크를 건네 보세요.</p>
+        <div class="btn-row">
+          <button class="btn primary" type="button" id="copyLink">링크 복사하기</button>
+        </div>
+      </section>
+
+      <!-- 예약 페이지(/jessie/visit)의 맨 마지막 인사 -->
+      <section class="card reveal thanks" id="thanksSection" hidden>
+        <p class="thanks-title">고맙습니다</p>
+        <p class="thanks-body">
+          여기까지 둘러봐 주셔서 정말 고마워요.<br />시간을 내어 이 페이지를 읽어 주신 것만으로도 큰 힘이 돼요.<br />전시장에서 반갑게
+          만나요!
+        </p>
+      </section>
+
+      <footer class="reveal">
+        조금 이상한 우리들 · Everyone Is a Little off<br />
+        2026. 11. 12 (목) — 11. 17 (화) · 홍대 피시스 아카이브<br />
+        <a href="https://www.pieces-archive.com/" target="_blank" rel="noopener">pieces-archive.com</a>
+        <p class="host-line" id="hostLine" hidden>
+          주최: 이즈드로잉 취미미술학원
+          <a href="https://www.instagram.com/izdrawing.studio/" target="_blank" rel="noopener">인스타그램 바로가기 ↗</a>
+        </p>
+      </footer>
     </div>
 
-    <div class="note-done" id="noteDone" hidden>
-      <p class="note-done-title">잘 전해드리겠습니다.</p>
-      <p class="note-done-sub" id="noteDoneSub">전시가 끝나면 작가에게 그대로 전달됩니다.</p>
-      <button class="btn" type="button" id="noteAgain">한 번 더 쓰기</button>
-    </div>
-    </div>
-  </section>
-
-  <section class="card reveal" id="shareSection">
-    <div class="section-head">
-      <h2>함께 보기</h2>
-      <span class="en">SHARE</span>
-    </div>
-    <p class="note">함께 보고 싶은 사람이 떠오른다면, 이 링크를 건네 보세요.</p>
-    <div class="btn-row">
-      <button class="btn primary" type="button" id="copyLink">링크 복사하기</button>
-    </div>
-  </section>
-
-  <!-- 예약 페이지(/jessie/visit)의 맨 마지막 인사 -->
-  <section class="card reveal thanks" id="thanksSection" hidden>
-    <p class="thanks-title">고맙습니다</p>
-    <p class="thanks-body">여기까지 둘러봐 주셔서 정말 고마워요.<br>시간을 내어 이 페이지를 읽어 주신 것만으로도 큰 힘이 돼요.<br>전시장에서 반갑게 만나요!</p>
-  </section>
-
-  <footer class="reveal">
-    조금 이상한 우리들 · Everyone Is a Little off<br>
-    2026. 11. 12 (목) — 11. 17 (화) · 홍대 피시스 아카이브<br>
-    <a href="https://www.pieces-archive.com/" target="_blank" rel="noopener">pieces-archive.com</a>
-    <p class="host-line" id="hostLine" hidden>주최: 이즈드로잉 취미미술학원 <a href="https://www.instagram.com/izdrawing.studio/" target="_blank" rel="noopener">인스타그램 바로가기 ↗</a></p>
-  </footer>
-
-</div>
-
-<script>
-(function(){
-  "use strict";
-
-  var ANIM = document.documentElement.classList.contains('anim');
-
-  /* ── 작가 전용 주소 ──
-     /jessie 처럼 들어오면 그 작가의 페이지로 바뀐다 (작품 섹션이 열리고, 이름이 강조되고,
-     예약·한마디에 미리 골라진다). 링크 끝의 #이름이 있으면 그쪽이 먼저다 */
-  var PAGE_ARTISTS = { jessie: '이재이' };
-  /* 관람 예약 전용 주소 (/jessie/visit). 작가 페이지와 같은 작가로 열리되, 그림 카드는 빼고
-     포스터를 작게 줄인 뒤 전시 안내 → 예약 → 인사말 → 쪽지 → 질문 → 감사 인사 순으로 보여 준다 */
-  var PAGE_VISITS = { 'jessie/visit': '이재이' };
-  var PAGE_PATH = location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
-  var IS_VISIT = !!PAGE_VISITS[PAGE_PATH];
-  var PAGE_ARTIST = PAGE_ARTISTS[PAGE_PATH] || PAGE_VISITS[PAGE_PATH] || '';
-  /* 작가 이름은 두 가지다. 화면에는 작가명(정연·재이), 시트와 링크에는 본명(배정연·이재이).
-     명단의 <li data-name="본명">작가명</li> 에서 짝을 읽는다. 작가명이 본명과 같으면 data-name 이 없다 */
-  var ARTIST_LABEL = {}, ARTIST_BY_LABEL = {};
-  Array.prototype.forEach.call(document.querySelectorAll('.artists li'), function(li){
-    var label = li.textContent.trim();
-    var name = li.getAttribute('data-name') || label;
-    ARTIST_LABEL[name] = label;
-    ARTIST_BY_LABEL[label] = name;
-  });
-  // 쪽지를 자기 페이지 게시판에 보여 주기로 한 작가 (Apps Script 의 BOARD_ARTISTS 와 같아야 한다)
-  var BOARD_ARTISTS = { '이재이': true };
-
-  function artistName(li){ return li.getAttribute('data-name') || li.textContent.trim(); }
-  function artistLabel(name){ return ARTIST_LABEL[name] || name; }
-
-  // 링크의 #이름은 본명(#이재이)이든 작가명(#재이)이든 본명으로 돌려준다
-  function sharedArtist(){
-    var raw = '';
-    try{ raw = decodeURIComponent((location.hash || '').slice(1)).trim(); }
-    catch(e){ raw = (location.hash || '').slice(1).trim(); }
-    raw = raw || PAGE_ARTIST;
-    return ARTIST_BY_LABEL[raw] || raw;
-  }
-  if(PAGE_ARTIST){
-    document.title = artistLabel(PAGE_ARTIST) + (IS_VISIT ? ' · 관람 예약' : '') + ' · 조금 이상한 우리들';
-    var workSec = document.getElementById('workSection');
-    if(workSec) workSec.hidden = IS_VISIT;          // 예약 페이지에서는 그림 카드를 빼 둔다
-    document.documentElement.classList.add('artist-page');
-    if(IS_VISIT) document.documentElement.classList.add('visit-page');
-
-    // 디데이 숫자를 카드에서 꺼내 '초대합니다' 문구 바로 아래에 글자로 둔다 (숫자는 그대로 매일 바뀐다)
-    var ddayNum = document.getElementById('ddayNum');
-    var invite = document.getElementById('inviteLine');
-    if(ddayNum && invite){
-      var ddayText = document.createElement('p');
-      ddayText.className = 'dday-text hero-el';
-      ddayText.appendChild(ddayNum);
-      invite.parentNode.insertBefore(ddayText, invite.nextSibling);
-      /* 예약 페이지: 맨 위 한 줄에 전시 제목(왼쪽)과 초대 문구(오른쪽).
-         영문 제목 덩어리는 빼고, 디데이는 전시 안내 카드 제목줄 오른쪽으로 옮긴다 */
-      if(IS_VISIT){
-        var topRow = document.createElement('div');
-        topRow.className = 'visit-top hero-el';
-        invite.parentNode.insertBefore(topRow, invite);
-        var h1 = document.querySelector('.hero h1');
-        if(h1) topRow.appendChild(h1);
-        topRow.appendChild(invite);
-        var tb = document.querySelector('.hero .title-block');
-        if(tb) tb.hidden = true;
-        var infoHead = document.querySelector('#infoSection .section-head');
-        if(infoHead){
-          ddayText.className = 'dday-text info-dday';
-          infoHead.appendChild(ddayText);
-        }
-      }
-    }
-
-    // 작가 인사말은 그림 카드가 아니라 맨 위 소개 문구 자리에 둔다
-    var hello = document.querySelector('#workSection .work-hello');
-    var titleCopy = document.querySelector('.hero .title-copy');
-    var subtitle = titleCopy && titleCopy.querySelector('.subtitle');
-    if(hello && titleCopy){
-      if(subtitle) subtitle.hidden = true;
-      // 예약 페이지에서는 인사말을 맨 위가 아니라 예약 카드 아래의 따로 된 카드에 둔다
-      var helloSec = document.getElementById('helloSection');
-      if(IS_VISIT && helloSec){
-        helloSec.appendChild(hello);
-        // 예약 페이지에는 그림이 없으니 '그림을 걸어 두었다'는 말은 빼고, 짧게 줄인 인사말을 쓴다
-        var hp = hello.querySelectorAll('p');
-        if(hp[0]) hp[0].textContent = '취미 미술 학원에서 그려 온 그림으로 단체전을 열게 됐어요. 꼭 와야 한다는 부담은 갖지 않아도 괜찮아요. 제가 전시를 한다는 걸 알아 주는 것만으로도 충분히 기뻐요.';
-        if(hp[1]) hp[1].innerHTML = '<strong class="q">언제 가면 만날 수 있나요?</strong> <em>11월 14일 토요일</em>에는 하루 종일 있어요. 다른 날도 퇴근하고 언제든 달려갈게요.';
-        if(hp[2]) hp[2].innerHTML = '<strong class="q">전시장에서는 또 뭘 즐길 수 있나요?</strong> <strong>스무 명의 그림</strong>과 QR로 듣는 <strong>도슨트</strong>, <strong>굿즈</strong>와 <strong>포토 스팟</strong>, <strong>웰컴 드링크</strong>까지 준비돼 있어요!';
-        helloSec.hidden = false;
-      } else {
-        titleCopy.appendChild(hello);
-      }
-    }
-
-    // 전시가 끝나면 서버가 이 작가의 도슨트 글을 내준다. 그 전에는 아무것도 보이지 않는다
-    // 전시 전에 미리 보려면 /jessie?k=도슨트열쇠 로 연다
-    var previewKey = new URLSearchParams(location.search).get('k') || '';
-    if(!IS_VISIT) fetch('/after-docent?artist=' + encodeURIComponent(PAGE_ARTIST) + (previewKey ? '&k=' + encodeURIComponent(previewKey) : ''), { cache: 'no-store' })
-      .then(function(r){ return r.ok ? r.json() : null; })
-      .then(function(d){
-        if(!d || !d.paragraphs) return;
-        var sec = document.getElementById('afterDocent');
-        var body = document.getElementById('afterDocentBody');
-        d.paragraphs.forEach(function(t, i){
-          var p = document.createElement('p');
-          p.textContent = t;
-          if(i === d.paragraphs.length - 1 && /^“|^"/.test(t)) p.className = 'after-q';
-          body.appendChild(p);
-        });
-        sec.hidden = false;
-        var soon = document.getElementById('docentSoon');
-        if(soon) soon.hidden = true;     // 공개된 뒤에는 '곧 공개' 안내를 치운다
-      })
-      .catch(function(){});
-
-    // 포스터에 작가 그림을 살짝 겹쳐 붙인다
-    var ARTIST_COVER = { '이재이': '/works/jessie/01-s.jpg' };
-    var posterFrame = document.querySelector('.hero .frame');
-    if(posterFrame && ARTIST_COVER[PAGE_ARTIST]){
-      var cover = document.createElement('span');
-      cover.className = 'frame-work';
-      cover.style.backgroundImage = 'url("' + ARTIST_COVER[PAGE_ARTIST] + '")';
-      cover.setAttribute('aria-hidden', 'true');
-      posterFrame.classList.add('has-work');
-      posterFrame.appendChild(cover);
-    }
-
-    // 작가 전용 페이지에서는 상단 학원 표기·링크를 숨기고, 맨 아래 '주최' 줄로 대신한다
-    var studio = document.querySelector('.studio-links');
-    if(studio) studio.hidden = true;
-    var eyebrow = document.querySelector('.hero .eyebrow');
-    if(eyebrow) eyebrow.hidden = true;
-    var hostLine = document.getElementById('hostLine');
-    if(hostLine) hostLine.hidden = false;
-
-    /* 카드 순서: 그림 → 쪽지(게시판 + 쓰는 칸) → 질문 → 전시 안내 → 지금 전시장에는 → 예약
-       참여 작가·작가에게 한마디·함께 보기 카드는 숨긴다. 받는 사람은 이 작가로 정해져 있다 */
-    var footer = document.querySelector('footer');
-    var ORDER = IS_VISIT
-      ? ['infoSection', 'visitSection', 'helloSection', 'boardSection', 'questSection', 'thanksSection']
-      : ['workSection', 'afterDocent', 'boardSection', 'questSection', 'infoSection', 'ondutySection', 'visitSection'];
-    ORDER.forEach(function(id){
-      var el = document.getElementById(id);
-      if(el && footer) footer.parentNode.insertBefore(el, footer);
-    });
-    var HIDE = ['artistsSection', 'noteSection', 'shareSection'];
-    if(IS_VISIT){
-      HIDE = HIDE.concat(['workSection', 'afterDocent', 'ondutySection']);
-      ['questLead', 'thanksSection'].forEach(function(id){
-        var el = document.getElementById(id);
-        if(el) el.hidden = false;
-      });
-    }
-    HIDE.forEach(function(id){
-      var el = document.getElementById(id);
-      if(el) el.hidden = true;
-    });
-    var slot = document.getElementById('boardWriteSlot');
-    var noteBody = document.getElementById('noteBody');
-    if(slot && noteBody) slot.appendChild(noteBody);
-    var change = document.getElementById('noteChange');
-    if(change) change.hidden = true;
-  }
-
-  /* ── 예약 페이지: 한 화면에 한 장면씩, 스크롤이 장면마다 툭툭 걸린다 ──
-     ① 표지 ② 전시 안내 ③ 예약 ④ 인사말 ⑤ 작가에게 한마디 ⑥ 질문 ⑦ 감사 인사(+ 하단 정보) */
-  if(IS_VISIT) (function(){
-    var MEET_DAY = 14;    // 작가가 하루 종일 전시장에 있는 날 (11월)
-
-    /* 전시 안내: 기간 줄은 달력으로, 주소 줄은 지우고 주소 복사 버튼과 지도 버튼은 장소 줄로 */
-    var info = document.getElementById('infoSection');
-    var dl = info && info.querySelector('dl');
-    if(dl){
-      var rowBy = function(label){
-        var rs = dl.querySelectorAll('.row');
-        for(var i = 0; i < rs.length; i++){
-          var dt = rs[i].querySelector('dt');
-          if(dt && dt.textContent.trim() === label) return rs[i];
-        }
-        return null;
-      };
-      var periodRow = rowBy('전시 기간'), placeRow = rowBy('장소'), addrRow = rowBy('주소'), hoursRow = rowBy('관람 시간');
-      // 관람 시간의 첫날 개관 · 마지막 날 마감 작은 글씨는 뺀다 (예약할 때 날짜 목록에 적혀 있다)
-      var hoursSub = hoursRow && hoursRow.querySelector('dd .sub');
-      if(hoursSub) hoursSub.remove();
-      dl.parentNode.insertBefore(buildCalendar(), dl);
-      if(periodRow) periodRow.remove();
-      if(placeRow && addrRow){
-        var placeDd = placeRow.querySelector('dd');
-        var copyBtn = document.getElementById('copyAddr');
-        var link = placeDd.querySelector('.place-link');
-        if(copyBtn && link) link.parentNode.insertBefore(copyBtn, link.nextSibling);
-        var maps = addrRow.querySelector('.map-links');
-        if(maps){
-          // 지도 앱은 글자 없이 아이콘만 (이름은 화면 읽기 프로그램용으로 남아 있다)
-          maps.classList.add('icon-only');
-          Array.prototype.forEach.call(maps.querySelectorAll('a'), function(a){
-            Array.prototype.slice.call(a.childNodes).forEach(function(n){ if(n.nodeType === 3) n.remove(); });
-            a.title = a.getAttribute('aria-label') || '';
-          });
-          // 영문 장소명(Pieces Archive) 자리에 지도 아이콘을 둔다
-          var enSub = placeDd.querySelector('.sub');
-          if(enSub) enSub.remove();
-          maps.classList.add('in-dd');
-          placeDd.appendChild(maps);
-        }
-        addrRow.remove();
-      }
-    }
-
-    function buildCalendar(){
-      var START = 12, END = 17, FIRST = 8, LAST = 21;   // 2026년 11월, 8일(일)~21일(토) 두 주만 보여 준다
-      var now = new Date(), today = (now.getFullYear() === 2026 && now.getMonth() === 10) ? now.getDate() : 0;
-      var box = document.createElement('div');
-      box.className = 'cal';
-      box.setAttribute('role', 'group');
-      box.setAttribute('aria-label', '전시 기간 2026년 11월 12일 목요일부터 17일 화요일까지');
-      var head = document.createElement('div');
-      head.className = 'cal-head';
-      head.innerHTML = '<span class="cal-month">2026. 11</span><span class="cal-range">12 (목) — 17 (화) · 엿새</span>';
-      box.appendChild(head);
-      var tip = document.createElement('p');
-      tip.className = 'cal-tip';
-      tip.innerHTML = '오실 날짜를 누르면 바로 예약으로 넘어가요<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 13l5 5 5-5M12 6v12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-      box.appendChild(tip);
-      var grid = document.createElement('div');
-      grid.className = 'cal-grid';
-      '일월화수목금토'.split('').forEach(function(d, i){
-        var s = document.createElement('span');
-        s.setAttribute('aria-hidden', 'true');
-        s.className = 'cal-dow' + (i === 0 ? ' sun' : '');
-        s.textContent = d;
-        grid.appendChild(s);
-      });
-      for(var d = FIRST; d <= LAST; d++){
-        var col = (d - FIRST) % 7;
-        var inRange = d >= START && d <= END;
-        var c = document.createElement(inRange ? 'button' : 'span');
-        var cls = ['cal-day'];
-        if(col === 0) cls.push('sun');
-        if(col === 6) cls.push('sat');
-        if(d >= START && d <= END) cls.push('in');
-        if(d === START) cls.push('start');
-        if(d === END) cls.push('end');
-        if(d === MEET_DAY) cls.push('meet');
-        if(d === today) cls.push('today');
-        c.className = cls.join(' ');
-        c.innerHTML = '<b>' + d + '</b>';
-        if(inRange){
-          c.type = 'button';
-          c.dataset.day = d;
-          c.setAttribute('aria-label', '11월 ' + d + '일 ' + '일월화수목금토'[col] + '요일에 관람 예약하기' + (d === MEET_DAY ? ' (' + artistLabel(PAGE_ARTIST) + '가 하루 종일 있는 날)' : ''));
-          c.addEventListener('click', function(){ pickDate(+this.dataset.day, true); });
-        } else {
-          c.setAttribute('aria-hidden', 'true');
-        }
-        grid.appendChild(c);
-      }
-      box.appendChild(grid);
-      var legend = document.createElement('p');
-      legend.className = 'cal-legend';
-      legend.innerHTML = '<i class="cal-dot" aria-hidden="true"></i>' + artistLabel(PAGE_ARTIST) + '가 하루 종일 전시장에 있는 날';
-      box.appendChild(legend);
-      return box;
-    }
-
-    /* 예약 안내 문구 끝에 작가가 상주하는 날을 덧붙인다 */
-    var visitLead = document.getElementById('visitLead');
-    if(visitLead){
-      var stay = document.createElement('strong');
-      stay.className = 'visit-stay';
-      stay.textContent = '저는 토요일날 상주합니다!';
-      visitLead.appendChild(document.createElement('br'));
-      visitLead.appendChild(stay);
-    }
-
-    /* 쪽지: 게시판은 빼고 쓰는 칸만. 제목도 그에 맞게 */
-    var boardSec = document.getElementById('boardSection');
-    if(boardSec){
-      var h2 = boardSec.querySelector('.section-head h2'), en = boardSec.querySelector('.section-head .en');
-      if(h2) h2.textContent = '작가에게 한마디';
-      if(en) en.textContent = 'LEAVE A NOTE';
-      // 쪽지 게시판은 작가 페이지에 있다. 그 페이지의 게시판 위치로 바로 데려간다
-      var head = boardSec.querySelector('.section-head');
-      var artistPath = Object.keys(PAGE_ARTISTS).filter(function(k){ return PAGE_ARTISTS[k] === PAGE_ARTIST; })[0];
-      if(head && artistPath){
-        var boardLink = document.createElement('a');
-        boardLink.className = 'board-link';
-        boardLink.href = '/' + artistPath + '?to=board';
-        boardLink.innerHTML = '게시판 보러가기<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-        head.appendChild(boardLink);
-      }
-      ['board', 'boardEmpty', 'boardMoreRow'].forEach(function(id){
-        var el = document.getElementById(id);
-        if(el){ el.hidden = true; el.style.display = 'none'; }
-      });
-    }
-
-    /* 장면으로 묶는다 */
-    var wrap = document.querySelector('.wrap');
-    var hero = document.querySelector('.hero');
-    var footer = document.querySelector('footer');
-    var SCENES = [
-      { name: '표지',       els: [hero], cls: 'scene-cover' },
-      { name: '전시 안내',  els: ['infoSection'] },
-      { name: '관람 예약',  els: ['visitSection'] },
-      { name: '인사말',     els: ['helloSection'] },
-      { name: '작가에게 한마디', els: ['boardSection'] },
-      { name: '조금 이상한 질문', els: ['questSection'] },
-      { name: '고맙습니다', els: ['thanksSection', footer], cls: 'scene-last' }
-    ];
-    var scenes = [];
-    SCENES.forEach(function(s){
-      var box = document.createElement('div');
-      box.className = 'scene' + (s.cls ? ' ' + s.cls : '');
-      box.setAttribute('aria-label', s.name);
-      var first = null;
-      s.els.forEach(function(x){
-        var el = typeof x === 'string' ? document.getElementById(x) : x;
-        if(!el) return;
-        if(!first){ first = el; el.parentNode.insertBefore(box, el); }
-        box.appendChild(el);
-      });
-      if(first) scenes.push(box);
-    });
-
-    // 표지 맨 아래: 넘겨 보라는 작은 안내
-    var hint = document.createElement('button');
-    hint.type = 'button';
-    hint.className = 'scene-hint';
-    hint.setAttribute('aria-label', '아래로 넘겨 보세요');
-    hint.innerHTML = '<span class="hint-text">아래로 넘겨 보세요</span>'
-      + '<span class="chevrons" aria-hidden="true">'
-      + '<svg viewBox="0 0 24 12"><path d="M5 2l7 7 7-7"/></svg>'
-      + '<svg viewBox="0 0 24 12"><path d="M5 2l7 7 7-7"/></svg>'
-      + '<svg viewBox="0 0 24 12"><path d="M5 2l7 7 7-7"/></svg>'
-      + '</span>';
-    // 누르면 표지의 클릭으로 이어져 다음 장면으로 넘어간다
-    if(hero) hero.appendChild(hint);
-    // 첫 진입 때만: 표지 맨 아래 1px 진행 막대. 다 차면 전시 안내로 넘어간다
-    var introBar = document.createElement('div');
-    introBar.className = 'intro-bar';
-    introBar.setAttribute('aria-hidden', 'true');
-    introBar.innerHTML = '<i></i>';
-    if(hero) hero.appendChild(introBar);
-    var introText = document.createElement('p');
-    introText.className = 'intro-text';
-    introText.textContent = '잠시 뒤 전시 안내로 넘어가요';
-    if(hero) hero.appendChild(introText);
-
-    /* ── 장면 넘기기: 모든 장면 사이를 스크롤이 아니라 페이드로 오간다 ──
-       장면은 화면에 겹쳐 고정돼 있고 한 번에 하나만 보인다.
-       아래로 스크롤·스와이프·키 → 다음 장면, 위로 → 이전 장면.
-       장면이 화면보다 길면 그 안에서 먼저 스크롤되고, 끝에 닿은 뒤 한 번 더 밀어야 넘어간다.
-       첫 진입 때만 표지가 잠깐 보였다가 저절로 전시 안내로 넘어간다 */
-    var root = document.documentElement;
-    var FADE = 450;                    // 장면이 바뀌는 페이드 시간 (CSS --scene-fade 와 같은 값)
-    root.style.setProperty('--scene-fade', FADE + 'ms');
-    var AUTO_HIDE = 3000 - FADE;      // 표지가 나타나 머무는 시간. 사라지는 FADE 까지 합쳐 3초 (사진·글꼴을 다 받은 뒤부터)
-    var current = -1, busyUntil = 0, autoTimer = null, loading = true;
-
-    // 오른쪽 점: 지금 몇 번째 장면인지. 누르면 그 장면으로
-    var nav = document.createElement('nav');
-    nav.className = 'scene-dots';
-    nav.setAttribute('aria-label', '장면 이동');
-    var dots = scenes.map(function(sc, i){
-      var b = document.createElement('button');
-      b.type = 'button';
-      b.setAttribute('aria-label', (i + 1) + '. ' + sc.getAttribute('aria-label'));
-      b.addEventListener('click', function(){ go(i, true); });
-      nav.appendChild(b);
-      return b;
-    });
-    document.body.appendChild(nav);
-
-    function go(i, force){
-      if(loading) return;
-      i = Math.max(0, Math.min(scenes.length - 1, i));
-      if(i === current) return;
-      var now = Date.now();
-      if(!force && now < busyUntil) return;          // 바뀌는 도중의 관성 스크롤로 여러 장 건너뛰지 않게
-      busyUntil = now + FADE + 150;
-      clearTimeout(autoTimer);
-      var prev = current;
-      current = i;
-      scenes.forEach(function(sc, k){
-        var on = k === i;
-        sc.classList.toggle('is-active', on);
-        if(on){ sc.removeAttribute('inert'); sc.removeAttribute('aria-hidden'); }
-        else { sc.setAttribute('inert', ''); sc.setAttribute('aria-hidden', 'true'); }
-      });
-      // 앞으로 넘어가면 그 장면의 맨 위부터, 뒤로 돌아오면 맨 아래부터 보이게
-      var sc = scenes[i];
-      sc.scrollTop = (prev > i) ? sc.scrollHeight : 0;
-      Array.prototype.forEach.call(sc.querySelectorAll('.reveal'), function(el){ el.classList.add('in'); });
-      dots.forEach(function(b, k){
-        b.classList.toggle('on', k === i);
-        if(k === i) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current');
-      });
-      nav.classList.toggle('on-cover', i === 0);
-      root.classList.toggle('cover-on', i === 0);
-      // 첫 진입의 표지에서는 '아래로 넘겨 보세요'를 숨겨 두고, 한 번 넘어간 뒤부터 보여 준다
-      if(i !== 0 && prev === 0) root.classList.add('intro-done');
-    }
-    function next(){ go(current + 1); }
-    function goToVisit(){ var k = scenes.indexOf(document.getElementById('visitSection').parentNode); if(k > -1) go(k, true); }
-
-    /* 달력에서 날짜를 누르면: 예약 폼의 방문 날짜를 그 날로 골라 두고 예약 장면으로 */
-    var dateSel = document.getElementById('visitDate');
-    function markPicked(){
-      var v = dateSel ? dateSel.value : '';
-      Array.prototype.forEach.call(document.querySelectorAll('.cal-day[data-day]'), function(c){
-        var on = !!v && v.indexOf('11/' + c.dataset.day + '(') === 0;
-        c.classList.toggle('picked', on);
-        c.setAttribute('aria-pressed', on ? 'true' : 'false');
-      });
-    }
-    function pickDate(day, jump){
-      if(!dateSel) return;
-      for(var k = 0; k < dateSel.options.length; k++){
-        if(dateSel.options[k].value.indexOf('11/' + day + '(') === 0){ dateSel.selectedIndex = k; break; }
-      }
-      dateSel.dispatchEvent(new Event('change', { bubbles: true }));
-      if(jump) goToVisit();
-    }
-    if(dateSel) dateSel.addEventListener('change', markPicked);
-    // 방문 날짜는 처음부터 작가가 상주하는 날(MEET_DAY)로 골라 둔다.
-    // 날짜 목록은 아래 '관람 예약' 코드가 채우므로 그 뒤에 고른다
-    setTimeout(function(){ if(dateSel && !dateSel.value) pickDate(MEET_DAY, false); }, 0);
-    window.addEventListener('visit-reset', function(){ setTimeout(function(){ pickDate(MEET_DAY, false); }, 0); });
-
-    /* 예약 입력을 가볍게: 초대한 작가는 이미 정해져 있으니 숨기고,
-       함께 오는 사람은 접어 두었다가 누르면 펼친다 */
-    var artistField = document.getElementById('visitArtist');
-    if(artistField && artistField.closest('.field')) artistField.closest('.field').hidden = true;
-    var partySel = document.getElementById('visitParty');
-    var partyField = partySel && partySel.closest('.field');
-    if(partyField){
-      partyField.hidden = true;
-      var more = document.createElement('button');
-      more.type = 'button';
-      more.className = 'party-toggle';
-      more.textContent = '+ 함께 오는 사람이 있어요';
-      more.addEventListener('click', function(){
-        partyField.hidden = false;
-        more.hidden = true;
-        partySel.focus();
-      });
-      partyField.parentNode.insertBefore(more, partyField);
-      // '한 번 더 예약하기'로 폼을 비우면 다시 접는다
-      window.addEventListener('visit-reset', function(){ partyField.hidden = true; more.hidden = false; markPicked(); });
-    }
-
-    /* 화면 아래에 떠 있는 '관람 예약하기' 버튼: 표지와 예약 장면을 뺀 모든 장면에서.
-       예약을 마치면 '예약 완료'로 바뀐다 */
-    /* 각 장면의 카드 바로 아래(16px)에 붙여, 카드와 함께 나타나고 사라지게 한다 */
-    var visitSec = document.getElementById('visitSection');
-    var ctas = [];
-    scenes.forEach(function(sc, k){
-      if(k === 0 || (visitSec && sc.contains(visitSec))) return;
-      var cards = sc.querySelectorAll(':scope > section.card');
-      var last = cards[cards.length - 1];
-      if(!last) return;
-      var cta = document.createElement('button');
-      cta.type = 'button';
-      cta.className = 'visit-cta';
-      cta.textContent = '관람 예약하기';
-      cta.addEventListener('click', goToVisit);
-      last.parentNode.insertBefore(cta, last.nextSibling);
-      ctas.push(cta);
-    });
-    window.addEventListener('visit-done', function(){ ctas.forEach(function(c){ c.textContent = '예약 완료 ✓'; c.classList.add('is-done'); }); });
-    window.addEventListener('visit-reset', function(){ ctas.forEach(function(c){ c.textContent = '관람 예약하기'; c.classList.remove('is-done'); }); });
-    function prev(){ go(current - 1); }
-
-    function atTop(sc){ return sc.scrollTop <= 1; }
-    function atBottom(sc){ return sc.scrollTop + sc.clientHeight >= sc.scrollHeight - 2; }
-    function typing(){ return root.classList.contains('is-typing'); }
-
-    // 휠 · 트랙패드: 장면 끝에 닿아 있을 때만 넘긴다.
-    // 트랙패드는 손을 뗀 뒤에도 관성으로 휠 신호가 1초 넘게 이어지므로,
-    // 한 번 넘긴 뒤에는 휠 신호가 잠깐(220ms) 끊길 때까지 다음 넘기기를 받지 않는다
-    var wheelLocked = false, wheelQuiet = null;
-    window.addEventListener('wheel', function(e){
-      if(loading){ if(e.deltaY > 4){ e.preventDefault(); skipIntro(); } return; }   // 받는 중이라도 내리면 바로 전시 안내로
-      if(typing()) return;
-      var sc = scenes[current];
-      if(!sc) return;
-      var down = e.deltaY > 0 && atBottom(sc), up = e.deltaY < 0 && atTop(sc);
-      if(!down && !up) return;                      // 장면 안에서 스크롤 중
-      e.preventDefault();
-      clearTimeout(wheelQuiet);
-      wheelQuiet = setTimeout(function(){ wheelLocked = false; }, 220);
-      if(wheelLocked || Math.abs(e.deltaY) < 4) return;
-      wheelLocked = true;
-      if(down) next(); else prev();
-    }, { passive: false });
-
-    // 손가락: 밀기 시작할 때 장면 끝에 닿아 있었다면, 충분히 밀었을 때 넘긴다
-    var t0 = null, startTop = false, startBottom = false;
-    window.addEventListener('touchstart', function(e){
-      var sc = scenes[current];
-      t0 = e.touches[0].clientY;
-      startTop = sc ? atTop(sc) : true;
-      startBottom = sc ? atBottom(sc) : true;
-    }, { passive: true });
-    window.addEventListener('touchmove', function(e){
-      if(t0 === null || typing()) return;
-      var dy = e.touches[0].clientY - t0;            // - : 위로 밀기(= 다음), + : 아래로 밀기(= 이전)
-      if(loading){ e.preventDefault(); if(dy < -45){ t0 = null; skipIntro(); } return; }
-      // 끝에 닿은 쪽으로 더 밀면 화면이 고무줄처럼 끌려가지 않게 막는다
-      if((dy < 0 && startBottom) || (dy > 0 && startTop)) e.preventDefault();
-      if(dy < -45 && startBottom){ t0 = null; next(); }
-      else if(dy > 45 && startTop){ t0 = null; prev(); }
-    }, { passive: false });
-    window.addEventListener('touchend', function(){ t0 = null; }, { passive: true });
-
-    // 키보드
-    document.addEventListener('keydown', function(e){
-      if(typing() || e.altKey || e.ctrlKey || e.metaKey) return;
-      if(loading){ if(/^(ArrowDown|PageDown| |Enter)$/.test(e.key)){ e.preventDefault(); skipIntro(); } return; }
-      var sc = scenes[current];
-      if(/^(ArrowDown|PageDown| )$/.test(e.key) && (!sc || atBottom(sc))){ e.preventDefault(); next(); }
-      else if(/^(ArrowUp|PageUp)$/.test(e.key) && (!sc || atTop(sc))){ e.preventDefault(); prev(); }
-      else if(e.key === 'Home'){ e.preventDefault(); go(0, true); }
-      else if(e.key === 'End'){ e.preventDefault(); go(scenes.length - 1, true); }
-    });
-
-    // 표지는 누르기만 해도 다음으로
-    scenes[0].addEventListener('click', function(e){ if(!e.target.closest('a')) next(); });
-
-    // 장면 안의 링크·버튼이 다른 장면의 요소로 초점을 옮기면 그 장면으로 넘어간다 (탭 키 이동 등)
-    document.addEventListener('focusin', function(e){
-      for(var k = 0; k < scenes.length; k++){
-        if(scenes[k].contains(e.target)){ if(k !== current) go(k, true); break; }
-      }
-    });
-
-    /* 첫 진입: 사진·글꼴이 다 받아질 때까지는 뒷배경만. 준비되면 표지가 스르륵 나타나고,
-       AUTO_HIDE 뒤 저절로 전시 안내로 넘어간다. 받는 동안에는 '불러오는 중' 막대가 흐른다.
-       네트워크가 끊긴 듯 아주 오래 걸리면(20초) 그때는 기다리지 않고 시작한다 */
-    function whenImage(src){
-      return new Promise(function(res){
-        var im = new Image();
-        im.onload = im.onerror = function(){ (im.decode ? im.decode() : Promise.resolve()).then(res, res); };
-        im.src = src;
-      });
-    }
-    var waits = [
-      new Promise(function(res){ if(document.readyState === 'complete') res(); else window.addEventListener('load', res); }),
-      whenImage('/poster-hero.jpg')
-    ];
-    var coverImg = document.querySelector('.frame-work');
-    var m = coverImg && /url\("?([^")]+)"?\)/.exec(coverImg.style.backgroundImage);
-    if(m) waits.push(whenImage(m[1]));
-    if(document.fonts && document.fonts.ready) waits.push(document.fonts.ready);
-    var started = false;
-    /* 받는 중에 사용자가 먼저 내리면: 표지 소개는 건너뛰고 곧장 전시 안내로 (사진은 뒤에서 계속 받는다) */
-    function skipIntro(){
-      if(started) return;
-      started = true;
-      loading = false;
-      root.classList.remove('visit-loading');
-      root.classList.add('intro-done');
-      go(1, true);
-    }
-    function start(){
-      if(started) return;
-      started = true;
-      // 두 프레임 기다렸다가 떼야 멈춰 있던 애니메이션이 첫 장면부터 매끄럽게 재생된다
-      requestAnimationFrame(function(){ requestAnimationFrame(function(){
-        loading = false;
-        root.classList.remove('visit-loading');
-        go(0, true);
-        root.style.setProperty('--intro-ms', AUTO_HIDE + 'ms');
-        root.classList.add('intro-run');             // 진행 막대가 AUTO_HIDE 동안 왼쪽에서 오른쪽으로 찬다
-        autoTimer = setTimeout(function(){ if(current === 0) go(1, true); }, AUTO_HIDE);
-      }); });
-    }
-    Promise.all(waits).then(start, start);
-    setTimeout(start, 20000);
-
-    /* 글을 입력하는 동안은 넘기기를 멈춘다 (키보드가 올라오며 화면이 바뀔 때 엉뚱한 장면으로 넘어가지 않게) */
-    var typingOff = null;
-    document.addEventListener('focusin', function(e){
-      if(/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)){ clearTimeout(typingOff); root.classList.add('is-typing'); }
-    });
-    document.addEventListener('focusout', function(){
-      clearTimeout(typingOff);
-      typingOff = setTimeout(function(){ root.classList.remove('is-typing'); }, 400);
-    });
-  })();
-
-  // 작품 사진을 누르면 화면 가득 크게 본다
-  (function(){
-    var viewer = document.getElementById('workViewer');
-    if(!viewer) return;
-    var track = document.getElementById('viewerTrack');
-    var countEl = document.getElementById('viewerCount');
-    var prevBtn = document.getElementById('viewerPrev');
-    var nextBtn = document.getElementById('viewerNext');
-    var buttons = Array.prototype.slice.call(document.querySelectorAll('.work-zoom'));
-
-    // 페이지에 있는 작품 사진을 차례대로 한 줄로 늘어놓는다 (같은 사진은 한 번만)
-    var srcs = [];
-    buttons.forEach(function(b){
-      var src = b.getAttribute('data-src');
-      if(srcs.indexOf(src) !== -1) return;
-      srcs.push(src);
-      var slide = document.createElement('div');
-      slide.className = 'viewer-slide';
-      var im = document.createElement('img');
-      im.alt = (b.querySelector('img') || {}).alt || '';
-      im.dataset.src = src;              // 열 때 불러온다
-      slide.appendChild(im);
-      track.appendChild(slide);
-    });
-    var slides = track.children;
-
-    function current(){ return Math.round(track.scrollLeft / Math.max(track.clientWidth, 1)); }
-    // 원본은 무거워서, 지금 보는 사진과 바로 옆 사진만 받아 둔다. 나머지는 넘길 때 받는다
-    function loadAround(i){
-      for(var k = i - 1; k <= i + 1; k++){
-        var im = slides[k] && slides[k].querySelector('img');
-        if(im && !im.getAttribute('src')) im.src = im.dataset.src;
-      }
-    }
-    function update(){
-      var i = current();
-      loadAround(i);
-      countEl.textContent = (i + 1) + ' / ' + slides.length;
-      prevBtn.disabled = i <= 0;
-      nextBtn.disabled = i >= slides.length - 1;
-    }
-    function go(i, smooth){
-      i = Math.max(0, Math.min(slides.length - 1, i));
-      track.scrollTo({ left: i * track.clientWidth, behavior: smooth ? 'smooth' : 'auto' });
-      update();
-    }
-    function open(src){
-      loadAround(srcs.indexOf(src));
-      viewer.hidden = false;
-      document.body.style.overflow = 'hidden';
-      go(srcs.indexOf(src), false);
-    }
-    function close(){ viewer.hidden = true; document.body.style.overflow = ''; }
-
-    buttons.forEach(function(b){
-      b.addEventListener('click', function(){ open(b.getAttribute('data-src')); });
-    });
-    var t = null;
-    track.addEventListener('scroll', function(){ clearTimeout(t); t = setTimeout(update, 60); }, { passive: true });
-    prevBtn.addEventListener('click', function(e){ e.stopPropagation(); go(current() - 1, true); });
-    nextBtn.addEventListener('click', function(e){ e.stopPropagation(); go(current() + 1, true); });
-    viewer.querySelector('.work-close').addEventListener('click', close);
-    // 사진 밖 어두운 곳을 누르면 닫는다 (사진을 누르거나 밀 때는 닫히지 않는다)
-    track.addEventListener('click', function(e){ if(e.target.classList.contains('viewer-slide')) close(); });
-    window.addEventListener('resize', function(){ if(!viewer.hidden) go(current(), false); });
-
-    // 가까이 보기 점 표시: 지금 보이는 사진 위치를 따라간다
-    var strip = document.querySelector('.work-strip');
-    if(strip){
-      var cards = strip.querySelectorAll('.work-zoom');
-      var dots = document.createElement('div');
-      dots.className = 'work-dots';
-      dots.setAttribute('aria-hidden', 'true');
-      for(var d = 0; d < cards.length; d++) dots.appendChild(document.createElement('span'));
-      strip.parentNode.insertBefore(dots, strip.nextSibling);
-      var mark = function(){
-        var step = cards.length > 1 ? cards[1].offsetLeft - cards[0].offsetLeft : 1;
-        var maxScroll = strip.scrollWidth - strip.clientWidth;
-        var i = strip.scrollLeft >= maxScroll - 2 ? cards.length - 1 : Math.round(strip.scrollLeft / step);
-        Array.prototype.forEach.call(dots.children, function(el, k){ el.classList.toggle('on', k === i); });
-      };
-      var ticking = false;
-      strip.addEventListener('scroll', function(){
-        if(ticking) return;
-        ticking = true;
-        setTimeout(function(){ ticking = false; mark(); }, 60);
-      }, { passive: true });
-      mark();
-    }
-    document.addEventListener('keydown', function(e){
-      if(viewer.hidden) return;
-      if(e.key === 'Escape') close();
-      else if(e.key === 'ArrowRight') go(current() + 1, true);
-      else if(e.key === 'ArrowLeft') go(current() - 1, true);
-    });
-  })();
-
-  /* 배경 그라데이션이 풀리기 시작하는 지점을 히어로 높이에 맞춘다 */
-  function syncHeroHeight(){
-    var hero = document.querySelector('.hero');
-    if(!hero) return;
-    document.documentElement.style.setProperty('--hero-h', Math.round(hero.offsetHeight) + 'px');
-  }
-  syncHeroHeight();
-  window.addEventListener('resize', syncHeroHeight);
-  if(document.fonts && document.fonts.ready){
-    document.fonts.ready.then(syncHeroHeight).catch(function(){});
-  }
-  window.addEventListener('load', syncHeroHeight);
-
-  /* ── D-DAY ── */
-  var OPEN  = new Date(2026, 10, 12);              // 2026-11-12
-  var CLOSE = new Date(2026, 10, 17, 20, 0, 0);    // 2026-11-17 20:00 마감
-  var DAY = 86400000;
-
-  function countTo(el, target, prefix){
-    if(!ANIM || !window.requestAnimationFrame){
-      el.textContent = prefix + target;
-      return;
-    }
-    var dur = 1000, start = null;
-    el.textContent = prefix + '0';
-    requestAnimationFrame(function step(ts){
-      if(start === null) start = ts;
-      var p = Math.min((ts - start) / dur, 1);
-      var eased = 1 - Math.pow(1 - p, 3);
-      el.textContent = prefix + Math.round(target * eased);
-      if(p < 1) requestAnimationFrame(step);
-    });
-    // 화면에 보이지 않는 탭에서는 애니메이션이 멈추므로, 시간이 지나면 최종 숫자를 확실히 넣는다
-    setTimeout(function(){ el.textContent = prefix + target; }, dur + 300);
-  }
-
-  function updateDday(){
-    var numEl = document.getElementById('ddayNum');
-    var labEl = document.getElementById('ddayLabel');
-    if(!numEl || !labEl) return;
-
-    var now = new Date();
-    var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    var diff = Math.round((OPEN - today) / DAY);
-
-    if(diff > 0){
-      labEl.textContent = '전시 오픈까지';
-      if(ANIM){
-        numEl.textContent = 'D-0';
-        setTimeout(function(){ countTo(numEl, diff, 'D-'); }, 860);
-      } else {
-        numEl.textContent = 'D-' + diff;
-      }
-    } else if(now <= CLOSE){
-      var n = Math.round((today - OPEN) / DAY) + 1;
-      numEl.textContent = n + '일차';
-      labEl.textContent = '전시가 열리고 있습니다';
-    } else {
-      numEl.textContent = '종료';
-      labEl.textContent = '찾아와 주셔서 감사합니다';
-    }
-  }
-  updateDday();
-
-  /* ── 복사 ── */
-  var ADDRESS = '서울 마포구 신촌로 48 (홍대 피시스 아카이브)';
-
-  var toastTimer = null;
-  function toast(msg){
-    var prev = document.querySelector('.toast');
-    if(prev) prev.remove();
-    if(toastTimer) clearTimeout(toastTimer);
-    var el = document.createElement('div');
-    el.className = 'toast';
-    el.textContent = msg;
-    document.body.appendChild(el);
-    toastTimer = setTimeout(function(){ if(el.parentNode) el.remove(); }, 2600);
-  }
-
-  function selectFallback(text, okMsg){
-    try{
-      var ta = document.createElement('textarea');
-      ta.value = text;
-      ta.setAttribute('readonly', '');
-      ta.style.position = 'fixed';
-      ta.style.top = '-1000px';
-      document.body.appendChild(ta);
-      ta.select();
-      var ok = document.execCommand && document.execCommand('copy');
-      ta.remove();
-      toast(ok ? okMsg : '복사가 막혀 있습니다. 길게 눌러 직접 복사해 주세요');
-    }catch(e){
-      toast('복사가 막혀 있습니다. 길게 눌러 직접 복사해 주세요');
-    }
-  }
-
-  function copy(text, okMsg){
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(text).then(function(){
-        toast(okMsg);
-      }).catch(function(){
-        selectFallback(text, okMsg);
-      });
-    } else {
-      selectFallback(text, okMsg);
-    }
-  }
-
-  var addrBtn = document.getElementById('copyAddr');
-  if(addrBtn) addrBtn.addEventListener('click', function(){
-    copy(ADDRESS, '주소를 복사했습니다');
-  });
-
-  // 지금 보고 있는 주소를 그대로 복사한다 (#작가 공유 링크로 들어왔다면 그것까지)
-  var linkBtn = document.getElementById('copyLink');
-  if(linkBtn) linkBtn.addEventListener('click', function(){
-    copy(location.href, '링크를 복사했습니다');
-  });
-
-  /* ▼ 구글 Apps Script 웹앱 주소. '작가에게 한마디'와 '관람 예약'이 함께 쓴다.
-       비어 있으면 두 섹션 모두 숨는다. */
-  var SHEET_ENDPOINT = 'https://script.google.com/macros/s/AKfycbz9oZZXBoCEBRYiXmML2QEUPuuK5gb1a4UqKDBBFDMhnSH3ud0gHYFVxLN8EM4yfnGEXg/exec';
-
-  /* ── 작가에게 한마디 ── */
-  (function(){
-    var ENDPOINT = SHEET_ENDPOINT;
-
-    var sec     = document.getElementById('noteSection');
-    var form    = document.getElementById('noteForm');
-    var wrap    = document.getElementById('noteFormWrap');
-    var done    = document.getElementById('noteDone');
-    var msgEl   = document.getElementById('noteMessage');
-    var cntEl   = document.getElementById('noteCount');
-    var statEl  = document.getElementById('noteStatus');
-    var btn     = document.getElementById('noteSubmit');
-    var again   = document.getElementById('noteAgain');
-    var intro   = document.getElementById('noteIntro');
-    var body    = document.getElementById('noteBody');
-    var toEl    = document.getElementById('noteTo');
-    var change  = document.getElementById('noteChange');
-    var allBtn  = document.getElementById('noteAll');
-    if(!sec || !form) return;
-
-    if(ENDPOINT.indexOf('http') !== 0){ sec.hidden = true; return; }
-
-    var MAX = 300;
-    var COOLDOWN = 20000;   // 같은 사람이 연달아 보내는 것을 막는다
-
-    /* 연락처와 광고를 거른다. 서버 쪽에서도 같은 검사를 한 번 더 한다 */
-    var BLOCKED = [
-      { re: /[\w.+-]+@[\w-]+\.[\w.]{2,}/,                    msg: '이메일 주소는 적지 않으셔도 됩니다.' },
-      { re: /01[016-9][-.\s]?\d{3,4}[-.\s]?\d{4}/,           msg: '전화번호는 적지 않으셔도 됩니다.' },
-      { re: /\d{9,}/,                                        msg: '긴 숫자는 적지 않으셔도 됩니다.' },
-      { re: /(https?:\/\/|www\.)/i,                          msg: '링크는 넣을 수 없습니다.' },
-      { re: /\.(com|net|org|kr|io|me|shop|link|xyz|top|biz)\b/i, msg: '링크는 넣을 수 없습니다.' },
-      { re: /(카지노|토토|바카라|먹튀|슬롯|대출|상위노출|홍보대행|부업|재택알바|비아그라|오픈채팅|오픈카톡|텔레그램|디비판매|코인리딩)/,
-        msg: '전시와 관련 없는 내용은 보낼 수 없습니다.' }
-    ];
-
-    function screen(text){
-      for(var i = 0; i < BLOCKED.length; i++){
-        if(BLOCKED[i].re.test(text)) return BLOCKED[i].msg;
-      }
-      return '';
-    }
-
-    function setStatus(text){ if(statEl) statEl.textContent = text || ''; }
-
-    // 글자 수
-    if(msgEl && cntEl){
-      var updateCount = function(){
-        cntEl.textContent = msgEl.value.length + ' / ' + MAX;
-      };
-      msgEl.addEventListener('input', updateCount);
-      updateCount();
-    }
-
-    function lastSent(){
-      try{ return parseInt(localStorage.getItem('note-sent') || '0', 10) || 0; }
-      catch(e){ return 0; }
-    }
-    function markSent(){
-      try{ localStorage.setItem('note-sent', String(Date.now())); }catch(e){}
-    }
-
-    function showDone(){
-      if(wrap) wrap.hidden = true;
-      if(done) done.hidden = false;
-    }
-
-    /* ── 작가를 고르면 본문이 펼쳐진다 ── */
-    var items = document.querySelectorAll('.artists li');
-
-    function markPicked(name){
-      Array.prototype.forEach.call(items, function(li){
-        li.classList.toggle('picked', artistName(li) === name);
-      });
-    }
-
-    function slideOpenBody(){
-      if(!body.hidden) return;
-      body.hidden = false;
-      if(!ANIM) return;
-
-      body.style.overflow = 'hidden';
-      body.style.height = 'auto';
-      var target = body.offsetHeight;
-
-      body.style.height = '0px';
-      body.style.opacity = '0';
-      void body.offsetHeight;
-
-      body.style.transition = 'height .5s cubic-bezier(.22,.61,.36,1), opacity .4s ease .1s';
-      body.style.height = target + 'px';
-      body.style.opacity = '1';
-
-      setTimeout(function(){
-        body.style.transition = '';
-        body.style.height = '';
-        body.style.overflow = '';
-        body.style.opacity = '';
-      }, 560);
-    }
-
-    // quiet: 공유 링크(#이름)로 미리 골라 둘 때. 화면을 끌어내리거나 입력칸에 커서를 두지 않는다
-    // 게시판을 연 작가에게 쓰는 쪽지는 그 작가 페이지에 붙는다고 알려 준다
-    var privacyEl = document.getElementById('notePrivacy');
-    var doneSubEl = document.getElementById('noteDoneSub');
-    var PRIVATE_TEXT = privacyEl ? privacyEl.textContent : '';
-    var PRIVATE_DONE = doneSubEl ? doneSubEl.textContent : '';
-    function notePrivacy(name){
-      var open = !!BOARD_ARTISTS[name];
-      var label = artistLabel(name);
-      if(open && PAGE_ARTIST === name){
-        // 작가 전용 페이지에서는 자기 이름을 부르지 않는다
-        if(privacyEl){
-          if(IS_VISIT){
-            // 예약 페이지: 게시판 안내 아래 줄에 감상평 부탁을 덧붙인다
-            privacyEl.textContent = '남겨 주신 쪽지는 작가 페이지의 쪽지 게시판에 붙어요.';
-            privacyEl.appendChild(document.createElement('br'));
-            var ask = document.createElement('span');
-            ask.className = 'note-ask';
-            ask.textContent = '전시를 보고 난 뒤에 감상평을 남겨 주시면 정말 기쁠 거예요!';
-            privacyEl.appendChild(ask);
-          } else {
-            privacyEl.textContent = '남겨 주신 쪽지는 이 페이지 게시판에 붙어요.';
-          }
-        }
-        if(doneSubEl) doneSubEl.textContent = IS_VISIT ? '작가 페이지 게시판에 붙었어요. 고마워요!' : '게시판에 붙었어요. 고마워요!';
-        return;
-      }
-      if(privacyEl) privacyEl.textContent = open
-        ? label + ' 작가에게 남긴 쪽지는 ' + label + ' 작가 페이지의 쪽지 게시판에 붙어요.'
-        : PRIVATE_TEXT;
-      if(doneSubEl) doneSubEl.textContent = open
-        ? label + ' 작가 페이지 게시판에 붙었어요.'
-        : PRIVATE_DONE;
-    }
-
-    function pickArtist(name, quiet){
-      var first = body.hidden;
-
-      form.artist.value = name;
-      if(toEl && PAGE_ARTIST && name === PAGE_ARTIST){
-        toEl.textContent = '작가에게 한마디';   // 작가 전용 페이지에서는 자기 이름을 부르지 않는다
-      } else if(toEl){
-        toEl.innerHTML = '';
-        var em = document.createElement('em');
-        em.textContent = (name === '전체') ? '참여 작가 모두' : artistLabel(name);
-        toEl.appendChild(em);
-        toEl.appendChild(document.createTextNode(
-          name === '전체' ? '에게' : ' 작가에게'));
-      }
-      markPicked(name);
-      notePrivacy(name);
-
-      // 다 쓴 상태였다면 폼으로 되돌린다
-      if(done && !done.hidden){
-        form.reset();
-        form.artist.value = name;
-        if(cntEl) cntEl.textContent = '0 / ' + MAX;
-        setStatus('');
-        done.hidden = true;
-        if(wrap) wrap.hidden = false;
-      }
-
-      if(intro) intro.hidden = true;
-      slideOpenBody();
-      if(quiet) return;
-
-      setTimeout(function(){
-        sec.scrollIntoView({ behavior: ANIM ? 'smooth' : 'auto', block: 'start' });
-        if(first && msgEl) setTimeout(function(){ msgEl.focus(); }, 420);
-      }, first && ANIM ? 180 : 0);
-    }
-
-    Array.prototype.forEach.call(items, function(li){
-      var name = artistName(li);   // 시트에는 본명으로 간다
-      li.setAttribute('role', 'button');
-      li.setAttribute('tabindex', '0');
-      li.setAttribute('aria-label', artistLabel(name) + ' 작가에게 한마디 남기기');
-      li.addEventListener('click', function(){ pickArtist(name); });
-      li.addEventListener('keydown', function(e){
-        if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); pickArtist(name); }
-      });
-    });
-
-    if(allBtn) allBtn.addEventListener('click', function(){ pickArtist('전체'); });
-
-    // 링크 끝에 작가 이름(#이재이)이 있으면 받는 사람으로 미리 골라 둔다
-    function pickFromHash(){
-      var raw = sharedArtist();
-      for(var i = 0; i < items.length; i++){
-        if(raw && artistName(items[i]) === raw){ pickArtist(raw, true); return; }
-      }
-    }
-    pickFromHash();
-    window.addEventListener('hashchange', pickFromHash);
-
-    // 받는 사람을 다시 고르러 명단으로 돌려보낸다
-    if(change){
-      change.addEventListener('click', function(){
-        var artists = document.getElementById('artistsSection') ||
-                      document.querySelector('.artists');
-        if(artists){
-          artists.scrollIntoView({ behavior: ANIM ? 'smooth' : 'auto', block: 'center' });
-        }
-      });
-    }
-
-    if(again){
-      again.addEventListener('click', function(){
-        var keep = form.artist.value;        // 받는 사람은 그대로 둔다
-        form.reset();
-        form.artist.value = keep;
-        if(cntEl) cntEl.textContent = '0 / ' + MAX;
-        setStatus('');
-        if(done) done.hidden = true;
-        if(wrap) wrap.hidden = false;
-        if(msgEl) msgEl.focus();
-      });
-    }
-
-    form.addEventListener('submit', function(e){
-      e.preventDefault();
-      setStatus('');
-
-      var trap = form.nickname ? form.nickname.value : '';
-      if(trap){ showDone(); return; }          // 자동 프로그램은 조용히 흘려보낸다
-
-      var message = (msgEl ? msgEl.value : '').trim();
-      if(!message){
-        setStatus('남기고 싶은 말을 적어 주세요.');
-        if(msgEl) msgEl.focus();
-        return;
-      }
-      if(message.length > MAX){
-        setStatus(MAX + '자까지 적을 수 있습니다.');
-        return;
-      }
-
-      var blocked = screen(message) || screen(form.sender ? form.sender.value : '');
-      if(blocked){
-        setStatus(blocked);
-        if(msgEl) msgEl.focus();
-        return;
-      }
-      if(Date.now() - lastSent() < COOLDOWN){
-        setStatus('방금 하나를 보냈습니다. 잠시 뒤에 다시 시도해 주세요.');
-        return;
-      }
-
-      var payload = {
-        artist:  form.artist ? form.artist.value : '전체',
-        message: message,
-        sender:  form.sender ? form.sender.value.trim() : '',
-        at:      new Date().toISOString()
-      };
-
-      if(btn){ btn.disabled = true; btn.textContent = '전하는 중…'; }
-
-      // text/plain 으로 보내면 사전 확인 요청 없이 바로 전달된다
-      fetch(ENDPOINT, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload)
-      }).then(function(){
-        markSent();
-        showDone();
-        window.dispatchEvent(new CustomEvent('note-sent', { detail: payload }));
-      }).catch(function(){
-        // 응답을 읽지 못해도 전달 자체는 되는 경우가 많다. 한 번 더 시도한다
-        return fetch(ENDPOINT, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify(payload)
-        }).then(function(){
-          markSent();
-          showDone();
-        }).catch(function(){
-          setStatus('전하지 못했습니다. 잠시 뒤에 다시 시도해 주세요.');
-        });
-      }).then(function(){
-        if(btn){ btn.disabled = false; btn.textContent = '전하기'; }
-      });
-    });
-  })();
-
-  /* ── 작가 쪽지 게시판 (/jessie) ──
-     Apps Script 에서 그 작가에게 온 쪽지만 받아 메모지처럼 붙인다 */
-  (function(){
-    var sec = document.getElementById('boardSection');
-    if(!sec || !PAGE_ARTIST || !BOARD_ARTISTS[PAGE_ARTIST]) return;
-    if(SHEET_ENDPOINT.indexOf('http') !== 0) return;
-    sec.hidden = false;
-    if(IS_VISIT) return;      // 예약 페이지: 쪽지 보드는 빼고 쓰는 칸만 둔다
-
-    // 손글씨 느낌 글꼴은 이 페이지에서만 불러온다
-    var font = document.createElement('link');
-    font.rel = 'stylesheet';
-    font.href = 'https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap';
-    document.head.appendChild(font);
-
-    var board = document.getElementById('board');
-    var empty = document.getElementById('boardEmpty');
-    var countEl = document.getElementById('boardCount');
-    var PAPERS = ['#FFF4A8', '#FFD9E4', '#D7F0FF', '#DDF5D2', '#FFE3C2', '#EADCFF'];
-    var total = 0;
-    var PAGE = 12;          // 처음에 보여 줄 장수, '더 보기'를 누를 때마다 이만큼 더
-    var shown = PAGE;
-    /* 이 글자 수를 넘는 쪽지는 접어 두고, 누르면 펼친다.
-       고정값이 아니라 쪽지를 불러올 때마다 다시 정한다:
-       가장 긴 쪽지 하나를 뺀 나머지의 평균 글자 수 + CLAMP_EXTRA.
-       쪽지가 2개 미만이면 CLAMP_DEFAULT 를 쓴다 */
-    var CLAMP_DEFAULT = 20;
-    var CLAMP_EXTRA = 8;
-    var CLAMP = CLAMP_DEFAULT;
-    function setClamp(notes){
-      var lens = notes.map(function(n){ return Array.from((n.message || '').trim()).length; });
-      if(lens.length < 2){ CLAMP = CLAMP_DEFAULT; return; }
-      lens.sort(function(a, b){ return a - b; });
-      lens.pop();                                   // 가장 긴 쪽지 하나는 평균에서 뺀다
-      var sum = 0;
-      for(var i = 0; i < lens.length; i++) sum += lens[i];
-      var avg = Math.round(sum / lens.length);
-      CLAMP = avg + CLAMP_EXTRA;
-      try { console.log('쪽지 평균 ' + avg + '자 (가장 긴 쪽지 제외, ' + lens.length + '개) → ' + CLAMP + '자 넘으면 접음'); } catch(e){}
-    }
-    var HEART_SENDERS = { '다진고기': true };   // 보낸 사람 이름이 이와 같으면 하트 쪽지 (접지 않음)
-    var moreRow = document.getElementById('boardMoreRow');
-    var moreBtn = document.getElementById('boardMore');
-
-    function paginate(){
-      var all = board.querySelectorAll('.sticky');
-      for(var i = 0; i < all.length; i++) all[i].hidden = i >= shown;
-      var rest = all.length - shown;
-      moreRow.hidden = rest <= 0;
-      if(rest > 0) moreBtn.textContent = '쪽지 더 보기';
-      fitHearts();
-    }
-
-    // 하트는 크기가 정해져 있으니, 글이 넘치면 넘치지 않을 때까지 글씨를 조금씩 줄인다
-    function fitHearts(){
-      var hs = board.querySelectorAll('.sticky.is-heart');
-      for(var i = 0; i < hs.length; i++){
-        var h = hs[i];
-        if(h.hidden) continue;
-        var fs = 1.0;
-        h.style.removeProperty('width'); h.style.removeProperty('max-width');
-        h.style.setProperty('--heart-fs', fs + 'rem');
-        while(h.scrollHeight > h.clientHeight + 1 && fs > 0.74){
-          fs = Math.round((fs - 0.04) * 100) / 100;
-          h.style.setProperty('--heart-fs', fs + 'rem');
-        }
-        // 글씨를 더 줄이면 읽기 어려우니, 그래도 넘치면 비율은 그대로 두고 하트를 조금씩 키운다
-        var w = h.offsetWidth, limit = board.clientWidth - 20;
-        while(h.scrollHeight > h.clientHeight + 1 && w < limit){
-          w = Math.min(limit, w + 12);
-          h.style.width = w + 'px'; h.style.maxWidth = 'none';
-        }
-      }
-    }
-    var fitTimer = null;
-    window.addEventListener('resize', function(){ clearTimeout(fitTimer); fitTimer = setTimeout(fitHearts, 150); });
-    if(document.fonts && document.fonts.ready) document.fonts.ready.then(fitHearts).catch(function(){});
-    moreBtn.addEventListener('click', function(){ shown += PAGE; paginate(); });
-
-    // 같은 쪽지는 늘 같은 색·기울기로 붙도록 글자로 값을 정한다
-    function seed(str){
-      var h = 0;
-      for(var i = 0; i < str.length; i++){ h = (h * 31 + str.charCodeAt(i)) | 0; }
-      return Math.abs(h);
-    }
-
-    /* 내용이 거의 없는 쪽지인지 가늠한다. 지우지는 않고 작게만 붙인다.
-       - ㅋㅋ·ㅎㅎ·ㅠㅠ 같은 자음·모음, 문장부호, 이모지를 걷어 내고 남는 글자가 3자 미만
-       - 몇 글자만 계속 되풀이 (하하하하하, 와와와와)
-       - 영문 자판 두드리기 (asdf, qwerty, 모음 없는 영문 덩어리) */
-    function isFluff(text){
-      var s = (text || '').replace(/\s+/g, '');
-      if(!s) return true;
-      var core = s.replace(/[^가-힣a-zA-Z0-9]/g, '');
-      if(core.length < 3) return true;
-      var uniq = {}, n = 0;
-      for(var i = 0; i < core.length; i++){ if(!uniq[core[i]]){ uniq[core[i]] = 1; n++; } }
-      if(core.length >= 5 && n <= 2) return true;
-      if(/^[a-zA-Z]+$/.test(core)){
-        if(/asdf|sdfg|qwer|wert|zxcv|hjkl|jkl/i.test(core)) return true;
-        if(core.length >= 4 && !/[aeiouy]/i.test(core)) return true;
-      }
-      return false;
-    }
-
-    function note(n, fresh){
-      var el = document.createElement('article');
-      el.className = 'sticky' + (fresh ? ' is-new' : '') + (isFluff(n.message) ? ' is-small' : '');
-      var k = seed((n.message || '') + (n.at || ''));
-      el.style.setProperty('--paper', PAPERS[k % PAPERS.length]);
-      el.style.setProperty('--r', ((k % 9) - 4) + 'deg');
-      el.style.setProperty('--t', ((k % 7) - 3) * 2 + 'deg');
-      el.style.setProperty('--y', ((k % 5) * 3) + 'px');
-      var msg = document.createElement('p');
-      msg.className = 'sticky-msg';
-      // 20자가 넘으면 앞부분만 보이고 말줄임표를 붙인다. 쪽지를 누르면 펼치고, 다시 누르면 접는다
-      var full = n.message || '';
-      var chars = Array.from(full);                 // 이모지가 반쪽으로 잘리지 않게 글자 단위로 센다
-      // 특별한 사람의 쪽지는 하트 모양으로, 늘 펼친 채로 붙인다
-      var special = HEART_SENDERS[(n.sender || '').trim()];
-      if(special){ el.classList.add('is-heart'); el.classList.remove('is-small'); }
-      if(!special && chars.length > CLAMP){
-        var short = chars.slice(0, CLAMP).join('').replace(/\s+$/, '') + '…';
-        msg.textContent = short;
-        el.classList.add('is-clamped');
-        el.tabIndex = 0;
-        el.setAttribute('role', 'button');
-        el.setAttribute('aria-expanded', 'false');
-        el.setAttribute('aria-label', full);
-        var toggle = function(){
-          var open = el.classList.toggle('is-open');
-          msg.textContent = open ? full : short;
-          el.setAttribute('aria-expanded', open ? 'true' : 'false');
-        };
-        el.addEventListener('click', toggle);
-        el.addEventListener('keydown', function(e){
-          if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); toggle(); }
-        });
-      } else {
-        msg.textContent = full;
-      }
-      var meta = document.createElement('div');
-      meta.className = 'sticky-meta';
-      var who = document.createElement('span');
-      who.textContent = '- ' + (n.sender || '익명');
-      var when = document.createElement('span');
-      when.textContent = n.at || '';
-      meta.appendChild(who); meta.appendChild(when);
-      el.appendChild(msg); el.appendChild(meta);
-      return el;
-    }
-
-    function setCount(){
-      // 쪽지 수는 보여 주지 않는다
-      empty.hidden = total > 0;
-    }
-
-    // 예약 페이지의 '게시판 보러가기'(/jessie?to=board)로 들어왔으면 게시판으로 내려간다.
-    // 쪽지가 다 붙은 뒤에 움직여야 위치가 어긋나지 않는다
-    var wantBoard = new URLSearchParams(location.search).get('to') === 'board';
-    function jumpToBoard(){
-      if(!wantBoard) return;
-      wantBoard = false;
-      setTimeout(function(){
-        sec.classList.add('in');
-        sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 120);
-    }
-    if(wantBoard) sec.style.scrollMarginTop = '16px';
-    board.innerHTML = '<span class="board-loading">쪽지를 가져오는 중…</span>';
-    fetch(SHEET_ENDPOINT + '?type=board&artist=' + encodeURIComponent(PAGE_ARTIST))
-      .then(function(r){ return r.json(); })
-      .then(function(r){
-        board.innerHTML = '';
-        var notes = (r && r.ok && r.notes) || [];
-        setClamp(notes);
-        notes.forEach(function(n){ board.appendChild(note(n)); });
-        total = notes.length;
-        setCount();
-        paginate();
-        jumpToBoard();
-      })
-      .catch(function(){
-        jumpToBoard();
-        board.innerHTML = '';
-        empty.textContent = '쪽지를 불러오지 못했어요. 잠시 뒤에 다시 들러 주세요.';
-        empty.hidden = false;
-      });
-
-    // 이 페이지에서 쪽지를 보내면 바로 맨 앞에 붙인다
-    window.addEventListener('note-sent', function(e){
-      var p = e.detail || {};
-      if(p.artist !== PAGE_ARTIST) return;
-      var d = new Date();
-      board.insertBefore(note({ message: p.message, sender: p.sender, at: (d.getMonth() + 1) + '/' + d.getDate() }, true), board.firstChild);
-      total++;
-      shown++;            // 방금 붙인 쪽지 때문에 다른 쪽지가 밀려 사라지지 않게
-      setCount();
-      paginate();
-    });
-
-  })();
-
-  /* ── 관람 예약 ──
-     Apps Script가 예약 시트의 해당 작가 칸에 한 줄씩 채운다.
-     결제 방법·입장여부·메모는 운영진이 직접 적는 칸이라 받지 않는다 */
-  (function(){
-    var sec = document.getElementById('visitSection');
-    if(!sec) return;
-    if(SHEET_ENDPOINT.indexOf('http') !== 0){ sec.hidden = true; return; }
-
-    var form    = document.getElementById('visitForm');
-    var wrap    = document.getElementById('visitFormWrap');
-    var done    = document.getElementById('visitDone');
-    var doneSub = document.getElementById('visitDoneSub');
-    var again   = document.getElementById('visitAgain');
-    var statEl  = document.getElementById('visitStatus');
-    var btn     = document.getElementById('visitSubmit');
-    var dateEl  = document.getElementById('visitDate');
-    var artEl   = document.getElementById('visitArtist');
-
-    var COOLDOWN = 20000;
-
-    // 값은 예약 시트 '방문 날짜' 드롭다운과 똑같아야 한다
-    var DAYS = [
-      { v:'11/12(목)', label:'11월 12일 (목) · 13:00 개관' },
-      { v:'11/13(금)', label:'11월 13일 (금)' },
-      { v:'11/14(토)', label:'11월 14일 (토)' },
-      { v:'11/15(일)', label:'11월 15일 (일)' },
-      { v:'11/16(월)', label:'11월 16일 (월)' },
-      { v:'11/17(화)', label:'11월 17일 (화) · 20:00 마감' }
-    ];
-    DAYS.forEach(function(d){ dateEl.appendChild(new Option(d.label, d.v)); });
-
-    // 작가 명단은 위 '참여 작가'에서 그대로 가져온다
-    Array.prototype.forEach.call(document.querySelectorAll('.artists li'), function(li){
-      var name = artistName(li);
-      artEl.appendChild(new Option(artistLabel(name), name));
-    });
-
-    // 공유 링크(#이름)로 들어왔다면 그 작가를 미리 골라 둔다
-    var hashName = sharedArtist();
-    for(var i = 0; i < artEl.options.length; i++){
-      if(hashName && artEl.options[i].value === hashName){ artEl.selectedIndex = i; break; }
-    }
-
-    var BLOCKED = /([\w.+-]+@[\w-]+\.[\w.]{2,}|01[016-9][-.\s]?\d{3,4}[-.\s]?\d{4}|\d{9,}|https?:\/\/|www\.)/i;
-
-    function setStatus(t){ statEl.textContent = t || ''; }
-    function lastSent(){
-      try{ return parseInt(localStorage.getItem('visit-sent') || '0', 10) || 0; }catch(e){ return 0; }
-    }
-    function markSent(){
-      try{ localStorage.setItem('visit-sent', String(Date.now())); }catch(e){}
-    }
-
-    function showDone(date){
-      var day = DAYS.filter(function(d){ return d.v === date; })[0];
-      doneSub.textContent = (day ? day.label.split(' · ')[0] : date) + '에 오시는 걸로 적어 두었어요.';
-      wrap.hidden = true;
-      done.hidden = false;
-      window.dispatchEvent(new CustomEvent('visit-done', { detail: { date: date } }));
-    }
-
-    again.addEventListener('click', function(){
-      var keepArtist = artEl.value;
-      form.reset();
-      artEl.value = keepArtist;
-      setStatus('');
-      done.hidden = true;
-      wrap.hidden = false;
-      window.dispatchEvent(new CustomEvent('visit-reset'));
-    });
-
-    form.addEventListener('submit', function(e){
-      e.preventDefault();
-      setStatus('');
-
-      if(form.nickname.value){ showDone(dateEl.value); return; }
-
-      var name = form.name.value.trim();
-      if(!name){ setStatus('입구에서 확인할 수 있도록 성함을 적어 주세요.'); form.name.focus(); return; }
-      if(!dateEl.value){ setStatus('방문 날짜를 골라 주세요.'); dateEl.focus(); return; }
-      if(BLOCKED.test(name)){ setStatus('성함만 적어 주세요. 연락처나 링크는 넣을 수 없습니다.'); return; }
-      if(Date.now() - lastSent() < COOLDOWN){ setStatus('방금 예약을 남겼습니다. 잠시 뒤에 다시 시도해 주세요.'); return; }
-
-      var payload = {
-        type:       'reservation',
-        name:       name,
-        date:       dateEl.value,
-        artist:     artEl.value,           // 비어 있으면 워크인 칸으로 간다
-        companions: form.companions.value  // 예약자를 뺀 인원. 비어 있으면 시트에도 비워 둔다
-      };
-
-      btn.disabled = true;
-      btn.textContent = '남기는 중…';
-
-      fetch(SHEET_ENDPOINT, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload)
-      }).then(function(res){
-        return res.json().catch(function(){ return { ok: true }; });
-      }).then(function(r){
-        if(r && r.ok === false){
-          var msg = {
-            blocked:      '보낼 수 없는 표현이 들어 있습니다. 다시 확인해 주세요.',
-            bad_date:     '고를 수 없는 날짜입니다. 다시 골라 주세요.',
-            rate_limited: '지금 예약이 몰려 있습니다. 잠시 뒤에 다시 시도해 주세요.',
-            busy:         '지금 예약이 몰려 있습니다. 잠시 뒤에 다시 시도해 주세요.'
-          }[String(r.reason).replace(/^blocked_.*/, 'blocked')];
-          setStatus(msg || '예약을 남기지 못했습니다. 잠시 뒤에 다시 시도해 주세요.');
-          return;
-        }
-        markSent();
-        showDone(payload.date);
-      }).catch(function(){
-        setStatus('연결이 원활하지 않습니다. 잠시 뒤에 다시 시도해 주세요.');
-      }).then(function(){
-        btn.disabled = false;
-        btn.textContent = '예약하기';
-      });
-    });
-  })();
-
-  /* ── 작가별 공유 링크 (#이름) ── */
-  (function(){
-    var items = document.querySelectorAll('.artists li');
-    var line  = document.getElementById('inviteLine');
-    var visit = document.getElementById('visitArtist');
-
-    function apply(){
-      var raw = sharedArtist();
-
-      var hit = null;
-      for(var i = 0; i < items.length; i++){
-        items[i].classList.remove('spotlight');
-        if(raw && artistName(items[i]) === raw) hit = items[i];
-      }
-      if(!hit){ if(line) line.hidden = true; return; }
-
-      hit.classList.add('spotlight');
-      if(line){
-        line.textContent = artistLabel(raw) + ' 작가가 초대합니다';
-        line.hidden = false;
-      }
-      if(visit) visit.value = raw;   // 관람 예약의 '초대한 작가'도 미리 골라 둔다
-    }
-
-    apply();
-    // 이미 열린 페이지에서 주소 끝의 #이름만 바꿔도 바로 반영한다
-    window.addEventListener('hashchange', apply);
-  })();
-
-  /* ── 조금 이상한 질문 ── */
-  (function(){
-    /* 작품에서 온 질문은 작가와 작품명을 함께 적는다.
-       전시 서문·도슨트에서 온 질문은 그 출처를, 그 밖의 것은 비워 둔다. */
-    var QUESTIONS = [
-      // ── 스무 점의 작품에서 ──
-      { q: '당신에게도 한때 자신만의 이상한 나라가 있었나요. 그 세계는 지금 어디에 있나요?', by: '노정균 〈이상한 나라들의 앨리스〉' },
-      { q: '당신은 어떤 어른이 되었나요?', by: '정연 〈어떤 어른이 되었나요?〉' },
-      { q: '이상한 나라에 가게 된다면 무엇이 되고 싶으신가요?', by: '엄현서 〈이상한 나라의 해바라기〉' },
-      { q: '당신의 다음 수는 어디에 두고 싶나요?', by: '재이 〈어디에 둘까요?〉' },
-      { q: '모두가 같은 모습으로 살아가야 할까요?', by: '이희지 〈WELCOME TO THE TEA PARTY〉' },
-      { q: '누군가의 성취를 보며 진심으로 응원해주지 못했던 적이 있나요?', by: '윤혜진 〈미소 짓는 자리〉' },
-      { q: '나의 계절은 정말 늦은 걸까요?', by: '박정은 〈나의 계절은 아직〉' },
-      { q: '곁에 있는 사람의 속도를 나의 기준으로 삼은 적이 있나요?', by: '최윤지 〈각자의 촛불을 켜는 시간〉' },
-      { q: '이곳이 이상한 걸까요, 아니면 그 안에서 낯설게 느끼는 내가 이상한 걸까요?', by: '최윤아 〈Off-beat〉' },
-      { q: '내가 믿어온 성공의 기준은 정말 나의 기준이었나요?', by: '임소라 〈발돋움〉' },
-      { q: '앞으로 내가 채워갈 찻잔에는 조금 더 나다운 것이 담길 수 있을까요?', by: '홍성호 〈나를 따르다〉' },
-      { q: '잠시 내려놓아도 괜찮은 것이 당신에게 있나요?', by: '남다름 〈꿈과 현실 사이〉' },
-      { q: '나는 앞으로 무엇을 선택하며 살아갈까요?', by: '남선주 〈그림자 너머〉' },
-      { q: '두려운 채로도 한 걸음 내디뎌 본 적이 있나요?', by: '박수룡 〈경계선 위의 발걸음〉' },
-      { q: '아무도 나를 보고 있지 않을 때, 나는 어떤 사람일까요?', by: '이경도 〈바다〉' },
-      { q: '아무런 역할을 하지 않고 온전히 자신으로 머물 수 있는 곳이 있나요?', by: '편해연 〈마이 룸 인 원더랜드〉' },
-      { q: '지금 다시 불을 붙이고 싶은 꿈은 무엇인가요?', by: '이서현 〈점화〉' },
-      { q: '지금까지의 삶은 당신에게 무엇을 남겼나요?', by: '김지현 〈What We Left on the Table〉' },
-      { q: '내가 나라고 믿어온 모습 중, 정말 내가 선택한 것은 무엇일까요?', by: '조수연 〈Vase〉' },
-      { q: '앞으로의 당신은 또 어떤 모습으로 변해갈까요?', by: '홍림 〈1+1+1=1〉' },
-
-      // ── 전시 서문과 도슨트에서 ──
-      { q: '우리는 언제부터 보통이라는 기준을 의식하며 살게 되었을까요?', by: '전시 서문' },
-      { q: '내가 조금 이상한 걸까. 이 질문을 마지막으로 떠올린 건 언제였나요?', by: '전시 서문' },
-      { q: '이상한 것은 서로 다른 우리일까요, 모두가 같은 속도로 살아야 한다고 믿은 일일까요?', by: '전시 서문' },
-      { q: '남들과 다른 길을 걷고 있어도 괜찮다고, 스스로에게 말해준 적이 있나요?', by: '전시 서문' },
-      { q: '아직 원하는 모습에 이르지 못했다고 해서, 지금까지의 시간이 의미 없을까요?', by: '전시 서문' },
-      { q: '당신은 어떤 사람인가요?', by: 'CHAPTER 02 · WHO ARE YOU?' },
-      { q: '나는 사회가 정한 기준에 맞춰 잘 크고 있는 걸까요?', by: '성장측정실' },
-      { q: '사람의 성장을 하나의 기준으로 측정할 수 있을까요?', by: '성장측정실' },
-      { q: '우리는 여전히 되어가는 중입니다. 당신은 지금 무엇이 되어가고 있나요?', by: 'CHAPTER 03 · STILL BECOMING' },
-      { q: '지금의 자신을 너무 서둘러 평가하고 있지는 않나요?', by: '에필로그' },
-      { q: '우리는 모두 처음 살아보는 삶을 지나고 있습니다. 당신의 방식은 무엇인가요?', by: '에필로그' },
-      { q: '전시를 나설 때 한 문장을 가져갈 수 있다면, 어떤 말이었으면 좋겠나요?', by: '에필로그 · TAKE ME' },
-
-      // ── 작품의 장면에서 ──
-      { q: 'DRINK ME라고 적힌 차가 눈앞에 있다면, 한 모금 마셔보시겠어요?' },
-      { q: '당신의 이상함을 가지고 티파티 테이블에 앉는다면, 어느 자리에 앉고 싶나요?' },
-      { q: '회중시계를 든 토끼가 당신을 재촉한다면, 무엇을 가장 먼저 내려놓겠어요?' },
-      { q: '아직 피지 않은 꽃봉오리처럼, 때를 기다리고 있는 것이 당신에게 있나요?' },
-      { q: '타인의 발자국으로 내가 얼마나 늦었는지를 재고 있지는 않나요?' },
-      { q: '쉬고 있다는 이유만으로 뒤처지고 있다고 느낀 적이 있나요?' },
-      { q: '지금 서 있는 자리는 누가 정해준 자리인가요?' },
-      { q: '어떤 선택이 후회로 남았더라도, 그 시간이 지금의 나를 만들었다고 생각해 본 적 있나요?' },
-
-      // ── 그 밖에 ──
-      { q: '남들은 시시하다고 하는데, 나는 한참을 들여다보게 되는 것이 있나요?' },
-      { q: '마지막으로 좀 이상하다는 말을 들은 건 언제였나요. 그때 기분은 어땠나요?' },
-      { q: '어릴 때는 아무렇지 않게 했는데, 지금은 하지 않게 된 일이 있나요?' },
-      { q: '잘 그리는 것과 나답게 그리는 것, 하나만 고른다면 어느 쪽인가요?' },
-      { q: '오늘 하루 중 가장 오래 바라본 것은 무엇이었나요?' },
-      { q: '누구에게도 보여주지 않고 혼자 간직하고 있는 것이 있나요?' },
-      { q: '지금 눈앞에 있는 것 중 하나를 그린다면, 무엇을 고르시겠어요?' },
-      { q: '서툴러서 오히려 좋았던 것이 있나요?' },
-      { q: '나를 설명하는 말 중에, 남들은 단점이라 하지만 나는 아끼는 것이 있나요?' },
-      { q: '아무것도 답하지 않아도 괜찮습니다. 그냥 한 바퀴 둘러보시겠어요?' }
-    ];
-
-    var textEl = document.getElementById('questText');
-    var byEl   = document.getElementById('questBy');
-
-    // 온점·반점 다음에 띄어쓰기가 오면 그 자리에서 줄을 내린다 (1+1+1=1 같은 건 건드리지 않는다)
-    function breakLines(q){ return q.replace(/([.,])\s+/g, '$1\n'); }
-    var btn    = document.getElementById('questNext');
-    if(!textEl || !btn) return;
-
-    /* 이 기기에서 이미 본 질문을 기억해 두고, 아직 안 본 질문을 먼저 보여 준다.
-       질문 문장 자체를 열쇠로 쓰므로 목록 순서를 바꾸거나 질문을 추가해도 기록이 어긋나지 않는다.
-       전부 다 봤으면 기록을 비우고 처음부터 다시 돈다.
-       (사생활 보호 모드 등에서 저장이 막혀 있으면 그냥 매번 새로 섞는다) */
-    var SEEN_KEY = 'alo.seenQuestions';
-    function loadSeen(){
-      try { var a = JSON.parse(localStorage.getItem(SEEN_KEY) || '[]'); return Array.isArray(a) ? a : []; }
-      catch(e){ return []; }
-    }
-    function saveSeen(list){
-      try { localStorage.setItem(SEEN_KEY, JSON.stringify(list)); } catch(e){}
-    }
-    var seen = loadSeen();
-    var seenSet = {};
-    seen.forEach(function(q){ seenSet[q] = true; });
-    function markSeen(q){
-      if(seenSet[q]) return;
-      seenSet[q] = true; seen.push(q);
-      // 지금 목록에 있는 질문을 모두 봤으면 기록을 비운다 (방금 본 질문만 남겨 바로 반복되지 않게)
-      var all = true;
-      for(var i = 0; i < QUESTIONS.length; i++){ if(!seenSet[QUESTIONS[i].q]){ all = false; break; } }
-      if(all){ seen = [q]; seenSet = {}; seenSet[q] = true; }
-      saveSeen(seen);
-    }
-
-    function shuffle(a){
-      for(var j = a.length - 1; j > 0; j--){
-        var k = Math.floor(Math.random() * (j + 1));
-        var t = a[j]; a[j] = a[k]; a[k] = t;
-      }
-      return a;
-    }
-
-    // 안 본 질문(섞음) → 본 질문(섞음) 순서로 늘어놓고 차례로 넘긴다
-    var fresh = [], old = [];
-    for(var i = 0; i < QUESTIONS.length; i++) (seenSet[QUESTIONS[i].q] ? old : fresh).push(i);
-    var order = shuffle(fresh).concat(shuffle(old));
-    var cursor = 0;
-
-    /* 링크 끝에 작가 이름(#이재이)이 있으면 그 작가의 질문을 맨 앞에 둔다.
-       작가 전용 페이지(/jessie)에서는 그 작가의 질문이 이미 그림 아래에 있으므로, 여기서는 빼고 다른 작가들의 질문만 보여 준다.
-       출처에 성을 뺀 이름만 적힌 경우도 있다 (재이 〈…〉, 정연 〈…〉) */
-    function artistFirst(){
-      var name = sharedArtist();
-      if(!name) return false;
-      var given = name.slice(1);
-      for(var i = 0; i < order.length; i++){
-        var by = QUESTIONS[order[i]].by || '';
-        if(by.indexOf(name + ' ') === 0 || (given && by.indexOf(given + ' ') === 0)){
-          var q = order.splice(i, 1)[0];
-          if(!(PAGE_ARTIST && name === PAGE_ARTIST)) order.unshift(q);
-          cursor = 0;
-          return true;
-        }
-      }
-      return false;
-    }
-    artistFirst();
-
-    /* 가장 긴 질문이 차지하는 높이를 재어 고정한다.
-       폭이나 글꼴이 바뀌면 다시 잰다 */
-    function lockHeight(){
-      var saved = textEl.textContent;
-      var root = document.documentElement;
-      root.style.removeProperty('--quest-h');
-      textEl.style.height = 'auto';
-
-      var max = 0;
-      for(var i = 0; i < QUESTIONS.length; i++){
-        textEl.textContent = breakLines(QUESTIONS[i].q);
-        if(textEl.scrollHeight > max) max = textEl.scrollHeight;
-      }
-
-      textEl.textContent = saved;
-      textEl.style.height = '';
-      if(max > 0) root.style.setProperty('--quest-h', max + 'px');
-
-      if(byEl){
-        var savedBy = byEl.textContent, maxBy = 0;
-        root.style.removeProperty('--quest-by-h');
-        for(var j = 0; j < QUESTIONS.length; j++){
-          byEl.textContent = QUESTIONS[j].by || '';
-          if(byEl.offsetHeight > maxBy) maxBy = byEl.offsetHeight;
-        }
-        byEl.textContent = savedBy;
-        if(maxBy > 0) root.style.setProperty('--quest-by-h', maxBy + 'px');
-      }
-    }
-
-    function render(){
-      var item = QUESTIONS[order[cursor]];
-      textEl.textContent = breakLines(item.q);
-      markSeen(item.q);
-      // 출처가 없어도 자리는 비워 둔다. 지우면 그만큼 카드가 줄어든다
-      if(byEl) byEl.textContent = item.by || '';
-    }
-
-    var busy = false;
-    var parts = byEl ? [textEl, byEl] : [textEl];
-    function next(){
-      if(busy) return;                       // 바뀌는 도중에 또 누르면 무시한다 (겹침 방지)
-      cursor = (cursor + 1) % order.length;
-      if(!ANIM || matchMedia('(prefers-reduced-motion: reduce)').matches){ render(); return; }
-      busy = true;
-      btn.setAttribute('aria-busy', 'true');
-      parts.forEach(function(el){ el.classList.add('q-out'); });
-      setTimeout(function(){
-        render();
-        // 아래쪽에서 시작하도록 위치를 옮긴 뒤(전환 없이), 다음 프레임에 떠오르게 한다
-        parts.forEach(function(el){ el.classList.remove('q-out'); el.classList.add('q-in'); });
-        void textEl.offsetWidth;
-        // 화면에 보이지 않는 탭에서도 멈추지 않도록 requestAnimationFrame 대신 짧은 타이머를 쓴다
-        setTimeout(function(){
-          parts.forEach(function(el){ el.classList.remove('q-in'); });
-        }, 20);
-        setTimeout(function(){ busy = false; btn.removeAttribute('aria-busy'); }, 320);
-      }, 210);
-    }
-
-    render();
-    lockHeight();
-    btn.addEventListener('click', next);
-    // 열린 페이지에서 #이름만 바꿔도 그 작가의 질문으로 바로 넘어간다
-    window.addEventListener('hashchange', function(){ if(artistFirst()) render(); });
-
-    if(document.fonts && document.fonts.ready){
-      document.fonts.ready.then(lockHeight).catch(function(){});
-    }
-    var reflowTimer = null;
-    window.addEventListener('resize', function(){
-      clearTimeout(reflowTimer);
-      reflowTimer = setTimeout(lockHeight, 180);
-    });
-  })();
-
-  /* ── 지금 전시장에는 ──
-     ▼ 운영 스케줄. 구글시트의 '스텝 타임테이블' 탭을 그대로 복사해 넣으면 된다.
-       (시트에서 범위 선택 → 복사 → 아래 각 줄을 따옴표로 감싸고 쉼표 구분 유지)
-       스케줄이 바뀌면 이 부분만 갈아 끼우고 폴더를 다시 올리면 된다.
-       ※ 2026-10-14 기준 시트 내용 — 아직 조율 중이므로 확정본으로 교체 필요 */
-  (function(){
-    var SCHEDULE_CSV = [
-      ',기간,,11/12 (목),,,,11/13 (금),,,,11/14 (토),,,,11/15 (일),,,,11/16 (월),,,,11/17 (화),,,',
-      ',업무,,입장,브릿지,지하 1층,굿즈(2층),입장,브릿지,지하 1층,굿즈(2층),입장,브릿지,지하 1층,굿즈(2층),입장,브릿지,지하 1층,굿즈(2층),입장,브릿지,지하 1층,굿즈(2층),입장,브릿지,지하 1층,굿즈(2층)',
-      ',11:00,,,,,,이서현,김지현,,,이재이,배정연,홍림,노정균,,김지현,,이재이,,김지현,,,,,,',
-      ',12:00,,,,,,이서현,김지현,,,이재이,배정연,홍림,노정균,,김지현,,이재이,,김지현,,,,,,',
-      ',13:00,,,,,,이서현,김지현,,,이재이,배정연,홍림,이서현,배정연,김지현,,이재이,,김지현,,,,,,',
-      ',14:00,,,김지현,,,이서현,,,,이재이,배정연,홍림,이서현,배정연,,이재이,이서현,이서현,노정균,,,노정균,박정은,,이서현',
-      ',15:00,,,김지현,,,이서현,,,,이재이,배정연,홍림,이서현,배정연,,이재이,이서현,이서현,노정균,,,노정균,박정은,,이서현',
-      ',16:00,,,김지현,,윤혜진,이서현,,,,이재이,,홍림,배정연,배정연,,홍림,이서현,이서현,노정균,박정은,,노정균,박정은,,이서현',
-      ',17:00,,,,,윤혜진,이서현,,,,조수연,이재이,,배정연,배정연,,홍림,이서현,이서현,노정균,박정은,,노정균,박정은,,이서현',
-      ',18:00,,,,,윤혜진,,,,,조수연,이재이,,배정연,조수연,,홍림,,,노정균,박정은,윤혜진,윤혜진,박정은,,',
-      ',19:00,,,박수룡,,,노정균,,,,노정균,이재이,,조수연,조수연,,홍림,,,노정균,박정은,박수룡,배정연,박정은,박수룡,윤혜진',
-      ',20:00,,,박수룡,,,노정균,,,,노정균,이재이,,조수연,조수연,,홍림,,,노정균,박정은,박수룡,배정연,박정은,박수룡,윤혜진',
-      ',21:00,,,박수룡,,,노정균,,,,노정균,이재이,,조수연,조수연,,홍림,,,노정균,박정은,박수룡,,,,'
-    ].join('\n');
-
-    var section = document.getElementById('ondutySection');
-    var listEl  = document.getElementById('ondutyList');
-    var timeEl  = document.getElementById('ondutyTime');
-    var footEl  = document.getElementById('ondutyFoot');
-    if(!section || !listEl) return;
-    if(IS_VISIT) return;                  // 예약 페이지에서는 보여 주지 않는다
-
-    // 한국 시간 기준으로 '지금'을 계산한다 — 기기 시계가 다른 곳에 맞춰져 있어도 같은 결과
-    function nowKST(){
-      var d = new Date();
-      var utc = d.getTime() + d.getTimezoneOffset() * 60000;
-      return new Date(utc + 9 * 3600000);
-    }
-
-    function parseCSV(text){
-      var rows = [];
-      text.replace(/\r/g, '').split('\n').forEach(function(line){
-        if(!line.trim()) return;
-        var cells = [], cur = '', q = false;
-        for(var i = 0; i < line.length; i++){
-          var c = line[i];
-          if(c === '"'){
-            if(q && line[i+1] === '"'){ cur += '"'; i++; }
-            else q = !q;
-          } else if(c === ',' && !q){ cells.push(cur); cur = ''; }
-          else cur += c;
-        }
-        cells.push(cur);
-        rows.push(cells.map(function(s){ return s.trim(); }));
-      });
-      return rows;
-    }
-
-    function pad(n){ return (n < 10 ? '0' : '') + n; }
-
-    (function(text){
-      try{
-        var rows = parseCSV(text);
-        if(rows.length < 4) return;
-
-        // 교차표를 (월, 일, 시, 구역, 이름) 목록으로 편다.
-        // 날짜 행은 병합되어 있어 블록의 첫 칸에만 값이 들어 있다.
-        var dateRow = -1;
-        for(var r = 0; r < Math.min(rows.length, 20) && dateRow < 0; r++){
-          for(var c = 0; c < rows[r].length; c++){
-            if(/^\d{1,2}\/\d{1,2}/.test(rows[r][c] || '')){ dateRow = r; break; }
-          }
-        }
-        if(dateRow < 0) return;
-        var areaRow = dateRow + 1;
-
-        var colDate = [], cursor = null;
-        for(var c2 = 0; c2 < rows[dateRow].length; c2++){
-          var m = (rows[dateRow][c2] || '').match(/^(\d{1,2})\/(\d{1,2})/);
-          if(m) cursor = { mo: +m[1], d: +m[2] };
-          colDate[c2] = cursor;
-        }
-
-        var schedule = [];
-        for(var i = areaRow + 1; i < rows.length; i++){
-          var row = rows[i];
-          if(!row) continue;
-
-          var hh = null;
-          for(var c3 = 0; c3 < row.length && hh === null; c3++){
-            var hm = (row[c3] || '').match(/^(\d{1,2}):(\d{2})$/);
-            if(hm) hh = +hm[1] + (+hm[2]) / 60;
-          }
-          if(hh === null) continue;
-
-          for(var c4 = 0; c4 < row.length; c4++){
-            var who = (row[c4] || '').trim();
-            if(!who) continue;
-            if(/^\d{1,2}:\d{2}$/.test(who)) continue;
-            var area = (rows[areaRow][c4] || '').trim();
-            var dt = colDate[c4];
-            if(!area || !dt) continue;
-            schedule.push({ mo: dt.mo, d: dt.d, hour: hh, area: area, name: who });
-          }
-        }
-        if(!schedule.length) return;
-
-        var now   = nowKST();
-        var curMo = now.getMonth() + 1, curD = now.getDate();
-        var hour  = now.getHours() + now.getMinutes() / 60;
-
-        var onNow = [], laterToday = [];
-        schedule.forEach(function(x){
-          if(x.mo !== curMo || x.d !== curD) return;
-          var entry = { area: x.area, name: x.name, start: x.hour };
-          if(hour >= x.hour && hour < x.hour + 1) onNow.push(entry);
-          else if(x.hour > hour) laterToday.push(entry);
-        });
-
-        if(!onNow.length && !laterToday.length) return;   // 오늘 일정이 없으면 숨긴 채로 둔다
-
-        // 같은 사람이 여러 구역에 겹쳐 있으면 한 번만
-        var seen = {}, uniq = [];
-        onNow.forEach(function(x){
-          var k = x.name + '|' + x.area;
-          if(seen[k]) return;
-          seen[k] = 1;
-          uniq.push(x);
-        });
-
-        listEl.innerHTML = '';
-        if(uniq.length){
-          uniq.forEach(function(x){
-            var li = document.createElement('li');
-            if(x.area){
-              var tag = document.createElement('span');
-              tag.className = 'onduty-area';
-              tag.textContent = x.area;
-              li.appendChild(tag);
-            }
-            var nm = document.createElement('span');
-            nm.className = 'onduty-name';
-            nm.textContent = x.name;
-            li.appendChild(nm);
-            listEl.appendChild(li);
-          });
-          if(timeEl) timeEl.textContent = pad(now.getHours()) + ':' + pad(now.getMinutes()) + ' 기준';
-          if(footEl) footEl.textContent = '전시장을 지키고 있는 작가들입니다. 말을 걸어도 괜찮습니다.';
-        } else {
-          laterToday.sort(function(a, b){ return a.start - b.start; });
-          var nextH = laterToday[0].start;
-          var names = laterToday.filter(function(x){ return x.start === nextH; })
-                                .map(function(x){ return x.name; });
-          var li2 = document.createElement('li');
-          var nm2 = document.createElement('span');
-          nm2.className = 'onduty-name';
-          nm2.textContent = Math.floor(nextH) + '시부터 ' + names.join(', ');
-          li2.appendChild(nm2);
-          listEl.appendChild(li2);
-          if(timeEl) timeEl.textContent = '오늘';
-          if(footEl) footEl.textContent = '아직 교대 전입니다.';
-        }
-
-        section.hidden = false;
-        section.classList.add('in');
-      } catch(e){
-        /* 스케줄 표가 예상과 다르면 섹션은 숨은 채로 둔다 */
-      }
-    })(SCHEDULE_CSV);
-  })();
-
-  /* ── 모션 ── */
-  if(ANIM){
-    var frame = document.querySelector('.frame');
-    if(frame){
-      frame.addEventListener('animationend', function(){
-        frame.classList.add('placed');
-      });
-    }
-
-    var groups = document.querySelectorAll('.stagger');
-    Array.prototype.forEach.call(groups, function(g){
-      Array.prototype.forEach.call(g.children, function(child, i){
-        child.style.setProperty('--i', (i * 34) + 'ms');
-      });
-    });
-
-    var targets = document.querySelectorAll('.reveal, .stagger');
-    var show = function(el){ el.classList.add('in'); };
-
-    // 처음부터 화면 안에 있는 것은 기다리지 않고 바로 드러낸다
-    Array.prototype.forEach.call(targets, function(t){
-      if(t.getBoundingClientRect().top < window.innerHeight) show(t);
-    });
-
-    if('IntersectionObserver' in window){
-      var io = new IntersectionObserver(function(entries){
-        entries.forEach(function(e){
-          if(e.isIntersecting){
-            show(e.target);
-            io.unobserve(e.target);
-          }
-        });
-      }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
-      Array.prototype.forEach.call(targets, function(t){ io.observe(t); });
-    } else {
-      Array.prototype.forEach.call(targets, show);
-    }
-
-    // 관찰자가 동작하지 않아도 내용은 반드시 드러난다
-    setTimeout(function(){
-      Array.prototype.forEach.call(targets, show);
-    }, 2500);
-  }
-})();
-</script>
-
-</body></html>
+    <script src="/assets/js/site.js"></script>
+  </body>
+</html>

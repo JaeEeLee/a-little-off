@@ -15,11 +15,13 @@
  *  - /docent/debug        점검 페이지
  *  - /docent/__status     지금 상태를 JSON으로. ?at=2026-11-14T15:00 이면 그 시각의 운영 여부도 알려 준다
  *                         ?logout=1 이면 이 휴대폰의 입장권을 지운다
- *  - /docent/tracks.js    도슨트 순서표 (작가·작품 이름뿐이라 공개돼도 괜찮다)
+ *
+ * 도슨트 페이지의 CSS · JS · 순서표는 /assets 아래에 있어 이 잠금을 거치지 않는다
+ * (작가·작품 이름뿐이라 공개돼도 괜찮다). 잠기는 것은 /docent 아래 HTML 과 음성 파일뿐이다.
  */
 
 const COOKIE = 'docent_pass';
-const PASS_SECONDS = 3 * 60 * 60;   // 입장권 유효 시간 3시간
+const PASS_SECONDS = 3 * 60 * 60; // 입장권 유효 시간 3시간
 
 // 리허설 모드는 전시 첫날 0시(한국 시간)에 저절로 꺼진다
 const REHEARSAL_UNTIL = new Date('2026-11-12T00:00:00+09:00');
@@ -42,7 +44,7 @@ export async function onRequest(context) {
   const url = new URL(request.url);
 
   if (url.pathname === '/docent/__status') return status(request, env, url);
-  if (/^\/docent\/(debug(\.html)?|tracks\.js)$/.test(url.pathname)) {
+  if (/^\/docent\/debug(\.html)?$/.test(url.pathname)) {
     const res = await context.next();
     const out = new Response(res.body, res);
     out.headers.set('Cache-Control', 'no-store');
@@ -60,12 +62,12 @@ export async function onRequest(context) {
   if (key !== null) {
     if (!sameText(key, env.DOCENT_KEY)) return notice('qr', 403);
     const exp = now + PASS_SECONDS;
-    const pass = exp + '.' + await sign(String(exp), env.DOCENT_SECRET);
+    const pass = exp + '.' + (await sign(String(exp), env.DOCENT_SECRET));
     url.searchParams.delete('k');
     return new Response(null, {
       status: 302,
       headers: {
-        Location: url.pathname + url.search,   // #작가이름은 브라우저가 그대로 이어 붙인다
+        Location: url.pathname + url.search, // #작가이름은 브라우저가 그대로 이어 붙인다
         'Set-Cookie': `${COOKIE}=${pass}; Path=/docent; Max-Age=${PASS_SECONDS}; HttpOnly; Secure; SameSite=Lax`,
         'Cache-Control': 'no-store'
       }
@@ -95,17 +97,27 @@ async function checkPass(request, env, now) {
   }
   const left = Number(exp) - now;
   if (left <= 0) return { present: true, valid: false, reason: '유효 시간이 지남' };
-  return { present: true, valid: true, reason: '유효', expiresKst: kstText(new Date(Number(exp) * 1000)), remainingMin: Math.floor(left / 60) };
+  return {
+    present: true,
+    valid: true,
+    reason: '유효',
+    expiresKst: kstText(new Date(Number(exp) * 1000)),
+    remainingMin: Math.floor(left / 60)
+  };
 }
 
 async function status(request, env, url) {
   const nowDate = new Date();
   const now = Math.floor(nowDate.getTime() / 1000);
-  const keySet = !!env.DOCENT_KEY, secretSet = !!env.DOCENT_SECRET;
+  const keySet = !!env.DOCENT_KEY,
+    secretSet = !!env.DOCENT_SECRET;
   const alwaysOpen = rehearsal(env, nowDate);
-  const rehearsalNote = env.DOCENT_ALWAYS_OPEN !== 'true' ? '꺼짐'
-    : alwaysOpen ? 'true (리허설: 운영 시간 무시 · ' + kstText(REHEARSAL_UNTIL) + '에 자동으로 꺼짐)'
-    : '설정은 남아 있지만 ' + kstText(REHEARSAL_UNTIL) + '이 지나 무시됨';
+  const rehearsalNote =
+    env.DOCENT_ALWAYS_OPEN !== 'true'
+      ? '꺼짐'
+      : alwaysOpen
+        ? 'true (리허설: 운영 시간 무시 · ' + kstText(REHEARSAL_UNTIL) + '에 자동으로 꺼짐)'
+        : '설정은 남아 있지만 ' + kstText(REHEARSAL_UNTIL) + '이 지나 무시됨';
   const openNow = isOpen(nowDate);
   const pass = await checkPass(request, env, now);
 
@@ -119,7 +131,11 @@ async function status(request, env, url) {
   const body = {
     nowKst: kstText(nowDate),
     gate,
-    settings: { DOCENT_KEY: keySet ? '설정됨' : '없음', DOCENT_SECRET: secretSet ? '설정됨' : '없음', DOCENT_ALWAYS_OPEN: rehearsalNote },
+    settings: {
+      DOCENT_KEY: keySet ? '설정됨' : '없음',
+      DOCENT_SECRET: secretSet ? '설정됨' : '없음',
+      DOCENT_ALWAYS_OPEN: rehearsalNote
+    },
     hours: { openNow, today: HOURS[kstText(nowDate).slice(0, 10)] || null, all: HOURS },
     pass,
     passSeconds: PASS_SECONDS
@@ -131,7 +147,11 @@ async function status(request, env, url) {
     body.checkAt = isNaN(d) ? { at, error: '날짜 형식: 2026-11-14T15:00' } : { at: kstText(d), open: isOpen(d) };
   }
 
-  const headers = { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex' };
+  const headers = {
+    'Content-Type': 'application/json; charset=utf-8',
+    'Cache-Control': 'no-store',
+    'X-Robots-Tag': 'noindex'
+  };
   if (url.searchParams.get('logout') === '1') {
     headers['Set-Cookie'] = `${COOKIE}=; Path=/docent; Max-Age=0; HttpOnly; Secure; SameSite=Lax`;
     body.loggedOut = true;
@@ -162,9 +182,14 @@ function toMin(t) {
 
 async function sign(text, secret) {
   const enc = new TextEncoder();
-  const k = await crypto.subtle.importKey('raw', enc.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const k = await crypto.subtle.importKey('raw', enc.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, [
+    'sign'
+  ]);
   const buf = await crypto.subtle.sign('HMAC', k, enc.encode(text));
-  return btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  return btoa(String.fromCharCode(...new Uint8Array(buf)))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
 }
 
 // 길이가 같으면 끝까지 비교해서, 어디서 틀렸는지 시간으로 새지 않게 한다
@@ -184,8 +209,14 @@ function readCookie(header, name) {
 }
 
 const MESSAGES = {
-  qr:     ['전시장에서 들어 주세요', '도슨트는 전시장 안의 QR 코드로만 열 수 있어요.<br>입장 후 3시간 동안 들을 수 있습니다.'],
-  hours:  ['지금은 운영 시간이 아니에요', '도슨트는 전시 운영 시간에만 들을 수 있어요.<br>11. 12 (목) 13:00 – 11. 17 (화) 20:00<br>매일 11:00 – 21:00'],
+  qr: [
+    '전시장에서 들어 주세요',
+    '도슨트는 전시장 안의 QR 코드로만 열 수 있어요.<br>입장 후 3시간 동안 들을 수 있습니다.'
+  ],
+  hours: [
+    '지금은 운영 시간이 아니에요',
+    '도슨트는 전시 운영 시간에만 들을 수 있어요.<br>11. 12 (목) 13:00 – 11. 17 (화) 20:00<br>매일 11:00 – 21:00'
+  ],
   closed: ['도슨트 준비 중', '곧 들으실 수 있도록 준비하고 있어요.']
 };
 

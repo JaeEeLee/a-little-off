@@ -1,385 +1,75 @@
 <!doctype html>
 <html lang="ko">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="color-scheme" content="light only">
-<meta name="robots" content="noindex, nofollow">
-<title>도슨트 · 조금 이상한 우리들</title>
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@300;500;700&family=IBM+Plex+Sans+KR:wght@300;400;500;600&display=swap">
-<style>
-/* 본 사이트와 같은 색. 라이트 모드 고정 */
-:root{
-  --wall:#FAFAFA; --surface:#FFFFFF; --ink:#332519; --ink-soft:#6E6254; --line:#E2DFD8;
-  --accent:#1E56B8; --on-accent:#FCFAF6; --shadow:rgba(53,37,24,.13); --radius:10px;
-  --player-h: 168px;
-  color-scheme: light;
-}
-*{ box-sizing:border-box }
-html{ -webkit-text-size-adjust:100% }
-body{
-  margin:0; background:var(--wall); color:var(--ink);
-  font: 15px/1.6 "IBM Plex Sans KR", -apple-system, BlinkMacSystemFont, sans-serif;
-  padding-bottom: calc(var(--player-h) + env(safe-area-inset-bottom, 0px) + 24px);
-}
-button{ font:inherit; color:inherit }
-.wrap{ max-width:560px; margin:0 auto; padding: 0 16px }
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <meta name="color-scheme" content="light only" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>도슨트 · 조금 이상한 우리들</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@300;500;700&family=IBM+Plex+Sans+KR:wght@300;400;500;600&display=swap"
+    />
+    <link rel="stylesheet" href="/assets/css/docent.css" />
+    <script src="/assets/js/console-greeting.js" defer></script>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <p class="eyebrow">조금 이상한 우리들 · AUDIO GUIDE</p>
+        <h1>도슨트</h1>
+        <p class="lead">
+          서문부터 에필로그까지 이어 듣거나,<br />작가 이름을 눌러 그 작품만 들을 수 있어요.<br />이어폰을 끼고 들어 주세요.
+        </p>
+        <button class="play-all" type="button" id="playAll">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 4v16l13-8z" /></svg>
+          서문부터 이어 듣기
+        </button>
+      </header>
 
-/* ── 머리 ── */
-header{ padding: 44px 0 18px; text-align:center }
-.eyebrow{ margin:0 0 10px; font-size:.7rem; letter-spacing:.24em; color:var(--ink-soft) }
-h1{ margin:0; font-family:"Hahmlet",serif; font-weight:700; font-size:1.9rem; letter-spacing:-.03em }
-.lead{ margin:10px 0 0; font-size:.86rem; color:var(--ink-soft) }
-.play-all{
-  margin-top:22px; display:inline-flex; align-items:center; gap:10px;
-  padding:13px 22px; border:0; border-radius:999px; cursor:pointer;
-  background:var(--accent); color:var(--on-accent); font-weight:500; font-size:.9rem;
-  box-shadow:0 8px 22px rgba(30,86,184,.25);
-}
-.play-all svg{ width:14px; height:14px }
+      <main id="list"></main>
+      <p class="foot">조금 이상한 우리들 · Everyone Is a Little off<br />2026. 11. 12 – 11. 17 · 홍대 피시스 아카이브</p>
+    </div>
 
-/* ── 목록 ── */
-.chapter{ margin-top:30px }
-.chapter-head{ display:flex; align-items:baseline; gap:10px; padding:0 4px 10px; border-bottom:1px solid var(--line) }
-.chapter-no{ font-size:.68rem; letter-spacing:.2em; color:var(--ink-soft) }
-.chapter-head{ flex-wrap:wrap; row-gap:2px }
-.chapter-title{ margin:0; font-family:"Hahmlet",serif; font-weight:500; font-size:1.05rem }
-.chapter-sub{ flex-basis:100%; margin:0; font-size:.78rem; color:var(--ink-soft) }
-.chapter-sub:empty{ display:none }
-.track.is-extra .track-name{ font-family:inherit; font-size:.92rem; font-weight:500; color:var(--ink-soft) }
-.tracks{ list-style:none; margin:0; padding:0 }
-.track{
-  width:100%; display:grid; grid-template-columns: 30px 1fr auto; align-items:center; gap:12px;
-  padding:14px 6px; border:0; border-bottom:1px solid var(--line); background:none; text-align:left; cursor:pointer;
-  transition: background .2s ease;
-}
-.track:hover{ background:rgba(30,86,184,.04) }
-.track:focus-visible{ outline:2px solid var(--accent); outline-offset:-2px }
-.track-no{ font-size:.78rem; color:var(--ink-soft); font-variant-numeric:tabular-nums; text-align:center }
-.track-name{ display:block; font-family:"Hahmlet",serif; font-size:1.02rem; font-weight:500; letter-spacing:-.01em }
-.track-work{ display:block; font-size:.8rem; color:var(--ink-soft) }
-.track-time{ font-size:.75rem; color:var(--ink-soft); font-variant-numeric:tabular-nums }
-.track.is-current .track-name{ color:var(--accent); font-weight:700 }
-.track.is-missing{ opacity:.45 }
-/* 재생 중 표시: 소리 막대 세 개 */
-.bars{ display:none; gap:2px; height:14px; align-items:flex-end; justify-content:center }
-.bars i{ width:3px; background:var(--accent); border-radius:1px; animation: bar 1s ease-in-out infinite }
-.bars i:nth-child(2){ animation-delay:.2s } .bars i:nth-child(3){ animation-delay:.4s }
-@keyframes bar{ 0%,100%{ height:30% } 50%{ height:100% } }
-.track.is-current .track-no .num{ display:none }
-.track.is-current .track-no .bars{ display:flex }
-.track.is-current.is-paused .bars i{ animation-play-state:paused }
-@media (prefers-reduced-motion: reduce){ .bars i{ animation:none; height:70% } }
-
-.foot{ margin:34px 0 0; text-align:center; font-size:.75rem; color:var(--ink-soft) }
-
-/* ── 아래 고정 플레이어 ── */
-.player{
-  position:fixed; left:0; right:0; bottom:0; z-index:10;
-  background:rgba(255,255,255,.96); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-  border-top:1px solid var(--line); box-shadow:0 -10px 30px var(--shadow);
-  padding: 14px 16px calc(14px + env(safe-area-inset-bottom, 0px));
-}
-.player-in{ max-width:560px; margin:0 auto }
-.now{ display:flex; justify-content:space-between; align-items:baseline; gap:12px; min-height:2.6em }
-.now-label{ display:block; font-size:.66rem; letter-spacing:.18em; color:var(--ink-soft) }
-.now-name{ display:block; font-family:"Hahmlet",serif; font-weight:700; font-size:1.08rem; letter-spacing:-.015em;
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
-.speed{ flex:0 0 auto; border:1px solid var(--line); background:var(--surface); border-radius:999px;
-  padding:4px 10px; font-size:.72rem; cursor:pointer; font-variant-numeric:tabular-nums }
-.seek{ display:grid; grid-template-columns:auto 1fr auto; gap:10px; align-items:center; margin:8px 0 6px;
-  font-size:.7rem; color:var(--ink-soft); font-variant-numeric:tabular-nums }
-.seek input{ width:100%; accent-color:var(--accent); margin:0 }
-.controls{ display:flex; justify-content:center; align-items:center; gap:26px }
-.ctl{ width:44px; height:44px; border:0; background:none; border-radius:50%; cursor:pointer; display:grid; place-items:center }
-.ctl svg{ width:22px; height:22px }
-.ctl.main{ width:58px; height:58px; background:var(--accent); color:var(--on-accent); box-shadow:0 6px 18px rgba(30,86,184,.3) }
-.ctl.main svg{ width:22px; height:22px }
-.ctl:disabled{ opacity:.35; cursor:default }
-.ctl svg[hidden]{ display:none }   /* svg에는 hidden 속성이 기본으로 먹지 않는다 */
-.ctl:focus-visible, .speed:focus-visible, .play-all:focus-visible{ outline:2px solid var(--accent); outline-offset:2px }
-.hint{ margin:6px 0 0; text-align:center; font-size:.74rem; color:var(--accent); min-height:1.2em }
-</style>
-</head>
-<body>
-
-<div class="wrap">
-  <header>
-    <p class="eyebrow">조금 이상한 우리들 · AUDIO GUIDE</p>
-    <h1>도슨트</h1>
-    <p class="lead">서문부터 에필로그까지 이어 듣거나,<br>작가 이름을 눌러 그 작품만 들을 수 있어요.<br>이어폰을 끼고 들어 주세요.</p>
-    <button class="play-all" type="button" id="playAll">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 4v16l13-8z"/></svg>
-      서문부터 이어 듣기
-    </button>
-  </header>
-
-  <main id="list"></main>
-  <p class="foot">조금 이상한 우리들 · Everyone Is a Little off<br>2026. 11. 12 – 11. 17 · 홍대 피시스 아카이브</p>
-</div>
-
-<div class="player" role="region" aria-label="도슨트 플레이어">
-  <div class="player-in">
-    <div class="now">
-      <div style="min-width:0">
-        <span class="now-label" id="nowLabel">들을 작품을 골라 주세요</span>
-        <span class="now-name" id="nowName">—</span>
+    <div class="player" role="region" aria-label="도슨트 플레이어">
+      <div class="player-in">
+        <div class="now">
+          <div style="min-width: 0">
+            <span class="now-label" id="nowLabel">들을 작품을 골라 주세요</span>
+            <span class="now-name" id="nowName">—</span>
+          </div>
+          <button class="speed" type="button" id="speed" aria-label="재생 속도">1×</button>
+        </div>
+        <div class="seek">
+          <span id="cur">0:00</span>
+          <input type="range" id="bar" min="0" max="0" step="0.1" value="0" aria-label="재생 위치" />
+          <span id="dur">0:00</span>
+        </div>
+        <div class="controls">
+          <button class="ctl" type="button" id="prev" aria-label="이전 작품">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6 5h2v14H6zM20 5v14L9 12z" /></svg>
+          </button>
+          <button class="ctl main" type="button" id="toggle" aria-label="재생">
+            <svg viewBox="0 0 24 24" aria-hidden="true" id="iconPlay"><path fill="currentColor" d="M7 4v16l13-8z" /></svg>
+            <svg viewBox="0 0 24 24" aria-hidden="true" id="iconPause" hidden>
+              <path fill="currentColor" d="M6 4h4v16H6zM14 4h4v16h-4z" />
+            </svg>
+          </button>
+          <button class="ctl" type="button" id="next" aria-label="다음 작품">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16 5h2v14h-2zM4 5v14l11-7z" /></svg>
+          </button>
+        </div>
+        <p class="hint" id="hint" role="status"></p>
       </div>
-      <button class="speed" type="button" id="speed" aria-label="재생 속도">1×</button>
     </div>
-    <div class="seek">
-      <span id="cur">0:00</span>
-      <input type="range" id="bar" min="0" max="0" step="0.1" value="0" aria-label="재생 위치">
-      <span id="dur">0:00</span>
-    </div>
-    <div class="controls">
-      <button class="ctl" type="button" id="prev" aria-label="이전 작품">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6 5h2v14H6zM20 5v14L9 12z"/></svg>
-      </button>
-      <button class="ctl main" type="button" id="toggle" aria-label="재생">
-        <svg viewBox="0 0 24 24" aria-hidden="true" id="iconPlay"><path fill="currentColor" d="M7 4v16l13-8z"/></svg>
-        <svg viewBox="0 0 24 24" aria-hidden="true" id="iconPause" hidden><path fill="currentColor" d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>
-      </button>
-      <button class="ctl" type="button" id="next" aria-label="다음 작품">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16 5h2v14h-2zM4 5v14l11-7z"/></svg>
-      </button>
-    </div>
-    <p class="hint" id="hint" role="status"></p>
-  </div>
-</div>
 
-<audio id="audio" preload="metadata"></audio>
+    <audio id="audio" preload="metadata"></audio>
 
-<script>
-/* 개발자도구 콘솔을 열면 인사 한마디 */
-try{
-  console.log('%c' + [
-    "     ███████████  ████                  ████",
-    "     ███████████  ████      ███████     ████",
-    "     ███████████  ████    ██████████    ████",
-    "     ███████████  ████    ████   ████   ████",
-    "   ██████████████ ████   ████     ███   ████",
-    "   ██████████████ ████   ████     ███   ████",
-    "       ████   ████████    ████   ████   ████",
-    "        ███   ████████    ███████████   ████",
-    "        ███ █████ ████     █████████    ████",
-    "          █████████          █████      ████",
-    "      █████████████████                 ████",
-    "      ██████     ██████                 ████",
-    "",
-    "     ████████████████      ████████████████         ███       ████                  ████",
-    "     ████████████████      ████████████████    █████████████  ████    ███████████   ████",
-    "                 ████                  ████    █████████████  ████    ███████████   ████",
-    "                 ████                  ████        █████      ████    ████          ████",
-    "   ████████████████████                ████      █████████  ██████    ████          ████",
-    "   ████████████████████  ████████████████████   ████   ████ ██████    ████          ████",
-    "           ████          ████████████████████   ███████████   ████    ████          ████",
-    "        ██████████         ████████████████      █████████    ████    █████████████ ████",
-    "      ██████████████       ████████████████        ████       ████    █████████████ ████",
-    "     █████      █████      ████        ████        ████                             ████",
-    "     ████████████████      ████████████████        ███████████████                  ████",
-    "       ████████████        ████████████████        ███████████████                  ████"
-  ].join('\n'), 'color:#E3708C; font-family:monospace; line-height:1.05; font-size:10px');
-  console.log('%c뭣이 궁금헌디 🐇', 'color:#3B2E22; font-size:20px; font-weight:800; padding:6px 0');
-}catch(e){}
-</script>
-
-<script src="/docent/tracks.js"></script>
-<script>
-/* 순서표(CHAPTERS, AUDIO_DIR)는 /docent/tracks.js 에 있다. 점검 페이지(/docent/debug)도 같은 파일을 쓴다 */
-(function(){
-  var audio = document.getElementById('audio');
-  var list  = document.getElementById('list');
-  var $ = function(id){ return document.getElementById(id); };
-  var nowLabel = $('nowLabel'), nowName = $('nowName'), hint = $('hint');
-  var bar = $('bar'), cur = $('cur'), dur = $('dur');
-  var toggle = $('toggle'), iconPlay = $('iconPlay'), iconPause = $('iconPause');
-  var speedBtn = $('speed');
-
-  // 챕터를 펼쳐 한 줄로 이어 듣는 순서를 만든다
-  var queue = [];
-  CHAPTERS.forEach(function(ch){
-    ch.tracks.forEach(function(t){
-      t.chapter = ch;
-      t.label = t.label || t.name;
-      t.src = AUDIO_DIR + encodeURIComponent(t.file || t.name) + '.mp3';
-      queue.push(t);
-    });
-  });
-
-  var index = -1;
-  var continuous = true;   // 한 작품이 끝나면 다음 작품으로 이어 간다
-
-  function fmt(s){
-    if(!isFinite(s) || s < 0) s = 0;
-    s = Math.floor(s);
-    return Math.floor(s / 60) + ':' + ('0' + s % 60).slice(-2);
-  }
-
-  /* ── 목록 그리기 ── */
-  var n = 0;
-  CHAPTERS.forEach(function(ch){
-    var sec = document.createElement('section');
-    sec.className = 'chapter';
-    sec.innerHTML = '<div class="chapter-head"><span class="chapter-no"></span><h2 class="chapter-title"></h2><p class="chapter-sub"></p></div><ul class="tracks"></ul>';
-    sec.querySelector('.chapter-no').textContent = ch.no;
-    sec.querySelector('.chapter-title').textContent = ch.title;
-    sec.querySelector('.chapter-sub').textContent = ch.sub || '';
-    var ul = sec.querySelector('.tracks');
-    ch.tracks.forEach(function(t){
-      var i = n++;
-      var desc = t.work ? '〈' + t.work + '〉' : (t.sub || '');
-      var li = document.createElement('li');
-      var b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'track';
-      b.innerHTML = '<span class="track-no"><span class="num"></span><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span></span>' +
-                    '<span><span class="track-name"></span><span class="track-work"></span></span>' +
-                    '<span class="track-time"></span>';
-      b.querySelector('.num').textContent = t.no ? ('0' + t.no).slice(-2) : '·';
-      b.querySelector('.track-name').textContent = t.label;
-      b.querySelector('.track-work').textContent = desc;
-      if(!t.no) b.classList.add('is-extra');
-      b.setAttribute('aria-label', t.label + (t.work ? ', ' + t.work : '') + ' 듣기');
-      b.addEventListener('click', function(){ load(i, true); });
-      t.el = b;
-      li.appendChild(b);
-      ul.appendChild(li);
-
-      // 길이를 미리 읽어 목록에 적는다. 파일이 아직 없으면 '준비 중'
-      var probe = new Audio();
-      probe.preload = 'metadata';
-      probe.addEventListener('loadedmetadata', function(){ b.querySelector('.track-time').textContent = fmt(probe.duration); });
-      probe.addEventListener('error', function(){
-        t.missing = true;
-        b.classList.add('is-missing');
-        b.querySelector('.track-time').textContent = '준비 중';
-      });
-      probe.src = t.src;
-    });
-    list.appendChild(sec);
-  });
-
-  /* ── 재생 ── */
-  function setPlaying(on){
-    // svg 요소에는 .hidden 속성이 없어서 속성을 직접 붙였다 뗀다
-    iconPlay.toggleAttribute('hidden', on); iconPause.toggleAttribute('hidden', !on);
-    toggle.setAttribute('aria-label', on ? '일시정지' : '재생');
-    queue.forEach(function(t){ t.el.classList.toggle('is-paused', !on); });
-  }
-
-  function mark(){
-    queue.forEach(function(t, i){ t.el.classList.toggle('is-current', i === index); });
-    var t = queue[index];
-    nowLabel.textContent = t.chapter.no + ' · ' + t.chapter.title;
-    nowName.textContent = t.label + (t.work ? ' 〈' + t.work + '〉' : '');
-    $('prev').disabled = index <= 0;
-    $('next').disabled = index >= queue.length - 1;
-    document.title = t.label + ' · 조금 이상한 우리들';
-
-    // 잠금 화면·이어폰 버튼에서도 제목이 보이고 조작되도록
-    if('mediaSession' in navigator){
-      navigator.mediaSession.metadata = new MediaMetadata({
-        title: t.label + (t.work ? ' 〈' + t.work + '〉' : ''),
-        artist: '조금 이상한 우리들 · 도슨트',
-        album: t.chapter.no + ' ' + t.chapter.title,
-        artwork: [{ src: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }]
-      });
-    }
-  }
-
-  function load(i, play){
-    if(i < 0 || i >= queue.length) return;
-    index = i;
-    hint.textContent = '';
-    audio.src = queue[i].src;
-    mark();
-    queue[i].el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-    if(play) start();
-  }
-
-  function start(){
-    var p = audio.play();
-    if(p && p.catch) p.catch(function(err){
-      // 브라우저는 사용자가 한 번 누르기 전에는 소리 재생을 막는다
-      if(err && err.name === 'NotAllowedError'){
-        hint.textContent = '▶ 재생 버튼을 눌러 시작해 주세요';
-      }
-    });
-  }
-
-  function nextPlayable(from, step){
-    for(var i = from + step; i >= 0 && i < queue.length; i += step){
-      if(!queue[i].missing) return i;
-    }
-    return -1;
-  }
-
-  // 다음 곡으로 넘어갈 때 'pause'가 'play'보다 늦게 올 수 있어서, 이벤트 종류 대신 실제 상태를 본다
-  function sync(){ setPlaying(!audio.paused); if(!audio.paused) hint.textContent = ''; }
-  ['play', 'playing', 'pause'].forEach(function(ev){ audio.addEventListener(ev, sync); });
-  audio.addEventListener('loadedmetadata', function(){ bar.max = audio.duration || 0; dur.textContent = fmt(audio.duration); });
-  audio.addEventListener('timeupdate', function(){
-    if(!bar.matches(':active')) bar.value = audio.currentTime;
-    cur.textContent = fmt(audio.currentTime);
-  });
-  audio.addEventListener('ended', function(){
-    setPlaying(false);
-    if(!continuous) return;
-    var i = nextPlayable(index, 1);
-    if(i !== -1) load(i, true);
-    else hint.textContent = '도슨트가 모두 끝났어요. 함께해 주셔서 고맙습니다.';
-  });
-  audio.addEventListener('error', function(){
-    if(index < 0) return;
-    queue[index].missing = true;
-    queue[index].el.classList.add('is-missing');
-    hint.textContent = '이 작품의 도슨트는 아직 준비 중이에요.';
-    setPlaying(false);
-  });
-
-  bar.addEventListener('input', function(){ audio.currentTime = +bar.value; });
-
-  toggle.addEventListener('click', function(){
-    if(index < 0){ load(Math.max(nextPlayable(-1, 1), 0), true); return; }
-    if(audio.paused) start(); else audio.pause();
-  });
-  $('prev').addEventListener('click', function(){ load(index - 1, true); });
-  $('next').addEventListener('click', function(){ load(index + 1, true); });
-  $('playAll').addEventListener('click', function(){ continuous = true; load(Math.max(nextPlayable(-1, 1), 0), true); });
-
-  var SPEEDS = [1, 1.25, 1.5, 0.75];
-  var sp = 0;
-  speedBtn.addEventListener('click', function(){
-    sp = (sp + 1) % SPEEDS.length;
-    audio.playbackRate = SPEEDS[sp];
-    speedBtn.textContent = SPEEDS[sp] + '×';
-  });
-
-  if('mediaSession' in navigator){
-    navigator.mediaSession.setActionHandler('play', start);
-    navigator.mediaSession.setActionHandler('pause', function(){ audio.pause(); });
-    navigator.mediaSession.setActionHandler('previoustrack', function(){ load(index - 1, true); });
-    navigator.mediaSession.setActionHandler('nexttrack', function(){ load(index + 1, true); });
-  }
-
-  /* ── #작가이름 으로 들어오면 그 작가의 도슨트부터 ── */
-  function fromHash(){
-    var name = '';
-    try{ name = decodeURIComponent(location.hash.slice(1)).trim(); }catch(e){}
-    if(!name) return;
-    for(var i = 0; i < queue.length; i++){
-      // 본명(#이재이)으로도, 작가명(#재이)으로도 찾는다. 현장 QR에는 본명이 들어 있다
-      if(queue[i].name && (queue[i].name === name || queue[i].label === name)){ load(i, true); return; }
-    }
-  }
-  fromHash();
-  window.addEventListener('hashchange', fromHash);
-})();
-</script>
-</body>
+    <script src="/assets/js/docent-tracks.js"></script>
+    <script src="/assets/js/docent.js"></script>
+  </body>
 </html>

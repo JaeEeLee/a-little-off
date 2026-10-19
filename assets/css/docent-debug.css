@@ -1,0 +1,144 @@
+/* 도슨트 점검 페이지 (/docent/debug) */
+:root {
+  --ink: #332519;
+  --soft: #6e6254;
+  --line: #e2dfd8;
+  --accent: #1e56b8;
+  --ok: #1f7a4d;
+  --bad: #b3361b;
+  --warn: #9a6a00;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: #fafafa;
+  color: var(--ink);
+  font:
+    14px/1.6 -apple-system,
+    BlinkMacSystemFont,
+    'Apple SD Gothic Neo',
+    sans-serif;
+}
+.wrap {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 28px 16px 60px;
+}
+h1 {
+  margin: 0 0 4px;
+  font-size: 1.3rem;
+}
+.sub {
+  margin: 0 0 22px;
+  color: var(--soft);
+  font-size: 0.82rem;
+}
+section {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 14px;
+}
+h2 {
+  margin: 0 0 10px;
+  font-size: 0.95rem;
+}
+dl {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap: 6px 12px;
+  margin: 0;
+}
+dt {
+  color: var(--soft);
+}
+dd {
+  margin: 0;
+  word-break: break-all;
+}
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+.ok {
+  background: #e6f4ec;
+  color: var(--ok);
+}
+.bad {
+  background: #fbe9e5;
+  color: var(--bad);
+}
+.warn {
+  background: #fff4d6;
+  color: var(--warn);
+}
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-top: 10px;
+}
+input {
+  font: inherit;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  min-width: 0;
+}
+button,
+.btn {
+  font: inherit;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  color: var(--ink);
+  text-decoration: none;
+}
+button.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+th,
+td {
+  text-align: left;
+  padding: 6px 4px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+th {
+  color: var(--soft);
+  font-weight: 500;
+}
+td.num {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+pre {
+  margin: 10px 0 0;
+  padding: 10px;
+  background: #f4f2ee;
+  border-radius: 8px;
+  overflow: auto;
+  font-size: 0.75rem;
+  max-height: 260px;
+}
+.note {
+  margin: 8px 0 0;
+  color: var(--soft);
+  font-size: 0.78rem;
+}

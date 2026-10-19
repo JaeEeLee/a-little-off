@@ -1,0 +1,2615 @@
+/* ═══════════════════════════════════════════════════════════════
+   조금 이상한 우리들 — 메인 · 작가(/jessie) · 예약(/jessie/visit) 공용 스타일
+   index.html 한 장을 세 주소가 함께 쓴다. 주소에 따라 <html> 에 붙는 class 로 갈라진다
+     .artist-page  /jessie, /jessie/visit
+     .visit-page   /jessie/visit (장면 넘기기)
+     .anim         움직임 허용 (동작 줄이기 설정이 꺼져 있을 때)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── 기본값 ── */
+:root {
+  color-scheme: light;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+html {
+  scroll-padding-top: env(safe-area-inset-top, 0px);
+}
+body {
+  margin: 0;
+  padding: 0;
+  font:
+    14px -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+  background: #fff;
+  color: #000;
+}
+img {
+  max-width: 100%;
+}
+[hidden]:not([hidden='until-found' i]) {
+  display: none !important;
+}
+
+/* 레이아웃: 원목 액자 한 점이 벽에 걸리고, 그 아래로 정보가 한 줄씩 내려앉는다 */
+:root {
+  --wall: #fafafa; /* 눈이 편한 중성 오프화이트 */
+  --wall-deep: #f0efec;
+  --surface: #ffffff;
+  --ink: #332519; /* 2번 다크 액자의 월넛 */
+  --ink-soft: #6e6254;
+  --line: #e2dfd8;
+  --radius: 7px;
+  --surface-rgb: 255, 255, 255;
+  --card-shadow: rgba(48, 38, 28, 0.13);
+  --accent: #1e56b8; /* 포스터의 코발트 하늘 */
+  --spark: #1e56b8;
+  --ember: #c8401b; /* 포스터의 튤립 */
+  --on-accent: #fcfaf6;
+  --shadow: rgba(53, 37, 24, 0.15);
+  --grain: rgba(83, 58, 38, 0.032);
+  --vignette: rgba(83, 58, 38, 0.055);
+  --frame-wood: linear-gradient(142deg, #ffffff 0%, #fbfbfa 42%, #f1f0ed 74%, #e4e3df 100%);
+  --poster-blur: url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwgHBgoICAgLCgoLDhgQDg0NDh0VFhEYIx8lJCIfIiEmKzcvJik0KSEiMEExNDk7Pj4+JS5ESUM8SDc9Pjv/2wBDAQoLCw4NDhwQEBw7KCIoOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozv/wAARCAAUAA4DASIAAhEBAxEB/8QAGAAAAgMAAAAAAAAAAAAAAAAAAAUBAwT/xAAeEAACAgICAwAAAAAAAAAAAAABAgADBAURMRNBcf/EABYBAQEBAAAAAAAAAAAAAAAAAAYBBf/EABwRAAICAgMAAAAAAAAAAAAAAAABAgQDIQUSMf/aAAwDAQACEQMRAD8AX1a45IIXqYsjV+Kwho31tz0qfcpzb1e3lpMd5wrpR0aWXj+9xue0ThMTUfkU7Gxhd3CEPISy8Z//2Q==');
+  --poster-img: url('/assets/img/poster-hero.jpg'); /* 페이지 안에 넣지 않고 따로 받아 휴대폰에 저장해 쓴다 */
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* 휴대폰에서 페이지가 흔들리지 않게
+   - 화면 밖으로 퍼지는 장식(소개 글 뒤 베일 등) 때문에 페이지가 옆으로 몇 px 밀리던 것을 잘라 낸다
+   - 맨 위·맨 아래에서 더 당길 때 출렁이는 고무줄 효과를 끈다 */
+html,
+body {
+  overflow-x: clip;
+  overscroll-behavior-y: none;
+}
+/* 글자 크기는 기기·브라우저 설정에 따라 달라지지 않게 고정한다
+   - 기준 글자 크기를 16px 로 못 박아 rem 이 늘 같은 값이 되게 하고
+   - 휴대폰 브라우저가 글자를 제멋대로 키우는 자동 확대를 끈다
+   - 화면 폭(vw)에 따라 바뀌던 제목·질문 크기도 390px 휴대폰에서 보이던 값으로 고정했다 */
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+@supports not (overflow: clip) {
+  body {
+    overflow-x: hidden;
+  }
+}
+
+body {
+  position: relative;
+  margin: 0;
+  background: var(--wall);
+  color: var(--ink);
+  font-family:
+    'IBM Plex Sans KR',
+    system-ui,
+    -apple-system,
+    'Apple SD Gothic Neo',
+    sans-serif;
+  font-weight: 400;
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 포스터가 페이지 전체에 번진다 — 위는 짙게, 아래로 갈수록 바탕에 녹는다 */
+.backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: var(--poster-blur, none);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  filter: blur(80px) saturate(1.34);
+  opacity: 0.82;
+  /* --hero-h 까지는 색을 꽉 채우고, 포스터·D-DAY를 지난 뒤부터 바탕으로 풀린다 */
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 1) 0,
+    rgba(0, 0, 0, 1) var(--hero-h, 900px),
+    rgba(0, 0, 0, 0.72) calc(var(--hero-h, 900px) + 260px),
+    rgba(0, 0, 0, 0.4) calc(var(--hero-h, 900px) + 680px),
+    rgba(0, 0, 0, 0.16) calc(var(--hero-h, 900px) + 1200px),
+    rgba(0, 0, 0, 0) 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 1) 0,
+    rgba(0, 0, 0, 1) var(--hero-h, 900px),
+    rgba(0, 0, 0, 0.72) calc(var(--hero-h, 900px) + 260px),
+    rgba(0, 0, 0, 0.4) calc(var(--hero-h, 900px) + 680px),
+    rgba(0, 0, 0, 0.16) calc(var(--hero-h, 900px) + 1200px),
+    rgba(0, 0, 0, 0) 100%
+  );
+}
+
+/* 아주 얕은 나뭇결 */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: repeating-linear-gradient(93deg, transparent 0 4px, var(--grain) 4px 5px, transparent 5px 13px);
+}
+
+.wrap {
+  position: relative;
+  z-index: 2;
+  max-width: 760px;
+  margin-inline: auto;
+  padding-inline: 20px;
+  padding-block: 0 80px;
+}
+
+/* ── 히어로 ───────────────────────────────── */
+.hero {
+  position: relative;
+  padding-block: 60px 52px;
+}
+.hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+.eyebrow {
+  font-size: 0.68rem;
+  letter-spacing: 0.26em;
+  color: var(--ink-soft);
+  font-weight: 500;
+  margin: 0 0 32px;
+  text-align: center;
+}
+.eyebrow .brand {
+  color: #ffffff;
+  text-shadow: 0 1px 10px rgba(16, 22, 44, 0.35);
+}
+.eyebrow .eyebrow-sub {
+  font-weight: 300;
+  color: #332519;
+}
+
+/* 학원 링크: 상단 학원 이름 바로 아래, 포스터 위에 가볍게 */
+.studio-links {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: -20px 0 30px;
+}
+.studio-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px 6px 10px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+.studio-links a:hover {
+  background: rgba(255, 255, 255, 0.9);
+  transform: translateY(-1px);
+}
+.studio-links a:focus-visible {
+  outline: 2px solid var(--spark);
+  outline-offset: 2px;
+}
+.studio-links svg {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+}
+
+/* ── 액자 ─────────────────────────────────── */
+.frame {
+  width: min(318px, 76vw);
+  margin-inline: auto;
+  aspect-ratio: 842 / 1191; /* 포스터 원본 비율 */
+  max-width: 100%;
+  background: var(--surface);
+  background-image: var(--poster-img, none);
+  background-size: cover;
+  background-position: center;
+  border: 6px solid transparent;
+  border-image: var(--frame-wood) 1;
+  box-shadow:
+    0 2px 4px var(--shadow),
+    0 18px 40px -16px var(--shadow);
+  transform: rotate(-1.2deg);
+  transition: transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.frame:hover {
+  transform: rotate(0deg);
+}
+/* 작가 전용 페이지: 포스터 오른쪽 아래에 작가의 그림을 살짝 겹쳐 둔다 (포스터 넓이의 약 1/4) */
+.frame.has-work {
+  /* 겹친 그림이 오른쪽으로 약 16% 삐져나오므로, 둘을 한 덩어리(포스터 넓이의 약 1.2배)로 보고
+     화면 좌우 16px 안에 들어가게 줄인 뒤, 덩어리가 가운데 오도록 왼쪽으로 옮긴다 (375px 화면에서 좌우 21px로 측정) */
+  --fw: min(300px, calc((100vw - 32px) / 1.22));
+  width: var(--fw);
+  position: relative;
+  right: calc(var(--fw) * 0.077);
+  margin-bottom: 34px;
+}
+.frame-work {
+  position: absolute;
+  right: -16%;
+  bottom: -9%;
+  width: 50%;
+  aspect-ratio: 1135 / 1600;
+  background-size: cover;
+  background-position: center;
+  border: 5px solid #fff;
+  box-shadow:
+    0 10px 24px rgba(40, 28, 18, 0.28),
+    0 2px 4px rgba(40, 28, 18, 0.18);
+  transform: rotate(6deg);
+  filter: brightness(1.14) saturate(1.04); /* 포스터 옆에서 어둡게 보이지 않도록 살짝 밝게 */
+  transition: transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+  pointer-events: none;
+}
+.frame:hover .frame-work {
+  transform: rotate(3deg) translate(4px, -2px);
+}
+/* 겹친 그림의 오른쪽 아래 모서리에서 시작해 안쪽으로 옅어지는 블러. 흰 테두리 안쪽만 흐리게 한다 */
+.frame-work {
+  overflow: hidden;
+}
+.frame-work::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: inherit; /* 같은 그림을 한 장 더 겹쳐 흐리게 */
+  border: 0;
+  filter: blur(3px);
+  /* 오른쪽 위 ↔ 왼쪽 아래 모서리를 잇는 대각선을 기준으로 오른쪽 아래 절반을 덮는다.
+     '모서리 방향' 그라디언트의 50% 선은 정확히 그 대각선이라, 거기서 0 → 오른쪽 아래 모서리에서 가장 진하게 */
+  -webkit-mask-image: linear-gradient(
+    to bottom right,
+    transparent 50%,
+    rgba(0, 0, 0, 0.45) 66%,
+    rgba(0, 0, 0, 0.85) 84%,
+    #000 100%
+  );
+  mask-image: linear-gradient(
+    to bottom right,
+    transparent 50%,
+    rgba(0, 0, 0, 0.45) 66%,
+    rgba(0, 0, 0, 0.85) 84%,
+    #000 100%
+  );
+}
+@media (prefers-reduced-motion: reduce) {
+  .frame,
+  .frame:hover {
+    transition: none;
+    transform: rotate(-1.2deg);
+  }
+}
+
+/* ── 타이틀 ───────────────────────────────── */
+/* 제목이 배경색에 묻히지 않도록 둥근 베일을 깔고, 흐려서 가장자리를 풀어 놓는다 */
+.title-block {
+  position: relative;
+  margin-top: 34px;
+  padding: 32px 30px 36px;
+  text-align: center;
+}
+.title-block > * {
+  position: relative;
+  z-index: 1;
+}
+@media (max-width: 420px) {
+  .title-block {
+    padding: 26px 14px 30px;
+  }
+}
+h1 {
+  font-family: 'Hahmlet', serif;
+  font-weight: 700;
+  font-size: 37px;
+  line-height: 1.26;
+  letter-spacing: -0.035em;
+  margin: 0 0 16px;
+  text-wrap: balance;
+  color: #ffffff;
+  text-shadow: 0 2px 20px rgba(16, 22, 44, 0.45);
+}
+h1 em {
+  font-style: normal;
+  color: #ffffff;
+}
+.en-title {
+  margin: 0 0 18px;
+  font-family: 'Hahmlet', serif;
+  font-weight: 300;
+  font-size: 0.86rem;
+  letter-spacing: 0.12em;
+  color: var(--spark);
+}
+/* 영문 제목·소개 문구 뒤로 가운데서 바깥으로 사라지는 밝은 블러 */
+.title-copy {
+  position: relative;
+  isolation: isolate;
+}
+.title-copy::before {
+  content: '';
+  position: absolute;
+  inset: -80px -40px;
+  transform: translateY(32px);
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse closest-side at center,
+    rgba(255, 255, 255, 0.4) 0%,
+    rgba(255, 255, 255, 0.28) 35%,
+    rgba(255, 255, 255, 0.1) 70%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  -webkit-mask-image: radial-gradient(ellipse closest-side at center, #000 30%, transparent 100%);
+  mask-image: radial-gradient(ellipse closest-side at center, #000 30%, transparent 100%);
+}
+/* 작가 전용 페이지: 맨 위 여백을 줄이고, 디데이는 카드 대신 초대 문구와 포스터 사이에 글자로 */
+.artist-page .hero {
+  padding-top: 30px;
+  padding-bottom: 0;
+}
+/* 인사말과 그림 카드 사이를 좁힌다 (원래 약 96px → 약 32px) */
+.artist-page .hero .title-block {
+  padding-bottom: 12px;
+}
+.artist-page #workSection {
+  margin-top: 20px;
+}
+.artist-page .hero .dday {
+  display: none;
+}
+.dday-text {
+  margin: 0 0 18px;
+  text-align: center;
+  font-family: 'Hahmlet', serif;
+  font-weight: 700;
+  font-size: 1.5rem;
+  letter-spacing: -0.01em;
+}
+.dday-text .dday-num {
+  font-size: 1.5rem;
+  text-shadow:
+    0 0 12px rgba(255, 255, 255, 0.8),
+    0 0 3px rgba(255, 255, 255, 0.6); /* 밝은 빛 번짐 */
+}
+/* 작가 전용 페이지: 맨 위 소개 자리에 흰 글씨 인사말 */
+.artist-page .title-copy::before {
+  background: radial-gradient(
+    ellipse closest-side at center,
+    rgba(16, 22, 44, 0.32) 0%,
+    rgba(16, 22, 44, 0.2) 45%,
+    rgba(16, 22, 44, 0) 100%
+  );
+}
+.artist-page .title-copy .work-hello {
+  margin-top: 6px;
+  gap: 12px;
+  color: #fff;
+  text-align: center;
+  text-shadow: 0 1px 12px rgba(16, 22, 44, 0.55);
+  word-break: keep-all;
+}
+.artist-page .title-copy .work-hello p {
+  margin: 0;
+  font-size: 1.1rem;
+  line-height: 1.75;
+  color: #fff;
+} /* 기본 소개 문구의 약 1.2배 */
+.artist-page .title-copy .work-notice {
+  background: none;
+  border: 0;
+  padding: 14px 0;
+} /* 질문 덩어리마다 위아래 여백 */
+/* 작가 그림은 모두 같은 밝기로 (포스터에 겹친 그림과 맞춤) */
+.artist-page .work-zoom img,
+.artist-page .work-viewer img {
+  filter: brightness(1.14) saturate(1.04);
+}
+.artist-page .title-copy .work-notice strong {
+  margin-right: 0;
+  color: #fff;
+  font-weight: 600;
+}
+.artist-page .title-copy .work-notice .q {
+  display: block;
+  margin: 0 0 4px;
+}
+.artist-page .title-copy .work-notice em {
+  color: #fff;
+}
+.subtitle {
+  margin: 0;
+  color: #332519;
+  font-weight: 300;
+  font-size: 0.92rem;
+  text-wrap: balance;
+}
+
+/* ── D-DAY ────────────────────────────────── */
+.dday {
+  margin: 40px auto 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 20px 32px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: calc(var(--radius) + 3px);
+  width: fit-content;
+  max-width: 100%;
+}
+.dday-num {
+  font-family: 'Hahmlet', serif;
+  font-size: 2.5rem;
+  line-height: 1.05;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--ember);
+  font-variant-numeric: tabular-nums;
+}
+.dday-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  color: var(--ink-soft);
+  font-weight: 500;
+}
+
+/* ── 섹션 ─────────────────────────────────── */
+section {
+  margin-top: 52px;
+}
+
+/* 카드: 가운데는 불투명하고 가장자리로 갈수록 바탕에 녹아든다.
+   drop-shadow 는 실제로 그려진 모양을 따라가므로 그림자도 같이 흐려진다. */
+.card {
+  padding: 32px 26px 36px;
+  border-radius: 18px;
+  background: radial-gradient(
+    128% 118% at 50% 42%,
+    rgba(var(--surface-rgb), 1) 0%,
+    rgba(var(--surface-rgb), 0.99) 48%,
+    rgba(var(--surface-rgb), 0.92) 70%,
+    rgba(var(--surface-rgb), 0.62) 85%,
+    rgba(var(--surface-rgb), 0.22) 94%,
+    rgba(var(--surface-rgb), 0) 100%
+  );
+  filter: drop-shadow(0 6px 14px var(--card-shadow)) drop-shadow(0 18px 36px var(--card-shadow));
+}
+@media (max-width: 420px) {
+  .card {
+    padding: 26px 18px 30px;
+    border-radius: 15px;
+  }
+}
+h2 {
+  font-family: 'Hahmlet', serif;
+  font-size: 1.1rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+.section-head {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-bottom: 12px;
+  margin-bottom: 26px;
+}
+.section-head::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--line);
+  transform-origin: left center;
+}
+.section-head .en {
+  font-size: 0.58rem;
+  letter-spacing: 0.3em;
+  color: var(--ink-soft);
+  font-weight: 500;
+}
+.count {
+  margin-left: auto;
+  font-size: 0.7rem;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 라벨–값 행 */
+dl {
+  margin: 0;
+}
+.row {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 4px 20px;
+  padding-block: 15px;
+  border-bottom: 1px solid var(--line);
+  align-items: baseline;
+}
+.row:last-child {
+  border-bottom: 0;
+}
+dt {
+  font-size: 0.74rem;
+  color: var(--ink-soft);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  min-width: 0;
+}
+dd {
+  margin: 0;
+  min-width: 0;
+  font-size: 0.98rem;
+  font-variant-numeric: tabular-nums;
+}
+.place-link {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid var(--line);
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+.place-link:hover {
+  color: var(--spark);
+  border-color: var(--spark);
+}
+.place-link svg {
+  width: 0.8em;
+  height: 0.8em;
+  margin-left: 3px;
+  vertical-align: -0.05em;
+  opacity: 0.6;
+}
+.icon-copy {
+  display: inline-grid;
+  place-items: center;
+  vertical-align: -0.3em;
+  width: 28px;
+  height: 28px;
+  margin-left: 6px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--surface);
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+.icon-copy:hover {
+  color: var(--spark);
+  border-color: var(--spark);
+}
+.icon-copy:focus-visible {
+  outline: 2px solid var(--spark);
+  outline-offset: 2px;
+}
+.icon-copy svg {
+  width: 15px;
+  height: 15px;
+}
+/* 주소 아래 지도 앱: 색 있는 작은 표시 + 짧은 이름 */
+.map-links {
+  grid-column: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+@media (max-width: 420px) {
+  .map-links {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    margin-top: 10px;
+  }
+  .map-links a {
+    justify-content: center;
+    padding: 7px 6px;
+  }
+}
+.map-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px 4px 5px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-weight: 500;
+  white-space: nowrap;
+  transition:
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+.map-links a:hover {
+  border-color: var(--spark);
+  transform: translateY(-1px);
+}
+.map-links a:focus-visible {
+  outline: 2px solid var(--spark);
+  outline-offset: 2px;
+}
+.map-ico {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  font-style: normal;
+  font-size: 0.7rem;
+  font-weight: 800;
+  line-height: 1;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+}
+.map-ico.naver {
+  background: #03c75a;
+  color: #fff;
+}
+.map-ico.kakao {
+  background: #fee500;
+  color: #3c1e1e;
+}
+.map-ico.google {
+  background: #fff;
+  color: #4285f4;
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+dd .sub {
+  display: block;
+  font-size: 0.79rem;
+  color: var(--ink-soft);
+  margin-top: 4px;
+  font-variant-numeric: normal;
+}
+.row.highlight dd {
+  font-family: 'Hahmlet', serif;
+  font-weight: 500;
+  font-size: 1.08rem;
+  letter-spacing: -0.01em;
+}
+@media (max-width: 420px) {
+  .row {
+    grid-template-columns: 78px 1fr;
+    gap: 4px 14px;
+  }
+}
+
+/* ── 참여 작가 ────────────────────────────── */
+.artists {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+  gap: 24px 10px;
+  margin: 0;
+  padding: 8px 6px;
+  list-style: none;
+}
+.artists li {
+  font-family: 'Hahmlet', serif;
+  font-weight: 300;
+  font-size: 1rem;
+  letter-spacing: -0.01em;
+  min-width: 0;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+.artists li:hover {
+  color: var(--spark);
+}
+.artists li:focus-visible {
+  outline: 2px solid var(--spark);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+.artists li.picked {
+  color: var(--spark);
+  font-weight: 700;
+}
+/* 이름들이 종이 위에 흩뿌려진 것처럼 — 칸 안에서 쏠리고, 기울고, 크기가 다르다.
+   서로 다른 주기의 규칙이 겹치면서 불규칙하게 보인다.
+   translate·rotate 속성은 등장 애니메이션의 transform과 따로 놀아 겹치지 않는다 */
+.artists li {
+  justify-self: var(--j, center);
+  translate: var(--dx, 0) var(--dy, 0);
+  rotate: var(--r, 0deg);
+  font-size: var(--fs, 1rem);
+  line-height: 1.2;
+}
+.artists li:nth-child(2n) {
+  --r: -4deg;
+}
+.artists li:nth-child(3n) {
+  --r: 5deg;
+  --dy: -9px;
+}
+.artists li:nth-child(3n + 1) {
+  --j: start;
+  --dx: 6px;
+  --dy: 8px;
+}
+.artists li:nth-child(4n + 2) {
+  --j: end;
+  --dx: -4px;
+}
+.artists li:nth-child(5n) {
+  --fs: 1.22rem;
+  --dy: 5px;
+}
+.artists li:nth-child(5n + 3) {
+  --fs: 0.9rem;
+  --r: -7deg;
+}
+.artists li:nth-child(6n + 5) {
+  --fs: 1.12rem;
+  --dx: -10px;
+}
+.artists li:nth-child(7n + 4) {
+  --j: center;
+  --dy: -12px;
+  --r: 3deg;
+}
+
+/* 공유 링크(#이름)로 들어왔을 때 그 작가만 크게 도드라진다.
+   흩어진 이름들 사이에서 두 칸을 차지하고, 기울기·쏠림은 거둬 가운데 선다 */
+.artists li.spotlight {
+  --fs: 1.85rem;
+  --r: -3deg;
+  --dx: 0;
+  --dy: 0;
+  --j: center;
+  grid-column: span 2;
+  font-weight: 700;
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 0 18px rgba(var(--surface-rgb), 0.9);
+  transition: font-size 0.35s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.artists li.spotlight.picked {
+  color: inherit;
+}
+
+.host-line {
+  margin: 14px 0 0;
+  font-size: 0.76rem;
+}
+.host-line a {
+  margin-left: 4px;
+}
+/* ── 작가 전용 페이지의 작품 ─────────────── */
+.work-notice {
+  margin: 20px 0 0;
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  background: rgba(30, 86, 184, 0.06);
+  border: 1px solid rgba(30, 86, 184, 0.18);
+  font-size: 0.86rem;
+  line-height: 1.65;
+  color: var(--ink);
+}
+.work-notice strong {
+  margin-right: 6px;
+  color: var(--accent);
+  font-weight: 600;
+}
+.work-notice em {
+  font-style: normal;
+  font-weight: 600;
+}
+.work-main {
+  margin: 22px 0 0;
+  display: grid;
+  gap: 16px;
+  justify-items: center;
+}
+.work-zoom {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.work-main .work-zoom {
+  width: min(100%, 420px);
+  border: 10px solid #fff;
+  box-shadow: 0 18px 40px var(--card-shadow);
+}
+.work-zoom img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.work-main figcaption {
+  display: grid;
+  gap: 6px;
+  text-align: center;
+}
+.work-title {
+  font-family: 'Hahmlet', serif;
+  font-weight: 500;
+  font-size: 1.15rem;
+  letter-spacing: -0.01em;
+}
+.work-q {
+  font-family: 'Hahmlet', serif;
+  font-weight: 300;
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+}
+.work-label {
+  margin: 30px 0 10px;
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  color: var(--ink-soft);
+}
+/* 가까이 보기: 스크롤바 대신 점 표시, 한 번 밀면 한 장씩, 다음 사진이 살짝 보이게 */
+.work-strip {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain; /* 끝까지 밀어도 페이지가 밀리거나 뒤로 가기가 되지 않게 */
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* 스크롤바 숨김 (Firefox) */
+  margin-inline: -4px;
+  padding: 2px 4px 4px;
+  scroll-padding-inline: 4px;
+}
+.work-strip::-webkit-scrollbar {
+  display: none;
+} /* 스크롤바 숨김 (Chrome·Safari) */
+.work-strip .work-zoom {
+  flex: 0 0 64%;
+  max-width: 240px;
+  scroll-snap-align: start;
+  scroll-snap-stop: always; /* 세게 튕겨도 한 장씩 멈춘다 */
+}
+.work-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 12px;
+}
+.work-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--line);
+  transition:
+    background 0.2s ease,
+    width 0.2s ease;
+}
+.work-dots span.on {
+  width: 16px;
+  border-radius: 3px;
+  background: var(--ink-soft);
+}
+.work-strip .work-zoom:focus-visible,
+.work-main .work-zoom:focus-visible {
+  outline: 2px solid var(--spark);
+  outline-offset: 2px;
+}
+/* 크게 보기: 미디어 뷰어처럼 옆으로 밀어서 넘긴다 */
+.work-viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(20, 16, 12, 0.94);
+  overscroll-behavior: contain;
+}
+.work-viewer[hidden] {
+  display: none;
+}
+.viewer-track {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+.viewer-track::-webkit-scrollbar {
+  display: none;
+}
+.viewer-slide {
+  flex: 0 0 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 56px 16px;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+}
+.viewer-slide img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+.viewer-count {
+  position: absolute;
+  top: 22px;
+  left: 0;
+  right: 0;
+  margin: 0;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+.viewer-nav {
+  position: absolute;
+  top: 50%;
+  translate: 0 -50%;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 0;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.viewer-nav.prev {
+  left: 12px;
+}
+.viewer-nav.next {
+  right: 12px;
+}
+.viewer-nav:disabled {
+  opacity: 0;
+  pointer-events: none;
+}
+@media (hover: none) {
+  .viewer-nav {
+    display: none;
+  }
+} /* 휴대폰은 손가락으로 밀어 넘긴다 */
+.work-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 0;
+  background: rgba(255, 255, 255, 0.9);
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+/* 제목 뒤 어두운 베일이 아래 전시 안내 카드 윗면까지 번져 흐릿하게 보여서, 예약 페이지에서는 뺀다 */
+.visit-page .title-copy::before {
+  display: none;
+}
+/* 인사말 카드: 질문(.q)만 한 줄로 띄우고, 본문 속 굵은 글씨 뒤에는 여백을 두지 않는다 (쉼표가 떨어지지 않게) */
+#helloSection .work-notice strong {
+  margin-right: 0;
+}
+#helloSection .work-notice .q {
+  display: block;
+  margin: 0 0 4px;
+}
+/* 관람 예약 카드: 포스터의 튤립 빨강 → 코발트 하늘로 이어지는 1px 그라데이션 테두리 */
+#visitSection {
+  position: relative;
+}
+#visitSection::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  padding: 1px; /* 이 두께만큼만 남기고 안쪽은 지운다 */
+  background: linear-gradient(135deg, var(--ember) 0%, #d9708a 45%, var(--accent) 100%);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+}
+
+/* ── 관람 예약 페이지 (/jessie/visit) ── */
+/* 포스터 · 겹친 그림 테두리는 조금 가늘게 (크기는 아래 '① 표지'에서 정한다) */
+.visit-page .frame.has-work {
+  border-width: 4px;
+}
+/* 표지 맨 위: 전시 제목 · 초대 문구 */
+.visit-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--cover-gap, 18px) - 3px);
+  margin: 0;
+  text-align: center;
+} /* 제목 위, 초대 문구 아래. 제목의 줄 높이 여유(약 3px)만큼 빼서 위아래가 같아 보이게 */
+.visit-top h1 {
+  margin: 0;
+  text-align: center;
+  white-space: nowrap;
+  font-size: 21px;
+}
+.visit-top .invite-line {
+  margin: 0;
+  text-align: center;
+  white-space: nowrap;
+  font-size: 0.78rem;
+}
+/* 전시 안내 카드 제목줄 오른쪽 끝의 디데이 */
+.section-head .info-dday {
+  margin: 0 0 0 auto;
+  font-size: 1.05rem;
+  line-height: 1;
+}
+.section-head .info-dday .dday-num {
+  font-size: 1.05rem;
+  color: var(--ember);
+  text-shadow: none;
+}
+.visit-page .frame-work {
+  border-width: 3px;
+}
+/* ── 장면 넘기기: 장면이 화면에 겹쳐 고정되고, 한 번에 하나만 페이드로 보인다 ──
+   페이지 자체는 스크롤되지 않는다. 화면보다 긴 장면은 장면 안에서 스크롤된다 */
+html.visit-page,
+html.visit-page body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+.visit-page .wrap {
+  padding-bottom: 0;
+}
+.scene {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  padding: 16px max(20px, calc((100vw - 720px) / 2));
+  box-sizing: border-box;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--scene-fade, 450ms) ease,
+    visibility 0s linear var(--scene-fade, 450ms);
+}
+.scene.is-active {
+  opacity: 1;
+  visibility: visible;
+  z-index: 6;
+  transition:
+    opacity var(--scene-fade, 450ms) ease,
+    visibility 0s;
+}
+/* 세로 가운데 정렬. 장면이 화면보다 길어지면 위가 잘리지 않고 위에서부터 스크롤된다 */
+.scene > :first-child {
+  margin-top: auto !important;
+}
+.scene > :last-child {
+  margin-bottom: auto !important;
+}
+.visit-page .scene > section.card {
+  margin: 0;
+}
+/* 장면 전환 끊김 방지: 카드의 drop-shadow 필터 두 겹은 페이드되는 동안 매 프레임 다시 그려져
+   크롬에서 프레임이 50~80ms씩 밀렸다. 예약 페이지에서는 같은 느낌의 box-shadow 로 바꾼다 (전환 중 끊김 0) */
+.visit-page .scene section.card {
+  filter: none;
+  background: #fff;
+  box-shadow:
+    0 6px 14px rgba(48, 38, 28, 0.1),
+    0 18px 36px rgba(48, 38, 28, 0.1);
+}
+.visit-page .scene > section.card + section.card {
+  margin-top: 18px;
+}
+/* 받아지는 중: 뒷배경만. 모든 애니메이션은 0초 지점에 멈춰 둔다 */
+html.visit-loading .wrap,
+html.visit-loading .scene-dots {
+  visibility: hidden;
+}
+html.visit-loading *,
+html.visit-loading *::before,
+html.visit-loading *::after {
+  animation-play-state: paused !important;
+}
+/* 받아지는 동안: 표지 진행 막대와 같은 자리에 '불러오는 중' 안내와 흐르는 1px 막대.
+   다 받아지면 이 자리에 '잠시 뒤 전시 안내로 넘어가요'와 차오르는 막대가 이어서 나온다 */
+html.visit-loading body::before {
+  content: '포스터를 불러오는 중이에요';
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 66px;
+  z-index: 40;
+  text-align: center;
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  color: #fff;
+  text-shadow: 0 1px 8px rgba(80, 30, 30, 0.35);
+}
+html.visit-loading body::after {
+  content: '';
+  position: fixed;
+  left: 50%;
+  bottom: 54px;
+  z-index: 40;
+  transform: translateX(-50%);
+  width: min(max(50vw, 280px), calc(100% - 40px));
+  height: 1px;
+  border-radius: 1px;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0), #fff 50%, rgba(255, 255, 255, 0)) no-repeat,
+    rgba(255, 255, 255, 0.3);
+  background-size:
+    40% 100%,
+    100% 100%;
+  animation: loaderSlide 1.2s ease-in-out infinite;
+  animation-play-state: running !important;
+}
+@keyframes loaderSlide {
+  from {
+    background-position:
+      -70% 0,
+      0 0;
+  }
+  to {
+    background-position:
+      170% 0,
+      0 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html.visit-loading body::after {
+    animation: none;
+    background: rgba(255, 255, 255, 0.6);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scene,
+  .scene.is-active {
+    transition: none;
+  }
+}
+/* ① 표지 */
+.scene-cover {
+  padding-block: 0;
+}
+.scene-cover .hero {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 22px 0 18px;
+}
+/* 제목 · 초대 문구 · 포스터를 한 덩어리로 화면 가운데에 두고,
+   초대 문구 위(제목까지)와 아래(포스터까지)의 여백을 같게(--cover-gap) 맞춘다 */
+.scene-cover .hero {
+  --cover-gap: 18px;
+}
+.scene-cover .visit-top {
+  margin-top: auto;
+  margin-bottom: 0;
+}
+.scene-cover .frame.has-work {
+  --fw: min(250px, calc((100vw - 32px) / 1.22), calc((100svh - 230px) / 1.62));
+  margin-block: var(--cover-gap) 0;
+}
+.scene-hint {
+  margin: auto auto 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  border: 0;
+  background: none;
+  padding: 6px 10px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.74rem;
+  letter-spacing: 0.04em;
+  color: var(--spark);
+}
+/* 첫 진입 진행 막대: 화면 아래쪽 가운데, 1px 높이의 가는 선이 차오른다 */
+.intro-bar {
+  position: absolute;
+  left: 50%;
+  bottom: 54px;
+  transform: translateX(-50%);
+  /* 화면 폭의 절반 정도. 단 포스터(약 250px)보다는 길게, 화면 가장자리에는 닿지 않게 */
+  width: min(max(50vw, 280px), calc(100% - 40px));
+  height: 1px;
+  background: rgba(255, 255, 255, 0.3);
+  overflow: hidden;
+  border-radius: 1px;
+}
+.intro-bar i {
+  display: block;
+  height: 100%;
+  width: 100%;
+  background: #fff; /* 아래쪽이 붉은 배경이라 흰 선이 가장 잘 보인다 */
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+.intro-run .intro-bar i {
+  transform: scaleX(1);
+  transition: transform var(--intro-ms, 1950ms) linear;
+}
+.intro-done .intro-bar,
+.intro-done .intro-text {
+  display: none;
+} /* 표지로 다시 돌아왔을 때는 없다 */
+/* 진행 막대 바로 위의 안내 한 줄 */
+.intro-text {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 66px;
+  margin: 0;
+  text-align: center;
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  color: #fff;
+  text-shadow: 0 1px 8px rgba(80, 30, 30, 0.35);
+}
+/* 첫 진입 때 잠깐 보이는 표지에서는 넘기기 안내를 숨긴다 (다시 표지로 돌아오면 보인다) */
+.visit-page:not(.intro-done) .scene-hint {
+  visibility: hidden;
+}
+/* 촘촘히 겹친 셰브론 3개: 덩어리째 아래로 둥둥 떠내려가고, 위에서부터 차례로 밝아진다 */
+.chevrons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 4px;
+  animation: hintFloat 2s ease-in-out infinite;
+}
+.chevrons svg {
+  width: 22px;
+  height: 11px;
+  margin-top: -4px;
+  overflow: visible;
+}
+.chevrons svg:first-child {
+  margin-top: 0;
+}
+.chevrons path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.chevrons svg {
+  animation: hintFade 2s ease-in-out infinite;
+}
+.chevrons svg:nth-child(1) {
+  animation-delay: 0s;
+}
+.chevrons svg:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.chevrons svg:nth-child(3) {
+  animation-delay: 0.4s;
+}
+@keyframes hintFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(7px);
+  }
+}
+@keyframes hintFade {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  40% {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .chevrons,
+  .chevrons svg {
+    animation: none;
+  }
+  .chevrons svg:nth-child(1) {
+    opacity: 0.35;
+  }
+  .chevrons svg:nth-child(2) {
+    opacity: 0.65;
+  }
+}
+/* 오른쪽 장면 점 */
+.scene-dots {
+  position: fixed;
+  right: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.scene-dots button {
+  width: 16px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.scene-dots button::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(110, 98, 84, 0.35);
+  box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.7);
+  transition:
+    transform 0.25s ease,
+    background 0.25s ease;
+}
+.scene-dots button.on::before {
+  background: linear-gradient(135deg, var(--ember), var(--accent));
+  transform: scale(1.45);
+}
+.scene-dots.on-cover button::before {
+  background: rgba(255, 255, 255, 0.55);
+  box-shadow: none;
+}
+.scene-dots.on-cover button.on::before {
+  background: #fff;
+}
+.scene-dots button:focus-visible {
+  outline: 2px solid var(--spark);
+  outline-offset: 1px;
+  border-radius: 50%;
+}
+
+/* 전시 기간 달력 */
+.cal {
+  margin: -4px 0 6px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+}
+.cal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 10px;
+}
+.cal-month {
+  font-family: 'Hahmlet', serif;
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+.cal-range {
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+}
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  row-gap: 4px;
+  text-align: center;
+}
+.cal-dow {
+  font-size: 0.66rem;
+  color: var(--ink-soft);
+  padding-bottom: 4px;
+  letter-spacing: 0.04em;
+}
+.cal-dow.sun,
+.cal-day.sun {
+  color: var(--ember);
+}
+.cal-day {
+  position: relative;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  font-size: 0.9rem;
+  color: #a69c90;
+  font-variant-numeric: tabular-nums;
+}
+.cal-day b {
+  position: relative;
+  z-index: 1;
+  font-weight: 500;
+}
+.cal-day.in {
+  color: var(--ink);
+}
+.cal-day.in.sun {
+  color: var(--ember);
+}
+.cal-day.in::before {
+  /* 전시 기간을 잇는 띠 */
+  content: '';
+  position: absolute;
+  inset: 4px 0;
+  background: rgba(217, 112, 138, 0.16);
+}
+.cal-day.in.sat::before {
+  right: 3px;
+  border-radius: 0 999px 999px 0;
+}
+.cal-day.in.sun::before {
+  left: 3px;
+  border-radius: 999px 0 0 999px;
+}
+.cal-day.start::before {
+  left: 50%;
+}
+.cal-day.end::before {
+  right: 50%;
+}
+.cal-day.start b,
+.cal-day.end b {
+  /* 첫날 · 마지막 날 */
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--ember), #d9708a 45%, var(--accent));
+  color: #fff;
+  font-weight: 700;
+}
+.cal-day.meet::after {
+  content: '';
+  position: absolute;
+  bottom: 1px;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  margin-left: -2.5px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.cal-day.today b {
+  text-decoration: underline 2px;
+  text-underline-offset: 4px;
+}
+.cal-tip {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin: 0 0 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+.cal-tip svg {
+  width: 14px;
+  height: 14px;
+  animation: hintFloat 2s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cal-tip svg {
+    animation: none;
+  }
+}
+button.cal-day {
+  border: 0;
+  background: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+button.cal-day:hover b {
+  box-shadow: 0 0 0 2px rgba(30, 86, 184, 0.35);
+  border-radius: 50%;
+}
+button.cal-day b {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  transition:
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+button.cal-day:focus-visible {
+  outline: none;
+}
+button.cal-day:focus-visible b {
+  box-shadow: 0 0 0 2px var(--accent);
+}
+.cal-day.picked b {
+  box-shadow: 0 0 0 2px var(--accent);
+  background: #fff;
+}
+.cal-day.start.picked b,
+.cal-day.end.picked b {
+  box-shadow:
+    0 0 0 2px #fff,
+    0 0 0 4px var(--accent);
+  background: linear-gradient(135deg, var(--ember), #d9708a 45%, var(--accent));
+}
+.cal-legend {
+  margin: 10px 0 0;
+  font-size: 0.74rem;
+  color: var(--ink-soft);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.cal-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  display: inline-block;
+}
+/* 장소 줄: 이름 옆 주소 복사 버튼 */
+.visit-page #infoSection .place-link + .icon-copy {
+  margin-left: 8px;
+}
+/* 줄 상자의 글자 위·아래 여유가 달라(위 4px, 아래 5.5px) 위 13 · 아래 11 로 맞추면 글자가 선 사이 한가운데 온다 */
+.visit-page #infoSection .row {
+  padding-block: 13px 11px;
+}
+.visit-page #infoSection .cal {
+  margin-top: -12.5px;
+  margin-bottom: 0;
+} /* '2026. 11' 줄이 위 선과 아래 안내 사이 가운데(각 18.5px) · 달력 아래 선과 '관람 시간' 사이도 다른 줄과 같게 */
+/* 장면 안에 들어가도록 조금씩 촘촘하게 */
+.visit-page .scene {
+  padding-block: 16px;
+}
+.visit-page .scene-cover {
+  padding-block: 0;
+}
+.visit-page .scene .note-form {
+  gap: 14px;
+  margin-top: 16px;
+}
+.visit-page .scene .field {
+  gap: 5px;
+}
+/* ⑤ 쪽지 장면 제목줄 오른쪽 끝: 작가 페이지 게시판으로 가는 링크 */
+.board-link {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--spark);
+  text-decoration: none;
+  padding: 4px 4px 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(30, 86, 184, 0.28);
+}
+.board-link svg {
+  width: 14px;
+  height: 14px;
+}
+.board-link {
+  white-space: nowrap;
+}
+.visit-stay {
+  font-weight: 600;
+  color: var(--accent);
+}
+/* 예약 폼: 함께 오는 사람 펼치기 */
+.party-toggle {
+  justify-self: start;
+  border: 0;
+  background: none;
+  padding: 2px 0;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 500;
+  color: var(--accent);
+}
+.party-toggle:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+/* 화면 아래 떠 있는 예약 버튼 */
+.visit-cta {
+  align-self: center;
+  flex: 0 0 auto;
+  margin-top: 16px !important; /* 카드 아랫면과 16px */
+  padding: 12px 32px;
+  border: 2px solid #fff;
+  border-radius: 999px;
+  cursor: pointer; /* 흰 테두리 2px */
+  font: inherit;
+  font-size: 1.06rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #fff;
+  white-space: nowrap;
+  background: linear-gradient(135deg, var(--ember) 0%, #d9708a 45%, var(--accent) 100%) padding-box;
+  box-shadow:
+    0 8px 22px rgba(60, 40, 90, 0.28),
+    0 2px 6px rgba(60, 40, 90, 0.18);
+  text-shadow: 0 1px 2px rgba(40, 20, 40, 0.25);
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+.visit-cta:hover {
+  transform: translateY(-1px);
+  opacity: 0.95;
+}
+.visit-cta.is-done {
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--accent);
+  text-shadow: none;
+  box-shadow:
+    0 6px 18px rgba(60, 40, 90, 0.16),
+    inset 0 0 0 1.5px rgba(30, 86, 184, 0.35);
+}
+.note-ask {
+  font-weight: 600;
+  color: var(--accent);
+}
+.visit-page .scene .note {
+  word-break: keep-all;
+} /* 안내 문구가 낱말 중간에서 끊기지 않게 */
+/* 전시 안내 장소 줄: 장소명 아래 지도 아이콘만 */
+.map-links.icon-only {
+  display: flex !important;
+  flex-wrap: nowrap;
+  flex: 0 0 auto;
+  gap: 6px;
+  margin: 0;
+  grid-column: auto;
+}
+.map-links.icon-only.in-dd {
+  margin-top: 10px;
+}
+.map-links.icon-only a {
+  width: 32px;
+  height: 32px;
+  padding: 0 !important;
+  justify-content: center;
+  border-radius: 9px;
+}
+.map-links.icon-only .map-ico {
+  width: 20px;
+  height: 20px;
+  font-size: 0.74rem;
+}
+/* 예약 페이지 카드의 위아래 여백을 맞춘다.
+   - 빈 안내 줄(오류 메시지 자리)이 버튼 아래 여백을 늘리고 있어서, 비어 있을 때는 자리를 차지하지 않게
+   - 위: 카드 윗면 ~ 제목 글자 = 26px + 제목 줄 여유 5px ≈ 31px, 아래도 마지막 요소 ~ 카드 아랫면 31px */
+.visit-page .scene .note-status:empty {
+  display: none;
+}
+.visit-page .scene section.card:not(.thanks) {
+  padding-top: 26px;
+  padding-bottom: 31px;
+}
+.visit-page #infoSection dl .row:last-child {
+  padding-bottom: 0;
+}
+/* 휴대폰 폭에서는 영문 라벨을 빼서 링크가 제목과 한 줄에 들어가게 */
+@media (max-width: 420px) {
+  .visit-page #boardSection .section-head .en {
+    display: none;
+  }
+}
+.board-link:hover {
+  background: rgba(30, 86, 184, 0.06);
+}
+.board-link:focus-visible {
+  outline: 2px solid var(--spark);
+  outline-offset: 2px;
+}
+/* ⑤ 쪽지: 게시판이 없으니 점선 구분선과 위 여백을 없애고, 제목과 겹치는 '○○ 작가에게' 줄은 숨긴다 */
+.visit-page #boardSection .board-write {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+.visit-page #boardSection .board-secret {
+  display: none;
+}
+.visit-page #boardSection .note-to {
+  display: none;
+}
+.visit-page #boardSection #notePrivacy {
+  margin-top: 0 !important;
+}
+/* ⑦ 마지막 장면: 가운데 감사 인사, 맨 아래 하단 정보 */
+.visit-page .scene-last {
+  padding-bottom: 0;
+}
+.visit-page .scene-last .thanks {
+  margin-block: auto 0 !important;
+}
+.visit-page .scene-last footer {
+  margin-top: auto;
+  padding-top: 22px;
+  padding-bottom: 18px;
+}
+.visit-page .scene-last > footer:last-child {
+  margin-bottom: 0 !important;
+}
+.quest-lead {
+  margin: 14px 0 4px;
+  text-align: center;
+  font-size: 0.86rem;
+  line-height: 1.7;
+  color: var(--ink-soft);
+  word-break: keep-all;
+}
+.thanks {
+  text-align: center;
+  padding-block: 34px 30px;
+}
+.thanks-title {
+  margin: 0 0 12px;
+  font-family: 'Hahmlet', serif;
+  font-weight: 700;
+  font-size: 1.35rem;
+  letter-spacing: -0.01em;
+}
+.thanks-body {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.8;
+  word-break: keep-all;
+}
+
+/* 재이 페이지 인사말 */
+.work-hello {
+  display: grid;
+  gap: 10px;
+  margin-top: 20px;
+}
+.work-hello > p:first-child {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.75;
+}
+.work-extra {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.75;
+}
+.work-extra strong {
+  font-weight: 600;
+}
+
+/* ── 쪽지 게시판: 메모지가 여기저기 붙은 느낌 ── */
+.board {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 2px;
+  margin-top: 20px;
+  padding: 18px 6px 22px;
+  border-radius: var(--radius);
+  background-color: #f6f1e7;
+  background-image: radial-gradient(rgba(120, 95, 60, 0.12) 1px, transparent 1.2px);
+  background-size: 14px 14px;
+  min-height: 120px;
+}
+.sticky {
+  position: relative;
+  width: calc(50% - 10px);
+  max-width: 210px;
+  margin: 6px 4px -2px;
+  padding: 20px 14px 12px;
+  background: var(--paper, #fff4a8);
+  box-shadow:
+    0 6px 14px rgba(70, 50, 30, 0.16),
+    0 1px 2px rgba(70, 50, 30, 0.12);
+  rotate: var(--r, -2deg);
+  translate: 0 var(--y, 0);
+  font-family: 'Gaegu', 'Hahmlet', sans-serif;
+  color: #3b2e22;
+  transition:
+    rotate 0.25s ease,
+    scale 0.25s ease;
+}
+.sticky:hover {
+  rotate: 0deg;
+  scale: 1.03;
+  z-index: 2;
+}
+.sticky::before {
+  /* 위에 붙인 테이프 */
+  content: '';
+  position: absolute;
+  top: -9px;
+  left: 50%;
+  width: 54px;
+  height: 18px;
+  translate: -50% 0;
+  rotate: var(--t, 3deg);
+  background: rgba(255, 255, 255, 0.55);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+.sticky-msg {
+  margin: 0;
+  font-size: 1.08rem;
+  line-height: 1.45;
+  white-space: pre-line;
+  word-break: break-word;
+}
+.sticky-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: 0.92rem;
+  opacity: 0.75;
+}
+.sticky.is-new {
+  animation: stickIn 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+@keyframes stickIn {
+  from {
+    opacity: 0;
+    scale: 1.25;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+@media (min-width: 560px) {
+  .sticky {
+    width: calc(33.333% - 10px);
+  }
+}
+/* 하트 쪽지: 종이를 하트 모양으로 오려 붙인 느낌.
+   다른 쪽지와 같은 폭, 늘 같은 비율의 하트. 글이 길면 하트 안에 들어가도록 글씨가 작아진다 */
+.sticky.is-heart {
+  background: none;
+  box-shadow: none;
+  isolation: isolate;
+  aspect-ratio: 100 / 90;
+  padding: 20px 20px 38px; /* % 는 게시판 폭 기준이라 안 맞는다. 하트 폭(140~210px)에 맞춘 고정값 */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  text-align: center;
+  filter: drop-shadow(0 6px 8px rgba(110, 40, 60, 0.18)) drop-shadow(0 1px 1px rgba(110, 40, 60, 0.12));
+}
+.sticky.is-heart::before {
+  display: none;
+} /* 테이프 없음 */
+.sticky.is-heart::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: #ffc2d1;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 90'%3E%3Cpath d='M50 89C20 67 1 49 1 28C1 12 13 1 27 1c10 0 18 6 23 15C55 7 63 1 73 1c14 0 26 11 26 27 0 21-19 39-49 61z'/%3E%3C/svg%3E")
+    center / 100% 100% no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 90'%3E%3Cpath d='M50 89C20 67 1 49 1 28C1 12 13 1 27 1c10 0 18 6 23 15C55 7 63 1 73 1c14 0 26 11 26 27 0 21-19 39-49 61z'/%3E%3C/svg%3E")
+    center / 100% 100% no-repeat;
+}
+/* 위아래 여백을 auto로 두어 가운데에 놓되, 넘칠 때는 아래로 넘치게 해서 글씨 줄이기 계산이 맞도록 한다 */
+.sticky.is-heart > * {
+  flex-shrink: 0;
+}
+.sticky.is-heart .sticky-msg {
+  margin-top: auto;
+  font-size: var(--heart-fs, 1rem);
+  line-height: 1.3;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+.sticky.is-heart .sticky-meta {
+  margin-bottom: auto;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 5px;
+  font-size: 0.74rem;
+  white-space: nowrap;
+}
+/* 20자가 넘어 접혀 있는 쪽지: 누르면 펼쳐진다 */
+.sticky.is-clamped {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.sticky.is-clamped:focus-visible {
+  outline: 2px solid rgba(59, 46, 34, 0.45);
+  outline-offset: 3px;
+}
+.sticky.is-open {
+  rotate: 0deg;
+  z-index: 3;
+}
+/* 내용이 거의 없는 쪽지(ㅋㅋㅋ, 자판 두드리기 등)는 한 치수 작게 붙인다 */
+.sticky.is-small {
+  width: calc(40% - 10px);
+  max-width: 160px;
+  padding: 16px 11px 9px;
+}
+.sticky.is-small .sticky-msg {
+  font-size: 0.9rem;
+}
+.sticky.is-small .sticky-meta {
+  font-size: 0.8rem;
+  margin-top: 7px;
+}
+@media (min-width: 560px) {
+  .sticky.is-small {
+    width: calc(26% - 10px);
+  }
+}
+.board-secret {
+  margin: 0 0 6px;
+  text-align: center;
+  font-size: 0.78rem;
+  color: #c9c3ba;
+  letter-spacing: 0.01em;
+} /* 옅은 회색 한마디 */
+.board-more {
+  display: flex;
+  justify-content: center;
+  margin-top: 14px;
+}
+.board-more .btn {
+  flex: 0 0 auto;
+}
+.board-write {
+  margin-top: 26px;
+  padding-top: 22px;
+  border-top: 1px dashed var(--line);
+}
+.board-empty {
+  margin: 12px 0 0;
+  text-align: center;
+  font-size: 0.86rem;
+  color: var(--ink-soft);
+}
+.board-loading {
+  align-self: center;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+
+/* 전시가 끝난 뒤 열리는 작가 도슨트 */
+.work-docent-note {
+  margin: 18px 0 0;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  background: rgba(30, 86, 184, 0.05);
+  font-size: 0.8rem;
+  line-height: 1.65;
+  color: var(--ink-soft);
+  text-align: center;
+  word-break: keep-all;
+}
+.work-docent-note strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+.after-lead {
+  margin: 16px 0 0;
+  font-size: 0.86rem;
+  color: var(--ink-soft);
+}
+.after-body {
+  margin-top: 16px;
+  display: grid;
+  gap: 12px;
+}
+.after-body p {
+  margin: 0;
+  font-family: 'Hahmlet', serif;
+  font-weight: 300;
+  font-size: 1rem;
+  line-height: 1.9;
+  word-break: keep-all;
+}
+.after-body p.after-q {
+  margin-top: 6px;
+  font-weight: 500;
+  text-align: center;
+}
+
+/* 초대 문구 */
+.invite-line {
+  margin: 0 0 10px;
+  text-align: center;
+  font-size: 0.84rem;
+  color: var(--spark);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* ── 지금 전시장에는 ──────────────────────── */
+.onduty-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.onduty-list li {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  min-width: 0;
+}
+.onduty-area {
+  flex: 0 0 auto;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  color: var(--on-accent);
+  background: var(--spark);
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+.onduty-name {
+  font-family: 'Hahmlet', serif;
+  font-size: 1rem;
+  min-width: 0;
+}
+.onduty-foot {
+  margin: 18px 0 0;
+  font-size: 0.76rem;
+  color: var(--ink-soft);
+}
+
+/* ── 조금 이상한 질문 ─────────────────────── */
+.quest {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
+  padding-block: 10px 4px;
+}
+.quest-text {
+  margin: 0;
+  width: 100%;
+  font-family: 'Hahmlet', serif;
+  font-weight: 300;
+  font-size: 18px;
+  line-height: 1.65;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+  white-space: pre-line; /* 온점·반점 뒤에서 JS가 넣은 줄바꿈을 그대로 보여 준다 */
+  word-break: keep-all; /* 낱말 중간(문장/을)에서 끊지 않는다 */
+  /* 질문마다 길이가 달라 아래 카드가 들썩이지 않도록 높이를 고정한다.
+     실제 값은 가장 긴 질문을 재어 JS가 --quest-h 로 넣는다 */
+  height: var(--quest-h, 6.6em);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* 질문이 바뀔 때: 살짝 위로 사라지고(.q-out) → 아래에서 떠오른다(.q-in 을 떼는 순간) */
+.quest-text,
+.quest-by {
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
+  will-change: opacity, transform;
+}
+.quest-text.q-out,
+.quest-by.q-out {
+  opacity: 0;
+  transform: translateY(-8px);
+  transition-duration: 0.2s;
+}
+.quest-text.q-in,
+.quest-by.q-in {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: none;
+}
+.quest-by {
+  margin: 0;
+  /* 긴 출처가 두 줄이 되어도 버튼과 겹치지 않게, 가장 긴 출처 높이를 JS가 --quest-by-h 로 넣는다 */
+  min-height: var(--quest-by-h, 1.6em);
+  font-size: 0.74rem;
+  line-height: 1.6;
+  letter-spacing: 0.02em;
+  color: var(--ink-soft);
+  text-wrap: balance;
+  word-break: keep-all;
+}
+.quest .btn {
+  flex: 0 0 auto;
+  margin-top: 8px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .quest-text,
+  .quest-by {
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+/* ── 작가에게 한마디 ──────────────────────── */
+/* 작가를 고르기 전에는 안내만 보이고, 고르면 본문이 펼쳐진다 */
+.note-intro {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.note-intro::before {
+  content: '↑';
+  flex: 0 0 auto;
+  font-size: 0.9rem;
+  color: var(--spark);
+}
+#noteBody {
+  will-change: height;
+}
+
+.note-to {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 22px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+}
+.note-to-name {
+  margin: 0;
+  font-family: 'Hahmlet', serif;
+  font-size: 1.12rem;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+}
+.note-to-name em {
+  font-style: normal;
+  color: var(--spark);
+}
+.note-change {
+  flex: 0 0 auto;
+  font: inherit;
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  padding: 0 0 1px;
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+.note-change:hover {
+  color: var(--spark);
+  border-color: var(--spark);
+}
+/* 명단 아래 보조 동작이라 조용히 둔다 */
+.all-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 26px;
+}
+
+.note-form {
+  display: grid;
+  gap: 18px;
+  margin-top: 22px;
+}
+.field {
+  display: grid;
+  gap: 7px;
+  position: relative;
+  min-width: 0;
+}
+.field label {
+  font-size: 0.76rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  color: var(--ink-soft);
+}
+.field label .opt {
+  font-weight: 400;
+  opacity: 0.75;
+}
+.field select,
+.field textarea,
+.field input[type='text'] {
+  width: 100%;
+  min-width: 0;
+  font: inherit;
+  font-size: 0.95rem;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 11px 13px;
+  transition: border-color 0.2s ease;
+}
+.field textarea {
+  resize: vertical;
+  min-height: 104px;
+  line-height: 1.7;
+}
+.field select {
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--ink-soft) 50%),
+    linear-gradient(135deg, var(--ink-soft) 50%, transparent 50%);
+  background-position:
+    calc(100% - 18px) 50%,
+    calc(100% - 13px) 50%;
+  background-size:
+    5px 5px,
+    5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 34px;
+  cursor: pointer;
+}
+.field select:focus,
+.field textarea:focus,
+.field input[type='text']:focus {
+  outline: none;
+  border-color: var(--spark);
+}
+.field-count {
+  justify-self: end;
+  font-size: 0.7rem;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+.field input[type='text']::placeholder {
+  color: var(--ink-soft);
+  opacity: 0.6;
+}
+#visitSubmit[disabled] {
+  opacity: 0.55;
+  cursor: default;
+}
+/* 자동 프로그램을 거르는 칸 — 화면에서 완전히 치운다 */
+.trap {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+.note-status {
+  margin: 0;
+  min-height: 1.4em;
+  font-size: 0.8rem;
+  color: var(--ember);
+}
+#noteSubmit[disabled] {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.note-done {
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+  text-align: center;
+  padding-block: 26px 10px;
+}
+.note-done-title {
+  margin: 0;
+  font-family: 'Hahmlet', serif;
+  font-size: 1.3rem;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+}
+.note-done-sub {
+  margin: 0;
+  font-size: 0.84rem;
+  color: var(--ink-soft);
+}
+.note-done .btn {
+  flex: 0 0 auto;
+  margin-top: 10px;
+}
+
+/* ── 버튼 ─────────────────────────────────── */
+.note {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.88rem;
+}
+.btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 22px;
+}
+.btn {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px;
+  font: inherit;
+  font-size: 0.81rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition:
+    border-color 0.25s ease,
+    color 0.25s ease,
+    transform 0.25s ease;
+}
+.btn:hover {
+  border-color: var(--spark);
+  color: var(--spark);
+  transform: translateY(-1px);
+}
+.btn:focus-visible {
+  outline: 2px solid var(--spark);
+  outline-offset: 2px;
+}
+.btn.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+  flex-basis: 100%;
+  padding-block: 15px;
+  border-radius: calc(var(--radius) + 2px);
+}
+.btn.primary:hover {
+  opacity: 0.9;
+  color: var(--on-accent);
+  border-color: var(--accent);
+}
+/* 작가 전용 페이지: 친근한 톤에 맞춰 채운 버튼 대신 테두리 버튼 */
+.artist-page .btn.primary {
+  background: transparent;
+  color: var(--accent);
+  border: 1.5px solid var(--accent);
+}
+.artist-page .btn.primary:hover {
+  opacity: 1;
+  background: rgba(30, 86, 184, 0.06);
+  color: var(--accent);
+}
+/* 예약하기 · 전하기 버튼: 예약 카드 테두리와 같은 빨강 → 분홍 → 파랑 대각선 그라데이션, 흰 글씨 */
+#visitSubmit,
+.artist-page #visitSubmit,
+#noteSubmit,
+.artist-page #noteSubmit {
+  background: linear-gradient(135deg, var(--ember) 0%, #d9708a 45%, var(--accent) 100%);
+  color: #fff;
+  border: 0;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(40, 20, 40, 0.25); /* 분홍 가운데에서도 흰 글씨가 묻히지 않게 */
+}
+#visitSubmit:hover,
+.artist-page #visitSubmit:hover,
+#noteSubmit:hover,
+.artist-page #noteSubmit:hover {
+  background: linear-gradient(135deg, var(--ember) 0%, #d9708a 45%, var(--accent) 100%);
+  color: #fff;
+  opacity: 0.92;
+}
+#visitSubmit:disabled,
+#noteSubmit:disabled {
+  opacity: 0.6;
+}
+/* 다른 질문 보기: 카드 폭을 꽉 채우는 버튼, 흰 바탕에 빨강 → 파랑 2px 그라데이션 테두리 */
+#questNext,
+.artist-page #questNext {
+  align-self: stretch;
+  width: 100%;
+  border: 2px solid transparent;
+  background:
+    linear-gradient(#fff, #fff) padding-box,
+    linear-gradient(135deg, var(--ember) 0%, #d9708a 45%, var(--accent) 100%) border-box;
+  color: var(--accent);
+  font-weight: 600;
+}
+#questNext:hover,
+.artist-page #questNext:hover {
+  background:
+    linear-gradient(rgba(30, 86, 184, 0.05), rgba(30, 86, 184, 0.05)) padding-box,
+    linear-gradient(#fff, #fff) padding-box,
+    linear-gradient(135deg, var(--ember) 0%, #d9708a 45%, var(--accent) 100%) border-box;
+  color: var(--accent);
+  border-color: transparent;
+}
+
+/* ── 푸터 ─────────────────────────────────── */
+footer {
+  margin-top: 72px;
+  padding-top: 26px;
+  border-top: 1px solid var(--line);
+  font-size: 0.77rem;
+  color: var(--ink-soft);
+  line-height: 1.9;
+  letter-spacing: 0.01em;
+}
+footer a {
+  color: var(--spark);
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  max-width: calc(100vw - 40px);
+  text-align: center;
+  background: var(--ink);
+  color: var(--wall);
+  font-size: 0.79rem;
+  padding: 11px 20px;
+  border-radius: var(--radius);
+  box-shadow: 0 6px 22px var(--shadow);
+  z-index: 50;
+  animation: toastIn 0.32s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+/* ── 모션 ─────────────────────────────────── */
+@keyframes riseIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes framePlace {
+  from {
+    opacity: 0;
+    transform: translateY(30px) rotate(-3.8deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(-1.2deg);
+  }
+}
+@keyframes drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(2.5%, -2%, 0) scale(1.07);
+  }
+}
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 10px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.anim .hero-el {
+  animation: riseIn 0.85s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+.anim .eyebrow {
+  animation-delay: 0.06s;
+}
+.anim .title-block {
+  animation-delay: 0.62s;
+}
+.anim .dday {
+  animation-delay: 0.78s;
+}
+.anim .frame {
+  animation: framePlace 1.15s cubic-bezier(0.22, 0.61, 0.36, 1) 0.16s both;
+}
+.anim .frame.placed {
+  animation: none;
+}
+.anim .hero::before {
+  animation: drift 48s ease-in-out infinite;
+}
+
+.anim .reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.85s cubic-bezier(0.22, 0.61, 0.36, 1),
+    transform 0.85s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.anim .reveal.in {
+  opacity: 1;
+  transform: none;
+}
+.anim .reveal .section-head::after {
+  transform: scaleX(0);
+  transition: transform 1s cubic-bezier(0.22, 0.61, 0.36, 1) 0.12s;
+}
+.anim .reveal.in .section-head::after {
+  transform: scaleX(1);
+}
+
+.anim .stagger > * {
+  opacity: 0;
+}
+.anim .stagger.in > * {
+  animation: riseIn 0.62s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  animation-delay: var(--i, 0ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .anim *,
+  .anim *::before,
+  .anim *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  .anim .reveal,
+  .anim .stagger > * {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .anim .section-head::after {
+    transform: none !important;
+  }
+}
