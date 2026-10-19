@@ -663,6 +663,13 @@ dd .sub{
 .visit-page .hero .title-block{ margin-top: 6px; padding-top: 18px; padding-bottom: 6px }
 .visit-page #infoSection{ margin-top: 8px }   /* 'Everyone Is a Little off' 글자 아래 ~ 카드 윗면 = 32px */
 .visit-page .frame-work{ border-width:3px }
+/* 약한 스냅: 카드 윗부분 근처에서 스크롤을 멈추면 그 카드 시작점에 살짝 맞춰 준다.
+   proximity 라서 스크롤 중간에 걸리거나 멀리 떨어진 곳에서 끌려가지 않는다.
+   화면보다 긴 카드(예약·쪽지)는 안쪽에서 자유롭게 스크롤된다 */
+html.visit-page{ scroll-snap-type: y proximity }
+.visit-page .hero,
+.visit-page .wrap > section.card{ scroll-snap-align: start; scroll-margin-top: 14px }
+.visit-page .hero{ scroll-margin-top: 0 }
 .quest-lead{
   margin:14px 0 4px; text-align:center;
   font-size:.86rem; line-height:1.7; color: var(--ink-soft);
