@@ -1,0 +1,18 @@
+{
+  "name": "a-little-off-tests",
+  "private": true,
+  "type": "module",
+  "description": "조금 이상한 우리들 사이트 테스트 (배포물과 분리하려고 tests/ 안에만 둔다)",
+  "scripts": {
+    "test": "npm run test:unit && npm run test:e2e",
+    "test:unit": "node --test \"unit/*.test.js\"",
+    "test:e2e": "playwright test",
+    "serve": "node server.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

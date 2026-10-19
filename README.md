@@ -6,6 +6,7 @@
 - 사이트: <https://a-little-off.pages.dev/>
 - 호스팅: Cloudflare Pages (`main` 브랜치에 푸시하면 자동 배포)
 - 빌드 과정 없음: HTML · CSS · JS 파일을 그대로 올리는 정적 사이트 + Cloudflare Pages Functions
+- 기술 명세(사용 기술 · 구조 · 연동 규격 · 테스트): [docs/SPEC.md](docs/SPEC.md)
 
 ---
 
@@ -119,6 +120,8 @@ flowchart LR
 
 ### Cloudflare Pages 환경 변수
 
+> **값은 저장소에 넣지 않습니다.** 아래는 이름과 용도뿐이고, 실제 값은 Cloudflare Pages → 설정 → 변수 및 비밀에만 있습니다. 테스트는 가짜 값을 쓰고, 로컬 값은 커밋되지 않는 `.dev.vars`에 둡니다.
+
 | 이름                 | 용도                                                                              |
 | -------------------- | --------------------------------------------------------------------------------- |
 | `DOCENT_KEY`         | QR 주소에 붙는 열쇠, `/after-docent` 미리 보기 열쇠. 바꾸면 이전 QR은 열리지 않음 |
@@ -157,6 +160,9 @@ flowchart LR
 │       ├── _middleware.js    /docent/* 잠금
 │       └── [[path]].js       /docent/* 를 모두 잠금으로 보내는 통로
 ├── _headers                  사진 · 아이콘 캐시 규칙
+├── _redirects                README · docs · tests 를 사이트 주소로 열면 첫 화면으로 돌린다
+├── docs/SPEC.md              기술 명세
+├── tests/                    테스트 (따로 package.json 을 둔다. 배포에 영향 없음)
 ├── og-image.jpg, favicon-*.png, apple-touch-icon.png
 │                             링크 미리보기 · 아이콘. 이미 공유된 링크가 이 주소를 쓰므로 루트에 둔다
 ├── .editorconfig  .prettierrc.json  .prettierignore  .gitignore
@@ -168,9 +174,9 @@ flowchart LR
 - **페이지(HTML)** 는 주소 그대로의 위치에 둡니다 (`/docent` → `docent/index.html`). HTML에는 마크업만 두고, 스타일 · 스크립트는 `assets/css`, `assets/js`에 페이지 이름과 같은 파일로 둡니다 (`docent/debug.html` → `docent-debug.css`, `docent-debug.js`). 예외는 첫 화면 깜빡임을 막는 짧은 부트 스크립트 하나뿐입니다.
 - **파일 이름**은 소문자 + 하이픈(kebab-case). 여러 페이지가 함께 쓰는 데이터 · 도구도 `assets/js`에 둡니다.
 - **주소가 바뀌면 안 되는 파일**(링크 미리보기 이미지, 아이콘, 작품 사진)은 지금 위치를 유지합니다.
-- **Cloudflare 예약 위치**(`functions/`, `_headers`)는 루트에 둡니다.
+- **Cloudflare 예약 위치**(`functions/`, `_headers`, `_redirects`)는 루트에 둡니다.
 - **코드 스타일**: 들여쓰기 2칸, LF, UTF-8. 브라우저 스크립트는 오래된 휴대폰을 위해 빌드 없이 돌아가는 ES5 문법(`var`, `function`)을 유지하고, 서버(Functions) 쪽은 최신 문법을 씁니다. 주석은 한국어로, "왜 이렇게 했는지"를 적습니다.
-- **포매팅**: 저장소에 `package.json`을 두지 않습니다. Cloudflare Pages가 의존성을 설치해 배포물에 섞일 수 있어서입니다. 고친 뒤에는 아래 명령으로 맞춥니다.
+- **포매팅**: 루트에 `package.json`을 두지 않습니다. Cloudflare Pages가 의존성을 설치해 배포물에 섞일 수 있어서입니다(테스트용 `package.json`은 `tests/` 안에만). 고친 뒤에는 아래 명령으로 맞춥니다.
 
   ```sh
   npx prettier@3.3.3 --write "**/*.{html,css,js,json,md}"
@@ -204,3 +210,16 @@ npx wrangler@3 pages dev .        # http://localhost:8788 (Functions 포함)
 ```
 
 도슨트를 로컬에서 열려면 `.dev.vars` 파일에 `DOCENT_KEY`, `DOCENT_SECRET`, `DOCENT_ALWAYS_OPEN=true`를 적어 둡니다 (`.gitignore`에 포함되어 있음).
+
+## 테스트
+
+```sh
+cd tests
+npm install
+npx playwright install chromium   # 처음 한 번
+npm test                          # 서버 함수 단위 테스트(16) + 브라우저 테스트(33)
+```
+
+- `npm run test:unit`: 도슨트 잠금 · 전시 후 도슨트 함수 (`node:test`)
+- `npm run test:e2e`: 메인 · 작가 · 예약 · 도슨트 페이지를 휴대폰 크기 크롬으로 (Playwright)
+- 네트워크 없이 돌아갑니다. Apps Script · 글꼴은 가짜 응답으로 바꾸고 시각은 고정합니다. 자세한 목록은 [docs/SPEC.md](docs/SPEC.md#9-테스트).

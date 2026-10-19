@@ -3,3 +3,6 @@
 *.png
 *.mp3
 _headers
+package-lock.json
+tests/test-results/
+_redirects
