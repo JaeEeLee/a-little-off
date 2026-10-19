@@ -716,6 +716,18 @@ html.visit-loading *, html.visit-loading *::before, html.visit-loading *::after{
   border:0; background:none; padding:6px 10px; cursor:pointer;
   font: inherit; font-size:.74rem; letter-spacing:.04em; color: var(--spark);
 }
+/* 첫 진입 진행 막대: 화면 아래쪽 가운데, 1px 높이의 가는 선이 차오른다 */
+.intro-bar{
+  position:absolute; left:50%; bottom:34px; transform: translateX(-50%);
+  width:120px; height:1px; background: rgba(255,255,255,.3); overflow:hidden; border-radius:1px;
+}
+.intro-bar i{
+  display:block; height:100%; width:100%;
+  background:#fff;                       /* 아래쪽이 붉은 배경이라 흰 선이 가장 잘 보인다 */
+  transform: scaleX(0); transform-origin:left center;
+}
+.intro-run .intro-bar i{ transform: scaleX(1); transition: transform var(--intro-ms, 1950ms) linear }
+.intro-done .intro-bar{ display:none }     /* 표지로 다시 돌아왔을 때는 없다 */
 /* 첫 진입 때 잠깐 보이는 표지에서는 넘기기 안내를 숨긴다 (다시 표지로 돌아오면 보인다) */
 .visit-page:not(.intro-done) .scene-hint{ visibility:hidden }
 /* 촘촘히 겹친 셰브론 3개: 덩어리째 아래로 둥둥 떠내려가고, 위에서부터 차례로 밝아진다 */
@@ -2025,6 +2037,12 @@ try{
       + '</span>';
     // 누르면 표지의 클릭으로 이어져 다음 장면으로 넘어간다
     if(hero) hero.appendChild(hint);
+    // 첫 진입 때만: 표지 맨 아래 1px 진행 막대. 다 차면 전시 안내로 넘어간다
+    var introBar = document.createElement('div');
+    introBar.className = 'intro-bar';
+    introBar.setAttribute('aria-hidden', 'true');
+    introBar.innerHTML = '<i></i>';
+    if(hero) hero.appendChild(introBar);
 
     /* ── 장면 넘기기: 모든 장면 사이를 스크롤이 아니라 페이드로 오간다 ──
        장면은 화면에 겹쳐 고정돼 있고 한 번에 하나만 보인다.
@@ -2169,6 +2187,8 @@ try{
         loading = false;
         root.classList.remove('visit-loading');
         go(0, true);
+        root.style.setProperty('--intro-ms', AUTO_HIDE + 'ms');
+        root.classList.add('intro-run');             // 진행 막대가 AUTO_HIDE 동안 왼쪽에서 오른쪽으로 찬다
         autoTimer = setTimeout(function(){ if(current === 0) go(1, true); }, AUTO_HIDE);
       }); });
     }
