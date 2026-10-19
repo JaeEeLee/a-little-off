@@ -661,7 +661,7 @@ dd .sub{
   margin-bottom: 14px;
 }
 /* 초대 문구 · 디데이 한 줄 */
-.visit-top{ display:flex; flex-direction:column; align-items:center; gap:6px; margin:0 0 22px; text-align:center }   /* 제목 위, 초대 문구 아래 */
+.visit-top{ display:flex; flex-direction:column; align-items:center; gap:calc(var(--cover-gap, 18px) - 3px); margin:0; text-align:center }   /* 제목 위, 초대 문구 아래. 제목의 줄 높이 여유(약 3px)만큼 빼서 위아래가 같아 보이게 */
 .visit-top h1{ margin:0; text-align:center; white-space:nowrap; font-size: 21px }
 .visit-top .invite-line{ margin:0; text-align:center; white-space:nowrap; font-size:.78rem }
 /* 전시 안내 카드 제목줄 오른쪽 끝의 디데이 */
@@ -703,10 +703,13 @@ html.visit-loading *, html.visit-loading *::before, html.visit-loading *::after{
 .scene-cover .hero{
   flex:1; display:flex; flex-direction:column; padding: 22px 0 18px;
 }
-.scene-cover .visit-top{ margin-bottom:auto }
+/* 제목 · 초대 문구 · 포스터를 한 덩어리로 화면 가운데에 두고,
+   초대 문구 위(제목까지)와 아래(포스터까지)의 여백을 같게(--cover-gap) 맞춘다 */
+.scene-cover .hero{ --cover-gap: 18px }
+.scene-cover .visit-top{ margin-top:auto; margin-bottom:0 }
 .scene-cover .frame.has-work{
   --fw: min(250px, calc((100vw - 32px) / 1.22), calc((100svh - 230px) / 1.62));
-  margin-block: 28px 44px;
+  margin-block: var(--cover-gap) 0;
 }
 .scene-hint{
   margin: auto auto 0; display:flex; flex-direction:column; align-items:center; gap:2px;
