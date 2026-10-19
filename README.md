@@ -161,6 +161,7 @@ flowchart LR
 │       └── [[path]].js       /docent/* 를 모두 잠금으로 보내는 통로
 ├── _headers                  사진 · 아이콘 캐시 규칙
 ├── _redirects                README · docs · tests 를 사이트 주소로 열면 첫 화면으로 돌린다
+├── robots.txt, sitemap.xml   검색 엔진 안내 (메인만 색인, 작가 페이지 · 도슨트 제외)
 ├── docs/SPEC.md              기술 명세
 ├── tests/                    테스트 (따로 package.json 을 둔다. 배포에 영향 없음)
 ├── og-image.jpg, favicon-*.png, apple-touch-icon.png

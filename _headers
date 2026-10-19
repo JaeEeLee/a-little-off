@@ -9,3 +9,9 @@
   Cache-Control: public, max-age=86400, stale-while-revalidate=604800
 /apple-touch-icon.png
   Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+# 작가 개인 페이지(지인에게 보내는 초대 · 예약 링크)는 검색에 나오지 않게 한다
+/jessie
+  X-Robots-Tag: noindex, follow
+/jessie/*
+  X-Robots-Tag: noindex, follow

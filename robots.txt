@@ -1,0 +1,8 @@
+# 전시 안내 메인만 검색에 나오게 한다
+User-agent: *
+Allow: /
+Disallow: /docent/
+Disallow: /tests/
+Disallow: /docs/
+
+Sitemap: https://a-little-off.pages.dev/sitemap.xml

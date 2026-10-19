@@ -4,13 +4,21 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
     <meta name="color-scheme" content="light only" />
-    <title>조금 이상한 우리들</title>
-    <meta name="description" content="취미로 그림을 배우는 스무 명이 모여 만든 단체전. 2026.11.12 – 11.17, 홍대 피시스 아카이브" />
+    <title>조금 이상한 우리들 · 이즈드로잉 단체전 | 홍대 피시스 아카이브</title>
+    <meta
+      name="description"
+      content="이즈드로잉 취미미술학원 스무 명이 그린 단체전 〈조금 이상한 우리들〉. 2026년 11월 12일(목)부터 17일(화)까지 홍대 피시스 아카이브(서울 마포구 신촌로 48)에서 열립니다. 관람 예약과 작가에게 쪽지 남기기."
+    />
+    <!-- 검색: 대표 주소는 메인 한 곳. 작가 페이지(/jessie…)는 _headers 에서 검색 제외 -->
+    <link rel="canonical" href="https://a-little-off.pages.dev/" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="preload" as="image" href="/assets/img/poster-hero.jpg" fetchpriority="high" />
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="조금 이상한 우리들" />
+    <meta property="og:locale" content="ko_KR" />
     <meta property="og:url" content="https://a-little-off.pages.dev/" />
     <meta property="og:title" content="조금 이상한 우리들 · Everyone Is a Little off" />
     <meta property="og:description" content="취미로 그림을 배우는 스무 명이 모여 만든 단체전. 2026.11.12 – 11.17, 홍대 피시스 아카이브" />
@@ -20,6 +28,47 @@
     <meta property="og:image:alt" content="붉은 튤립 사이에 흰 튤립 한 송이가 핀 전시 포스터와 전시 제목" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content="https://a-little-off.pages.dev/og-image.jpg" />
+    <!-- 검색 결과에 전시 정보(기간 · 장소 · 입장료)를 보여 주기 위한 구조화 데이터 -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "ExhibitionEvent",
+        "name": "조금 이상한 우리들 (Everyone Is a Little off)",
+        "description": "이즈드로잉 취미미술학원 수강생 스무 명이 참여한 단체전",
+        "startDate": "2026-11-12T13:00:00+09:00",
+        "endDate": "2026-11-17T20:00:00+09:00",
+        "eventStatus": "https://schema.org/EventScheduled",
+        "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+        "inLanguage": "ko",
+        "url": "https://a-little-off.pages.dev/",
+        "image": ["https://a-little-off.pages.dev/og-image.jpg"],
+        "location": {
+          "@type": "Place",
+          "name": "피시스 아카이브 (Pieces Archive)",
+          "url": "https://www.pieces-archive.com/",
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "신촌로 48",
+            "addressLocality": "마포구",
+            "addressRegion": "서울특별시",
+            "addressCountry": "KR"
+          }
+        },
+        "offers": {
+          "@type": "Offer",
+          "price": "5000",
+          "priceCurrency": "KRW",
+          "availability": "https://schema.org/InStock",
+          "url": "https://a-little-off.pages.dev/",
+          "validFrom": "2026-10-01T00:00:00+09:00"
+        },
+        "organizer": {
+          "@type": "Organization",
+          "name": "이즈드로잉 취미미술학원",
+          "url": "https://www.instagram.com/izdrawing.studio/"
+        }
+      }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link

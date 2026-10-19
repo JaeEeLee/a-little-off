@@ -46,6 +46,7 @@ works/<작가>/            작품 사진 (NN.jpg 원본, NN-s.jpg 목록용)
 functions/              Pages Functions
 _headers                캐시 규칙
 _redirects              배포할 필요 없는 문서 · 테스트 폴더를 첫 화면으로 돌림
+robots.txt, sitemap.xml 검색 엔진 안내
 tests/                  테스트 (배포에 영향 없음)
 docs/                   문서
 ```
@@ -169,6 +170,14 @@ Cloudflare Pages는 `404.html`이 없으면 없는 주소에 `index.html`을 내
 - HTML · CSS · JS는 Pages 기본값(매번 확인)이라 고친 내용이 바로 반영됩니다.
 - 표지 포스터는 `<link rel="preload" fetchpriority="high">`, 작품 사진은 `loading="lazy"`, 뷰어 원본은 지금 사진과 양옆만 받음.
 - 글꼴 크기는 기기 설정과 상관없이 고정(`html { font-size: 16px; text-size-adjust: 100% }`).
+
+## 7-1. 검색 노출 (SEO)
+
+- 검색에 나오는 주소는 메인(`/`) 하나입니다. `<link rel="canonical">`, `robots.txt`, `sitemap.xml`이 모두 메인을 가리킵니다.
+- 작가 개인 페이지(`/jessie`, `/jessie/visit`)는 지인에게 보내는 초대 링크라 `_headers`의 `X-Robots-Tag: noindex`와 페이지 안 `<meta name="robots">`로 검색에서 뺍니다. `/docent`는 잠금 함수가 `noindex`를 붙입니다.
+- `<script type="application/ld+json">`에 schema.org `ExhibitionEvent`(기간 · 장소 · 입장료 · 주최)를 적어, 검색 결과에 전시 일정이 함께 보일 수 있게 합니다.
+- 링크 미리보기: Open Graph(`og:*`), Twitter 카드, 1200×630 `og-image.jpg`.
+- 검색 엔진 등록(구글 서치 콘솔, 네이버 서치어드바이저)은 소유 확인이 필요해 각 서비스에서 직접 합니다. 확인용 `<meta>` 태그나 HTML 파일을 받으면 `index.html` 머리나 루트에 넣습니다.
 
 ## 8. 접근성
 

@@ -50,6 +50,9 @@
   }
   if (PAGE_ARTIST) {
     document.title = artistLabel(PAGE_ARTIST) + (IS_VISIT ? ' · 관람 예약' : '') + ' · 조금 이상한 우리들';
+    // 작가 개인 페이지는 검색에 나오지 않게 한다 (_headers 의 X-Robots-Tag 와 같은 뜻을 페이지에도 적어 둔다)
+    var robots = document.querySelector('meta[name="robots"]');
+    if (robots) robots.setAttribute('content', 'noindex, follow');
     var workSec = document.getElementById('workSection');
     if (workSec) workSec.hidden = IS_VISIT; // 예약 페이지에서는 그림 카드를 빼 둔다
     document.documentElement.classList.add('artist-page');
