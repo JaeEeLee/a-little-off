@@ -800,6 +800,7 @@ html.visit-loading *, html.visit-loading *::before, html.visit-loading *::after{
 }
 .board-link svg{ width:14px; height:14px }
 .board-link{ white-space:nowrap }
+.visit-stay{ font-weight:600; color: var(--accent) }
 /* 휴대폰 폭에서는 영문 라벨을 빼서 링크가 제목과 한 줄에 들어가게 */
 @media (max-width: 420px){ .visit-page #boardSection .section-head .en{ display:none } }
 .board-link:hover{ background: rgba(30,86,184,.06) }
@@ -1533,7 +1534,7 @@ try{
       <h2>관람 예약</h2>
       <span class="en">RESERVATION</span>
     </div>
-    <p class="note">언제 오실지 남겨 주시면 미리 기다리고 있을게요.<br>예약하지 않아도 관람할 수 있습니다.</p>
+    <p class="note" id="visitLead">언제 오실지 남겨 주시면 미리 기다리고 있을게요.<br>예약하지 않아도 관람할 수 있습니다.</p>
 
     <div id="visitFormWrap">
       <form class="note-form" id="visitForm" novalidate>
@@ -1946,6 +1947,16 @@ try{
       legend.innerHTML = '<i class="cal-dot" aria-hidden="true"></i>' + artistLabel(PAGE_ARTIST) + '가 하루 종일 전시장에 있는 날';
       box.appendChild(legend);
       return box;
+    }
+
+    /* 예약 안내 문구 끝에 작가가 상주하는 날을 덧붙인다 */
+    var visitLead = document.getElementById('visitLead');
+    if(visitLead){
+      var stay = document.createElement('strong');
+      stay.className = 'visit-stay';
+      stay.textContent = '저는 토요일날 상주합니다!';
+      visitLead.appendChild(document.createElement('br'));
+      visitLead.appendChild(stay);
     }
 
     /* 쪽지: 게시판은 빼고 쓰는 칸만. 제목도 그에 맞게 */
