@@ -817,6 +817,18 @@ html.visit-loading *, html.visit-loading *::before, html.visit-loading *::after{
 .board-link svg{ width:14px; height:14px }
 .board-link{ white-space:nowrap }
 .visit-stay{ font-weight:600; color: var(--accent) }
+/* 전시 안내 장소 줄 아래: 지도 아이콘(왼쪽) + 예약으로 넘기라는 안내(오른쪽) */
+.map-row{ grid-column: 1 / -1; display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:12px }
+.map-links.icon-only{ display:flex !important; flex-wrap:nowrap; flex:0 0 auto; gap:6px; margin:0; grid-column:auto }
+.map-links.icon-only a{ width:32px; height:32px; padding:0 !important; justify-content:center; border-radius:9px }
+.map-links.icon-only .map-ico{ width:20px; height:20px; font-size:.74rem }
+.to-visit{
+  display:inline-flex; align-items:center; gap:2px; text-align:right;
+  border:0; background:none; padding:4px 0; cursor:pointer;
+  font: inherit; font-size:.78rem; line-height:1.4; color: var(--spark); word-break:keep-all;
+}
+.to-visit svg{ width:15px; height:15px; flex:0 0 auto; animation: hintFloat 2s ease-in-out infinite }
+@media (prefers-reduced-motion: reduce){ .to-visit svg{ animation:none } }
 /* 예약 페이지 카드의 위아래 여백을 맞춘다.
    - 빈 안내 줄(오류 메시지 자리)이 버튼 아래 여백을 늘리고 있어서, 비어 있을 때는 자리를 차지하지 않게
    - 위: 카드 윗면 ~ 제목 글자 = 26px + 제목 줄 여유 5px ≈ 31px, 아래도 마지막 요소 ~ 카드 아랫면 31px */
@@ -1923,7 +1935,25 @@ try{
         var link = placeDd.querySelector('.place-link');
         if(copyBtn && link) link.parentNode.insertBefore(copyBtn, link.nextSibling);
         var maps = addrRow.querySelector('.map-links');
-        if(maps) placeRow.appendChild(maps);
+        if(maps){
+          // 지도 앱은 글자 없이 아이콘만 (이름은 화면 읽기 프로그램용으로 남아 있다)
+          maps.classList.add('icon-only');
+          Array.prototype.forEach.call(maps.querySelectorAll('a'), function(a){
+            Array.prototype.slice.call(a.childNodes).forEach(function(n){ if(n.nodeType === 3) n.remove(); });
+            a.title = a.getAttribute('aria-label') || '';
+          });
+          // 비워진 자리에: 다음 장면(예약)으로 넘기라는 안내
+          var toVisit = document.createElement('button');
+          toVisit.type = 'button';
+          toVisit.className = 'to-visit';
+          toVisit.innerHTML = '오실 날이 정해졌다면, 넘겨서 예약해 주세요<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+          toVisit.addEventListener('click', function(){ goToVisit(); });
+          var mapRow = document.createElement('div');
+          mapRow.className = 'map-row';
+          mapRow.appendChild(maps);
+          mapRow.appendChild(toVisit);
+          placeRow.appendChild(mapRow);
+        }
         addrRow.remove();
       }
     }
@@ -2106,6 +2136,7 @@ try{
       if(i !== 0 && prev === 0) root.classList.add('intro-done');
     }
     function next(){ go(current + 1); }
+    function goToVisit(){ var k = scenes.indexOf(document.getElementById('visitSection').parentNode); if(k > -1) go(k, true); }
     function prev(){ go(current - 1); }
 
     function atTop(sc){ return sc.scrollTop <= 1; }
