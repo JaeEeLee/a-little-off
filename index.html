@@ -629,6 +629,18 @@ dd .sub{
   border:0; background: rgba(255,255,255,.9); font-size:1rem; cursor:pointer;
 }
 
+/* 관람 예약 카드: 포스터의 튤립 빨강 → 코발트 하늘로 이어지는 1px 그라데이션 테두리 */
+#visitSection{ position:relative }
+#visitSection::before{
+  content:""; position:absolute; inset:0; pointer-events:none;
+  border-radius: inherit;
+  padding:1px;                          /* 이 두께만큼만 남기고 안쪽은 지운다 */
+  background: linear-gradient(135deg, var(--ember) 0%, #D9708A 45%, var(--accent) 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+
 /* ── 관람 예약 페이지 (/jessie/visit) ── */
 /* 포스터와 겹친 그림을 기존의 절반 크기로 (겹친 그림은 포스터 폭의 50%라 함께 줄어든다) */
 .visit-page .frame.has-work{
