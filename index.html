@@ -681,11 +681,11 @@ html.visit-page, html.visit-page body{ height:100%; overflow:hidden; overscroll-
   box-sizing:border-box;
   overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling: touch;
   opacity:0; visibility:hidden;
-  transition: opacity .8s ease, visibility 0s linear .8s;
+  transition: opacity var(--scene-fade, 450ms) ease, visibility 0s linear var(--scene-fade, 450ms);
 }
 .scene.is-active{
   opacity:1; visibility:visible; z-index:6;
-  transition: opacity .8s ease, visibility 0s;
+  transition: opacity var(--scene-fade, 450ms) ease, visibility 0s;
 }
 /* 세로 가운데 정렬. 장면이 화면보다 길어지면 위가 잘리지 않고 위에서부터 스크롤된다 */
 .scene > :first-child{ margin-top:auto !important }
@@ -713,6 +713,8 @@ html.visit-loading *, html.visit-loading *::before, html.visit-loading *::after{
   border:0; background:none; padding:6px 10px; cursor:pointer;
   font: inherit; font-size:.74rem; letter-spacing:.04em; color: var(--spark);
 }
+/* 첫 진입 때 잠깐 보이는 표지에서는 넘기기 안내를 숨긴다 (다시 표지로 돌아오면 보인다) */
+.visit-page:not(.intro-done) .scene-hint{ visibility:hidden }
 /* 촘촘히 겹친 셰브론 3개: 덩어리째 아래로 둥둥 떠내려가고, 위에서부터 차례로 밝아진다 */
 .chevrons{ display:flex; flex-direction:column; align-items:center; margin-top:4px; animation: hintFloat 2s ease-in-out infinite }
 .chevrons svg{ width:22px; height:11px; margin-top:-4px; overflow:visible }
@@ -2016,7 +2018,8 @@ try{
        장면이 화면보다 길면 그 안에서 먼저 스크롤되고, 끝에 닿은 뒤 한 번 더 밀어야 넘어간다.
        첫 진입 때만 표지가 잠깐 보였다가 저절로 전시 안내로 넘어간다 */
     var root = document.documentElement;
-    var FADE = 800;
+    var FADE = 450;                    // 장면이 바뀌는 페이드 시간 (CSS --scene-fade 와 같은 값)
+    root.style.setProperty('--scene-fade', FADE + 'ms');
     var AUTO_HIDE = 2400 - FADE;      // 표지가 나타나 머무는 시간. 사라지는 FADE 까지 합쳐 2.4초 (사진·글꼴을 다 받은 뒤부터)
     var current = -1, busyUntil = 0, autoTimer = null, loading = true;
 
@@ -2040,7 +2043,7 @@ try{
       if(i === current) return;
       var now = Date.now();
       if(!force && now < busyUntil) return;          // 바뀌는 도중의 관성 스크롤로 여러 장 건너뛰지 않게
-      busyUntil = now + FADE + 250;
+      busyUntil = now + FADE + 150;
       clearTimeout(autoTimer);
       var prev = current;
       current = i;
@@ -2060,6 +2063,8 @@ try{
       });
       nav.classList.toggle('on-cover', i === 0);
       root.classList.toggle('cover-on', i === 0);
+      // 첫 진입의 표지에서는 '아래로 넘겨 보세요'를 숨겨 두고, 한 번 넘어간 뒤부터 보여 준다
+      if(i !== 0 && prev === 0) root.classList.add('intro-done');
     }
     function next(){ go(current + 1); }
     function prev(){ go(current - 1); }
