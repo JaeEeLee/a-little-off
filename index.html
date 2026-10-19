@@ -823,11 +823,11 @@ html.visit-loading *, html.visit-loading *::before, html.visit-loading *::after{
 .map-links.icon-only a{ width:32px; height:32px; padding:0 !important; justify-content:center; border-radius:9px }
 .map-links.icon-only .map-ico{ width:20px; height:20px; font-size:.74rem }
 .to-visit{
-  display:inline-flex; align-items:center; gap:2px; text-align:right;
+  display:inline-flex; align-items:flex-end; gap:2px; text-align:right;   /* 화살표는 둘째 줄 끝에 */
   border:0; background:none; padding:4px 0; cursor:pointer;
   font: inherit; font-size:.78rem; line-height:1.4; color: var(--spark); word-break:keep-all;
 }
-.to-visit svg{ width:15px; height:15px; flex:0 0 auto; animation: hintFloat 2s ease-in-out infinite }
+.to-visit svg{ width:15px; height:15px; flex:0 0 auto; margin-bottom:3px; animation: hintFloat 2s ease-in-out infinite }
 @media (prefers-reduced-motion: reduce){ .to-visit svg{ animation:none } }
 /* 예약 페이지 카드의 위아래 여백을 맞춘다.
    - 빈 안내 줄(오류 메시지 자리)이 버튼 아래 여백을 늘리고 있어서, 비어 있을 때는 자리를 차지하지 않게
@@ -1946,7 +1946,7 @@ try{
           var toVisit = document.createElement('button');
           toVisit.type = 'button';
           toVisit.className = 'to-visit';
-          toVisit.innerHTML = '오실 날이 정해졌다면, 넘겨서 예약해 주세요<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+          toVisit.innerHTML = '<span>오실 날이 정해졌다면,<br>넘겨서 예약해 주세요</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
           toVisit.addEventListener('click', function(){ goToVisit(); });
           var mapRow = document.createElement('div');
           mapRow.className = 'map-row';
