@@ -629,6 +629,11 @@ dd .sub{
   border:0; background: rgba(255,255,255,.9); font-size:1rem; cursor:pointer;
 }
 
+/* 예약 페이지는 포스터가 작으니 전시 제목도 한 단계 작게 (원래 2.2–3.5rem) */
+.visit-page h1{ font-size: clamp(1.8rem, 7.8vw, 2.8rem); margin-bottom:12px }
+/* 인사말 카드: 질문(.q)만 한 줄로 띄우고, 본문 속 굵은 글씨 뒤에는 여백을 두지 않는다 (쉼표가 떨어지지 않게) */
+#helloSection .work-notice strong{ margin-right:0 }
+#helloSection .work-notice .q{ display:block; margin:0 0 4px }
 /* 관람 예약 카드: 포스터의 튤립 빨강 → 코발트 하늘로 이어지는 1px 그라데이션 테두리 */
 #visitSection{ position:relative }
 #visitSection::before{
@@ -1592,6 +1597,11 @@ try{
       var helloSec = document.getElementById('helloSection');
       if(IS_VISIT && helloSec){
         helloSec.appendChild(hello);
+        // 예약 페이지에는 그림이 없으니 '그림을 걸어 두었다'는 말은 빼고, 짧게 줄인 인사말을 쓴다
+        var hp = hello.querySelectorAll('p');
+        if(hp[0]) hp[0].textContent = '취미 미술 학원에서 그려 온 그림으로 단체전을 열게 됐어요. 꼭 와야 한다는 부담은 갖지 않아도 괜찮아요. 제가 전시를 한다는 걸 알아 주는 것만으로도 충분히 기뻐요.';
+        if(hp[1]) hp[1].innerHTML = '<strong class="q">언제 가면 만날 수 있나요?</strong> <em>11월 14일 토요일</em>에는 하루 종일 있어요. 다른 날도 퇴근하고 언제든 달려갈게요.';
+        if(hp[2]) hp[2].innerHTML = '<strong class="q">전시장에서는 또 뭘 즐길 수 있나요?</strong> <strong>스무 명의 그림</strong>과 QR로 듣는 <strong>도슨트</strong>, <strong>굿즈</strong>와 <strong>포토 스팟</strong>, <strong>웰컴 드링크</strong>까지 준비돼 있어요!';
         helloSec.hidden = false;
       } else {
         titleCopy.appendChild(hello);
