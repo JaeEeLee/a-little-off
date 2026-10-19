@@ -682,8 +682,26 @@ html.visit-page.is-typing{ scroll-snap-type: none }
 }
 .visit-page .scene > section.card{ margin:0 }
 .visit-page .scene > section.card + section.card{ margin-top: 18px }
-/* ① 표지: 맨 위 제목 줄, 가운데 포스터, 맨 아래 안내 */
-.scene-cover{ padding-block: 0 }
+/* ① 표지: 스크롤 흐름 밖에서 화면 전체를 덮는 덮개. 전시 안내와는 페이드로만 오간다 */
+.scene-cover{
+  padding-block: 0;
+  position:fixed; inset:0; z-index:30;
+  padding-inline: 20px; max-width: 760px; margin-inline:auto;
+  opacity:0; visibility:hidden; pointer-events:none;
+  scroll-snap-align: none;
+  transition: opacity .8s ease, visibility 0s linear .8s;
+}
+.cover-on .scene-cover{
+  opacity:1; visibility:visible; pointer-events:auto;
+  transition: opacity .8s ease, visibility 0s;
+}
+/* 표지가 덮여 있는 동안 나머지 장면은 흐려 두었다가, 걷힐 때 함께 스르륵 드러난다 */
+.visit-page .scene:not(.scene-cover){ transition: opacity .8s ease .15s }
+.cover-on .scene:not(.scene-cover){ opacity:0; transition: opacity .5s ease }
+html.cover-on{ overflow:hidden }
+@media (prefers-reduced-motion: reduce){
+  .scene-cover, .cover-on .scene-cover, .visit-page .scene:not(.scene-cover){ transition:none }
+}
 .scene-cover .hero{
   flex:1; display:flex; flex-direction:column; padding: 22px 0 18px;
 }
@@ -1983,7 +2001,7 @@ try{
       + '<svg viewBox="0 0 24 12"><path d="M5 2l7 7 7-7"/></svg>'
       + '<svg viewBox="0 0 24 12"><path d="M5 2l7 7 7-7"/></svg>'
       + '</span>';
-    hint.addEventListener('click', function(){ if(scenes[1]) scenes[1].scrollIntoView({ behavior: 'smooth' }); });
+    hint.addEventListener('click', function(){ hideCover(); });
     if(hero) hero.appendChild(hint);
 
     /* 오른쪽 점: 지금 몇 번째 장면인지. 누르면 그 장면으로 */
@@ -1994,7 +2012,11 @@ try{
       var b = document.createElement('button');
       b.type = 'button';
       b.setAttribute('aria-label', (i + 1) + '. ' + sc.getAttribute('aria-label'));
-      b.addEventListener('click', function(){ sc.scrollIntoView({ behavior: 'smooth' }); });
+      b.addEventListener('click', function(){
+        if(i === 0){ showCover(); return; }
+        if(coverOn) hideCover();
+        sc.scrollIntoView({ behavior: coverOn ? 'auto' : 'smooth' });
+      });
       nav.appendChild(b);
       return b;
     });
@@ -2006,16 +2028,72 @@ try{
       });
       nav.classList.toggle('on-cover', i === 0);
     }
-    mark(0);
+
+    /* ── 표지는 스크롤 흐름 밖의 덮개 ──
+       처음 들어오면 표지가 스르륵 나타났다가 잠시 뒤 스르륵 사라지며 전시 안내가 드러난다.
+       그 뒤로는 맨 위에서 위로 한 번 더 올리면 표지가 다시 스르륵 덮이고, 내리거나 누르면 걷힌다.
+       (표지와 전시 안내 사이는 스크롤로 이어지지 않고 페이드로만 오간다) */
+    var cover = scenes[0];
+    var root = document.documentElement;
+    var coverOn = false, autoTimer = null;
+    var AUTO_HIDE = 2600;              // 첫 진입 때 표지가 머무는 시간 (나타나는 동작 포함)
+    function showCover(){
+      if(coverOn) return;
+      coverOn = true;
+      window.scrollTo(0, 0);
+      cover.removeAttribute('inert');
+      cover.setAttribute('aria-hidden', 'false');
+      root.classList.add('cover-on');
+      mark(0);
+    }
+    function hideCover(){
+      clearTimeout(autoTimer);
+      if(!coverOn) return;
+      coverOn = false;
+      root.classList.remove('cover-on');
+      cover.setAttribute('inert', '');
+      cover.setAttribute('aria-hidden', 'true');
+      mark(1);
+    }
+    // 첫 진입: 바로 덮고, 잠시 뒤 자동으로 걷는다
+    showCover();
+    autoTimer = setTimeout(hideCover, AUTO_HIDE);
+
+    // 표지가 덮여 있을 때: 내리는 스크롤·스와이프·키·탭이면 걷는다
+    // 표지가 걷혀 있고 맨 위일 때: 위로 올리는 스크롤·스와이프면 다시 덮는다
+    window.addEventListener('wheel', function(e){
+      if(coverOn){ e.preventDefault(); if(e.deltaY > 0) hideCover(); return; }
+      if(e.deltaY < -8 && window.scrollY <= 0) showCover();
+    }, { passive: false });
+    var touchY = null;
+    window.addEventListener('touchstart', function(e){ touchY = e.touches[0].clientY; }, { passive: true });
+    window.addEventListener('touchmove', function(e){
+      if(touchY === null) return;
+      var dy = e.touches[0].clientY - touchY;     // + : 손가락이 아래로 (= 위로 올리는 스크롤)
+      if(coverOn){
+        e.preventDefault();
+        if(dy < -30){ touchY = null; hideCover(); }
+        return;
+      }
+      if(dy > 60 && window.scrollY <= 0 && !root.classList.contains('is-typing')){ touchY = null; showCover(); }
+    }, { passive: false });
+    window.addEventListener('touchend', function(){ touchY = null; }, { passive: true });
+    document.addEventListener('keydown', function(e){
+      if(coverOn && /^(ArrowDown|PageDown|Space| |Enter)$/.test(e.key)){ e.preventDefault(); hideCover(); }
+      else if(!coverOn && /^(ArrowUp|PageUp)$/.test(e.key) && window.scrollY <= 0) showCover();
+    });
+    cover.addEventListener('click', function(e){ if(!e.target.closest('a')) hideCover(); });
+
     if('IntersectionObserver' in window){
       var io = new IntersectionObserver(function(entries){
+        if(coverOn) return;
         entries.forEach(function(e){ if(e.isIntersecting) mark(scenes.indexOf(e.target)); });
       }, { rootMargin: '-45% 0px -45% 0px' });      // 화면 한가운데를 지나는 장면이 '지금'
-      scenes.forEach(function(sc){ io.observe(sc); });
+      scenes.slice(1).forEach(function(sc){ io.observe(sc); });
     }
 
     /* 글을 입력하는 동안은 스냅을 끈다 (키보드가 올라오며 화면이 바뀔 때 엉뚱한 곳으로 끌려가지 않게) */
-    var root = document.documentElement, typingOff = null;
+    var typingOff = null;
     document.addEventListener('focusin', function(e){
       if(/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)){ clearTimeout(typingOff); root.classList.add('is-typing'); }
     });
