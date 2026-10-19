@@ -656,12 +656,15 @@ dd .sub{
   margin-bottom: 14px;
 }
 /* 초대 문구 · 디데이 한 줄 */
-.visit-top{ display:flex; justify-content:center; align-items:baseline; gap:12px; margin:0 0 16px; flex-wrap:wrap }
-.visit-top .invite-line, .visit-top .dday-text{ margin:0 }
-.visit-top .dday-text, .visit-top .dday-text .dday-num{ font-size:1.2rem }
+.visit-top{ display:flex; justify-content:space-between; align-items:baseline; gap:8px 12px; margin:0 0 22px; flex-wrap:wrap }
+.visit-top h1{ margin:0; text-align:left; white-space:nowrap; font-size: clamp(1.15rem, 5.3vw, 2rem) }   /* 초대 문구와 한 줄에 들어가도록 */
+.visit-top .invite-line{ margin:0 0 0 auto; text-align:right; white-space:nowrap; font-size:.78rem }
+/* 전시 안내 카드 제목줄 오른쪽 끝의 디데이 */
+.section-head .info-dday{ margin:0 0 0 auto; font-size:1.05rem; line-height:1 }
+.section-head .info-dday .dday-num{ font-size:1.05rem; color: var(--ember); text-shadow:none }
 .visit-page .hero{ padding-top: 22px }
 .visit-page .hero .title-block{ margin-top: 6px; padding-top: 18px; padding-bottom: 6px }
-.visit-page #infoSection{ margin-top: 8px }   /* 'Everyone Is a Little off' 글자 아래 ~ 카드 윗면 = 32px */
+.visit-page #infoSection{ margin-top: 43px }   /* 겹친 작품 그림 아래 ~ 카드 윗면 ≈ 32px */
 .visit-page .frame-work{ border-width:3px }
 /* 약한 스냅: 카드 윗부분 근처에서 스크롤을 멈추면 그 카드 시작점에 살짝 맞춰 준다.
    proximity 라서 스크롤 중간에 걸리거나 멀리 떨어진 곳에서 끌려가지 않는다.
@@ -1613,13 +1616,22 @@ try{
       ddayText.className = 'dday-text hero-el';
       ddayText.appendChild(ddayNum);
       invite.parentNode.insertBefore(ddayText, invite.nextSibling);
-      // 예약 페이지: 초대 문구와 디데이를 위아래가 아니라 한 줄에 나란히 두어 첫 화면을 아낀다
+      /* 예약 페이지: 맨 위 한 줄에 전시 제목(왼쪽)과 초대 문구(오른쪽).
+         영문 제목 덩어리는 빼고, 디데이는 전시 안내 카드 제목줄 오른쪽으로 옮긴다 */
       if(IS_VISIT){
         var topRow = document.createElement('div');
         topRow.className = 'visit-top hero-el';
         invite.parentNode.insertBefore(topRow, invite);
+        var h1 = document.querySelector('.hero h1');
+        if(h1) topRow.appendChild(h1);
         topRow.appendChild(invite);
-        topRow.appendChild(ddayText);
+        var tb = document.querySelector('.hero .title-block');
+        if(tb) tb.hidden = true;
+        var infoHead = document.querySelector('#infoSection .section-head');
+        if(infoHead){
+          ddayText.className = 'dday-text info-dday';
+          infoHead.appendChild(ddayText);
+        }
       }
     }
 
