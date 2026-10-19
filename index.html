@@ -695,6 +695,25 @@ html.visit-page, html.visit-page body{ height:100%; overflow:hidden; overscroll-
 /* 받아지는 중: 뒷배경만. 모든 애니메이션은 0초 지점에 멈춰 둔다 */
 html.visit-loading .wrap, html.visit-loading .scene-dots{ visibility:hidden }
 html.visit-loading *, html.visit-loading *::before, html.visit-loading *::after{ animation-play-state: paused !important }
+/* 받아지는 동안: 표지 진행 막대와 같은 자리에 '불러오는 중' 안내와 흐르는 1px 막대.
+   다 받아지면 이 자리에 '잠시 뒤 전시 안내로 넘어가요'와 차오르는 막대가 이어서 나온다 */
+html.visit-loading body::before{
+  content:"포스터를 불러오는 중이에요"; position:fixed; left:0; right:0; bottom:66px; z-index:40;
+  text-align:center; font-size:.78rem; letter-spacing:.02em; color:#fff;
+  text-shadow: 0 1px 8px rgba(80,30,30,.35);
+}
+html.visit-loading body::after{
+  content:""; position:fixed; left:50%; bottom:54px; z-index:40; transform: translateX(-50%);
+  width: min(max(50vw, 280px), calc(100% - 40px)); height:1px; border-radius:1px;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,0), #fff 50%, rgba(255,255,255,0)) no-repeat,
+    rgba(255,255,255,.3);
+  background-size: 40% 100%, 100% 100%;
+  animation: loaderSlide 1.2s ease-in-out infinite;
+  animation-play-state: running !important;
+}
+@keyframes loaderSlide{ from{ background-position: -70% 0, 0 0 } to{ background-position: 170% 0, 0 0 } }
+@media (prefers-reduced-motion: reduce){ html.visit-loading body::after{ animation:none; background: rgba(255,255,255,.6) } }
 @media (prefers-reduced-motion: reduce){
   .scene, .scene.is-active{ transition:none }
 }
@@ -2284,7 +2303,8 @@ try{
     // 한 번 넘긴 뒤에는 휠 신호가 잠깐(220ms) 끊길 때까지 다음 넘기기를 받지 않는다
     var wheelLocked = false, wheelQuiet = null;
     window.addEventListener('wheel', function(e){
-      if(loading || typing()) return;
+      if(loading){ if(e.deltaY > 4){ e.preventDefault(); skipIntro(); } return; }   // 받는 중이라도 내리면 바로 전시 안내로
+      if(typing()) return;
       var sc = scenes[current];
       if(!sc) return;
       var down = e.deltaY > 0 && atBottom(sc), up = e.deltaY < 0 && atTop(sc);
@@ -2306,8 +2326,9 @@ try{
       startBottom = sc ? atBottom(sc) : true;
     }, { passive: true });
     window.addEventListener('touchmove', function(e){
-      if(t0 === null || loading || typing()) return;
+      if(t0 === null || typing()) return;
       var dy = e.touches[0].clientY - t0;            // - : 위로 밀기(= 다음), + : 아래로 밀기(= 이전)
+      if(loading){ e.preventDefault(); if(dy < -45){ t0 = null; skipIntro(); } return; }
       // 끝에 닿은 쪽으로 더 밀면 화면이 고무줄처럼 끌려가지 않게 막는다
       if((dy < 0 && startBottom) || (dy > 0 && startTop)) e.preventDefault();
       if(dy < -45 && startBottom){ t0 = null; next(); }
@@ -2317,7 +2338,8 @@ try{
 
     // 키보드
     document.addEventListener('keydown', function(e){
-      if(loading || typing() || e.altKey || e.ctrlKey || e.metaKey) return;
+      if(typing() || e.altKey || e.ctrlKey || e.metaKey) return;
+      if(loading){ if(/^(ArrowDown|PageDown| |Enter)$/.test(e.key)){ e.preventDefault(); skipIntro(); } return; }
       var sc = scenes[current];
       if(/^(ArrowDown|PageDown| )$/.test(e.key) && (!sc || atBottom(sc))){ e.preventDefault(); next(); }
       else if(/^(ArrowUp|PageUp)$/.test(e.key) && (!sc || atTop(sc))){ e.preventDefault(); prev(); }
@@ -2336,7 +2358,8 @@ try{
     });
 
     /* 첫 진입: 사진·글꼴이 다 받아질 때까지는 뒷배경만. 준비되면 표지가 스르륵 나타나고,
-       AUTO_HIDE 뒤 저절로 전시 안내로 넘어간다. 너무 오래 걸리면(6초) 기다리지 않고 시작한다 */
+       AUTO_HIDE 뒤 저절로 전시 안내로 넘어간다. 받는 동안에는 '불러오는 중' 막대가 흐른다.
+       네트워크가 끊긴 듯 아주 오래 걸리면(20초) 그때는 기다리지 않고 시작한다 */
     function whenImage(src){
       return new Promise(function(res){
         var im = new Image();
@@ -2353,6 +2376,15 @@ try{
     if(m) waits.push(whenImage(m[1]));
     if(document.fonts && document.fonts.ready) waits.push(document.fonts.ready);
     var started = false;
+    /* 받는 중에 사용자가 먼저 내리면: 표지 소개는 건너뛰고 곧장 전시 안내로 (사진은 뒤에서 계속 받는다) */
+    function skipIntro(){
+      if(started) return;
+      started = true;
+      loading = false;
+      root.classList.remove('visit-loading');
+      root.classList.add('intro-done');
+      go(1, true);
+    }
     function start(){
       if(started) return;
       started = true;
@@ -2367,7 +2399,7 @@ try{
       }); });
     }
     Promise.all(waits).then(start, start);
-    setTimeout(start, 6000);
+    setTimeout(start, 20000);
 
     /* 글을 입력하는 동안은 넘기기를 멈춘다 (키보드가 올라오며 화면이 바뀔 때 엉뚱한 장면으로 넘어가지 않게) */
     var typingOff = null;
