@@ -696,9 +696,9 @@ html.visit-page.is-typing{ scroll-snap-type: none }
   transition: opacity .8s ease, visibility 0s;
 }
 /* 표지가 덮여 있는 동안 나머지 장면은 흐려 두었다가, 걷힐 때 함께 스르륵 드러난다 */
-.visit-page .scene:not(.scene-cover){ transition: opacity .8s ease .15s }
+.visit-page .scene:not(.scene-cover){ transition: opacity .8s ease }
 .cover-on .scene:not(.scene-cover){ opacity:0; transition: opacity .5s ease }
-html.cover-on{ overflow:hidden }
+html.cover-on, html.cover-leaving{ overflow:hidden }
 @media (prefers-reduced-motion: reduce){
   .scene-cover, .cover-on .scene-cover, .visit-page .scene:not(.scene-cover){ transition:none }
 }
@@ -2036,7 +2036,10 @@ try{
     var cover = scenes[0];
     var root = document.documentElement;
     var coverOn = false, autoTimer = null;
-    var AUTO_HIDE = 2600;              // 첫 진입 때 표지가 머무는 시간 (나타나는 동작 포함)
+    /* 첫 진입: 진입 → 표지가 나타나 머무름(AUTO_HIDE) → 스르륵 사라짐(FADE) → 스크롤 가능.
+       AUTO_HIDE + FADE = 2.8초. 사라지는 동안에도 스크롤을 잠가 둔다 */
+    var FADE = 800;
+    var AUTO_HIDE = 2800 - FADE;
     function showCover(){
       if(coverOn) return;
       coverOn = true;
@@ -2050,7 +2053,9 @@ try{
       clearTimeout(autoTimer);
       if(!coverOn) return;
       coverOn = false;
+      root.classList.add('cover-leaving');
       root.classList.remove('cover-on');
+      setTimeout(function(){ if(!coverOn) root.classList.remove('cover-leaving'); }, FADE);
       cover.setAttribute('inert', '');
       cover.setAttribute('aria-hidden', 'true');
       mark(1);
