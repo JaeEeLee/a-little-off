@@ -1975,7 +1975,10 @@ try{
         }
         return null;
       };
-      var periodRow = rowBy('전시 기간'), placeRow = rowBy('장소'), addrRow = rowBy('주소');
+      var periodRow = rowBy('전시 기간'), placeRow = rowBy('장소'), addrRow = rowBy('주소'), hoursRow = rowBy('관람 시간');
+      // 관람 시간의 첫날 개관 · 마지막 날 마감 작은 글씨는 뺀다 (예약할 때 날짜 목록에 적혀 있다)
+      var hoursSub = hoursRow && hoursRow.querySelector('dd .sub');
+      if(hoursSub) hoursSub.remove();
       dl.parentNode.insertBefore(buildCalendar(), dl);
       if(periodRow) periodRow.remove();
       if(placeRow && addrRow){
