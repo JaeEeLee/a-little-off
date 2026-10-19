@@ -840,20 +840,17 @@ button.cal-day:focus-visible b{ box-shadow: 0 0 0 2px var(--accent) }
 .party-toggle:hover{ text-decoration: underline; text-underline-offset:3px }
 /* 화면 아래 떠 있는 예약 버튼 */
 .visit-cta{
-  position:fixed; left:50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); z-index:25;
-  transform: translate(-50%, 16px); opacity:0; visibility:hidden; pointer-events:none;
-  padding: 12px 32px; border:2px solid #fff; border-radius:999px; cursor:pointer;   /* 흰 테두리 2px (테두리만큼 안쪽 여백을 줄여 크기는 그대로) */
+  align-self:center; flex:0 0 auto;
+  margin-top:16px !important;                 /* 카드 아랫면과 16px */
+  padding: 12px 32px; border:2px solid #fff; border-radius:999px; cursor:pointer;   /* 흰 테두리 2px */
   font: inherit; font-size:1.06rem; font-weight:700; letter-spacing:-.01em; color:#fff; white-space:nowrap;
   background: linear-gradient(135deg, var(--ember) 0%, #D9708A 45%, var(--accent) 100%) padding-box;
   box-shadow: 0 8px 22px rgba(60,40,90,.28), 0 2px 6px rgba(60,40,90,.18);
   text-shadow: 0 1px 2px rgba(40,20,40,.25);
-  transition: opacity .35s ease, transform .35s ease, visibility 0s linear .35s;
+  transition: transform .2s ease, opacity .2s ease;
 }
-.cta-on .visit-cta{ opacity:1; visibility:visible; pointer-events:auto; transform: translate(-50%, 0); transition: opacity .35s ease, transform .35s ease, visibility 0s }
-.is-typing .visit-cta, .visit-loading .visit-cta{ opacity:0 !important; visibility:hidden !important; pointer-events:none !important }
+.visit-cta:hover{ transform: translateY(-1px); opacity:.95 }
 .visit-cta.is-done{ background: rgba(255,255,255,.95); color: var(--accent); text-shadow:none; box-shadow: 0 6px 18px rgba(60,40,90,.16), inset 0 0 0 1.5px rgba(30,86,184,.35) }
-/* 버튼에 가리지 않도록 장면 아래쪽에 자리를 비워 둔다 */
-.cta-on .scene:not(.scene-cover){ padding-bottom: 80px }
 .note-ask{ font-weight:600; color: var(--accent) }
 .visit-page .scene .note{ word-break:keep-all }   /* 안내 문구가 낱말 중간에서 끊기지 않게 */
 /* 전시 안내 장소 줄 아래: 지도 아이콘(왼쪽) + 예약으로 넘기라는 안내(오른쪽) */
@@ -2194,8 +2191,6 @@ try{
       });
       nav.classList.toggle('on-cover', i === 0);
       root.classList.toggle('cover-on', i === 0);
-      var vs = document.getElementById('visitSection');
-      root.classList.toggle('cta-on', i !== 0 && !(vs && scenes[i].contains(vs)));
       // 첫 진입의 표지에서는 '아래로 넘겨 보세요'를 숨겨 두고, 한 번 넘어간 뒤부터 보여 준다
       if(i !== 0 && prev === 0) root.classList.add('intro-done');
     }
@@ -2250,14 +2245,24 @@ try{
 
     /* 화면 아래에 떠 있는 '관람 예약하기' 버튼: 표지와 예약 장면을 뺀 모든 장면에서.
        예약을 마치면 '예약 완료'로 바뀐다 */
-    var cta = document.createElement('button');
-    cta.type = 'button';
-    cta.className = 'visit-cta';
-    cta.textContent = '관람 예약하기';
-    cta.addEventListener('click', goToVisit);
-    document.body.appendChild(cta);
-    window.addEventListener('visit-done', function(){ cta.textContent = '예약 완료 ✓'; cta.classList.add('is-done'); });
-    window.addEventListener('visit-reset', function(){ cta.textContent = '관람 예약하기'; cta.classList.remove('is-done'); });
+    /* 각 장면의 카드 바로 아래(16px)에 붙여, 카드와 함께 나타나고 사라지게 한다 */
+    var visitSec = document.getElementById('visitSection');
+    var ctas = [];
+    scenes.forEach(function(sc, k){
+      if(k === 0 || (visitSec && sc.contains(visitSec))) return;
+      var cards = sc.querySelectorAll(':scope > section.card');
+      var last = cards[cards.length - 1];
+      if(!last) return;
+      var cta = document.createElement('button');
+      cta.type = 'button';
+      cta.className = 'visit-cta';
+      cta.textContent = '관람 예약하기';
+      cta.addEventListener('click', goToVisit);
+      last.parentNode.insertBefore(cta, last.nextSibling);
+      ctas.push(cta);
+    });
+    window.addEventListener('visit-done', function(){ ctas.forEach(function(c){ c.textContent = '예약 완료 ✓'; c.classList.add('is-done'); }); });
+    window.addEventListener('visit-reset', function(){ ctas.forEach(function(c){ c.textContent = '관람 예약하기'; c.classList.remove('is-done'); }); });
     function prev(){ go(current - 1); }
 
     function atTop(sc){ return sc.scrollTop <= 1; }
