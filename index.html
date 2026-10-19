@@ -691,6 +691,12 @@ html.visit-page, html.visit-page body{ height:100%; overflow:hidden; overscroll-
 .scene > :first-child{ margin-top:auto !important }
 .scene > :last-child{ margin-bottom:auto !important }
 .visit-page .scene > section.card{ margin:0 }
+/* 장면 전환 끊김 방지: 카드의 drop-shadow 필터 두 겹은 페이드되는 동안 매 프레임 다시 그려져
+   크롬에서 프레임이 50~80ms씩 밀렸다. 예약 페이지에서는 같은 느낌의 box-shadow 로 바꾼다 (전환 중 끊김 0) */
+.visit-page .scene section.card{
+  filter:none; background:#fff;
+  box-shadow: 0 6px 14px rgba(48,38,28,.10), 0 18px 36px rgba(48,38,28,.10);
+}
 .visit-page .scene > section.card + section.card{ margin-top: 18px }
 /* 받아지는 중: 뒷배경만. 모든 애니메이션은 0초 지점에 멈춰 둔다 */
 html.visit-loading .wrap, html.visit-loading .scene-dots{ visibility:hidden }
