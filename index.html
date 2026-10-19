@@ -699,6 +699,11 @@ html.visit-page.is-typing{ scroll-snap-type: none }
 .visit-page .scene:not(.scene-cover){ transition: opacity .8s ease }
 .cover-on .scene:not(.scene-cover){ opacity:0; transition: opacity .5s ease }
 html.cover-on, html.cover-leaving{ overflow:hidden }
+/* 받아지는 중: 뒷배경만. 모든 애니메이션은 0초 지점에 멈춰 둔다 */
+html.visit-loading{ overflow:hidden }
+html.visit-loading .wrap, html.visit-loading .scene-dots{ visibility:hidden }
+html.visit-loading .scene-cover{ opacity:0 !important; transition:none !important }
+html.visit-loading *, html.visit-loading *::before, html.visit-loading *::after{ animation-play-state: paused !important }
 @media (prefers-reduced-motion: reduce){
   .scene-cover, .cover-on .scene-cover, .visit-page .scene:not(.scene-cover){ transition:none }
 }
@@ -1354,6 +1359,13 @@ try{
 try{
   if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
     document.documentElement.classList.add('anim');
+  }
+}catch(e){}
+/* 예약 페이지(/jessie/visit): 사진·글꼴이 다 받아질 때까지는 뒷배경만 보여 주고,
+   표지 등장 애니메이션은 멈춰 둔다. 다 받아지면 JS가 이 표시를 떼고 처음부터 재생한다 */
+try{
+  if(/^\/?jessie\/visit\/?$/i.test(location.pathname)){
+    document.documentElement.classList.add('visit-loading');
   }
 }catch(e){}
 </script>
@@ -2037,9 +2049,9 @@ try{
     var root = document.documentElement;
     var coverOn = false, autoTimer = null;
     /* 첫 진입: 진입 → 표지가 나타나 머무름(AUTO_HIDE) → 스르륵 사라짐(FADE) → 스크롤 가능.
-       AUTO_HIDE + FADE = 2.8초. 사라지는 동안에도 스크롤을 잠가 둔다 */
+       AUTO_HIDE + FADE = 2.4초 (사진·글꼴을 다 받은 뒤부터 잰다). 사라지는 동안에도 스크롤을 잠가 둔다 */
     var FADE = 800;
-    var AUTO_HIDE = 2800 - FADE;
+    var AUTO_HIDE = 2400 - FADE;
     function showCover(){
       if(coverOn) return;
       coverOn = true;
@@ -2060,14 +2072,44 @@ try{
       cover.setAttribute('aria-hidden', 'true');
       mark(1);
     }
-    // 첫 진입: 바로 덮고, 잠시 뒤 자동으로 걷는다
+    /* 첫 진입: 표지를 덮어 둔 채로(아직 안 보임) 사진·글꼴이 다 받아지길 기다린다.
+       준비되면 표지가 스르륵 나타나고, AUTO_HIDE 뒤 자동으로 걷힌다.
+       너무 오래 걸리면(6초) 기다리지 않고 시작한다 */
+    var loading = true;
     showCover();
-    autoTimer = setTimeout(hideCover, AUTO_HIDE);
+    function whenImage(src){
+      return new Promise(function(res){
+        var im = new Image();
+        im.onload = im.onerror = function(){ (im.decode ? im.decode() : Promise.resolve()).then(res, res); };
+        im.src = src;
+      });
+    }
+    var waits = [
+      new Promise(function(res){ if(document.readyState === 'complete') res(); else window.addEventListener('load', res); }),
+      whenImage('/poster-hero.jpg')
+    ];
+    var coverImg = document.querySelector('.frame-work');
+    var m = coverImg && /url\("?([^")]+)"?\)/.exec(coverImg.style.backgroundImage);
+    if(m) waits.push(whenImage(m[1]));
+    if(document.fonts && document.fonts.ready) waits.push(document.fonts.ready);
+    var started = false;
+    function start(){
+      if(started) return;
+      started = true;
+      loading = false;
+      // 두 프레임 기다렸다가 떼야 멈춰 있던 애니메이션이 첫 장면부터 매끄럽게 재생된다
+      requestAnimationFrame(function(){ requestAnimationFrame(function(){
+        root.classList.remove('visit-loading');
+        if(coverOn) autoTimer = setTimeout(hideCover, AUTO_HIDE);
+      }); });
+    }
+    Promise.all(waits).then(start, start);
+    setTimeout(start, 6000);
 
     // 표지가 덮여 있을 때: 내리는 스크롤·스와이프·키·탭이면 걷는다
     // 표지가 걷혀 있고 맨 위일 때: 위로 올리는 스크롤·스와이프면 다시 덮는다
     window.addEventListener('wheel', function(e){
-      if(coverOn){ e.preventDefault(); if(e.deltaY > 0) hideCover(); return; }
+      if(coverOn){ e.preventDefault(); if(e.deltaY > 0 && !loading) hideCover(); return; }
       if(e.deltaY < -8 && window.scrollY <= 0) showCover();
     }, { passive: false });
     var touchY = null;
@@ -2077,17 +2119,17 @@ try{
       var dy = e.touches[0].clientY - touchY;     // + : 손가락이 아래로 (= 위로 올리는 스크롤)
       if(coverOn){
         e.preventDefault();
-        if(dy < -30){ touchY = null; hideCover(); }
+        if(dy < -30 && !loading){ touchY = null; hideCover(); }
         return;
       }
       if(dy > 60 && window.scrollY <= 0 && !root.classList.contains('is-typing')){ touchY = null; showCover(); }
     }, { passive: false });
     window.addEventListener('touchend', function(){ touchY = null; }, { passive: true });
     document.addEventListener('keydown', function(e){
-      if(coverOn && /^(ArrowDown|PageDown|Space| |Enter)$/.test(e.key)){ e.preventDefault(); hideCover(); }
+      if(coverOn && /^(ArrowDown|PageDown|Space| |Enter)$/.test(e.key)){ e.preventDefault(); if(!loading) hideCover(); }
       else if(!coverOn && /^(ArrowUp|PageUp)$/.test(e.key) && window.scrollY <= 0) showCover();
     });
-    cover.addEventListener('click', function(e){ if(!e.target.closest('a')) hideCover(); });
+    cover.addEventListener('click', function(e){ if(!loading && !e.target.closest('a')) hideCover(); });
 
     if('IntersectionObserver' in window){
       var io = new IntersectionObserver(function(entries){
