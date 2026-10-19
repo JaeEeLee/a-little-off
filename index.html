@@ -665,48 +665,36 @@ dd .sub{
 .visit-page .hero{ padding-top: 22px }
 .visit-page .hero .title-block{ margin-top: 6px; padding-top: 18px; padding-bottom: 6px }
 .visit-page .frame-work{ border-width:3px }
-/* ── 장면 스냅: 한 화면에 한 장면, 스크롤을 놓으면 가장 가까운 장면에 툭 맞춘다 ──
-   화면보다 긴 장면은 그 안에서 자유롭게 스크롤된다 (브라우저 기본 동작).
-   글을 입력하는 중(.is-typing), 화면이 아주 낮은 기기, '동작 줄이기' 설정에서는 약하게 */
-html.visit-page{ scroll-snap-type: y mandatory }
-html.visit-page.is-typing{ scroll-snap-type: none }
-@media (max-height: 560px), (prefers-reduced-motion: reduce){
-  html.visit-page{ scroll-snap-type: y proximity }
-}
+/* ── 장면 넘기기: 장면이 화면에 겹쳐 고정되고, 한 번에 하나만 페이드로 보인다 ──
+   페이지 자체는 스크롤되지 않는다. 화면보다 긴 장면은 장면 안에서 스크롤된다 */
+html.visit-page, html.visit-page body{ height:100%; overflow:hidden; overscroll-behavior:none }
 .visit-page .wrap{ padding-bottom: 0 }
 .scene{
-  min-height: 100vh; min-height: 100svh;      /* svh: 휴대폰 주소창이 보일 때의 높이 */
-  display:flex; flex-direction:column; justify-content:center;
-  padding-block: 28px; box-sizing:border-box;
-  scroll-snap-align: start;
-}
-.visit-page .scene > section.card{ margin:0 }
-.visit-page .scene > section.card + section.card{ margin-top: 18px }
-/* ① 표지: 스크롤 흐름 밖에서 화면 전체를 덮는 덮개. 전시 안내와는 페이드로만 오간다 */
-.scene-cover{
-  padding-block: 0;
-  position:fixed; inset:0; z-index:30;
-  padding-inline: 20px; max-width: 760px; margin-inline:auto;
-  opacity:0; visibility:hidden; pointer-events:none;
-  scroll-snap-align: none;
+  position:fixed; inset:0; z-index:5;
+  display:flex; flex-direction:column;
+  padding: 16px max(20px, calc((100vw - 720px) / 2));
+  box-sizing:border-box;
+  overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling: touch;
+  opacity:0; visibility:hidden;
   transition: opacity .8s ease, visibility 0s linear .8s;
 }
-.cover-on .scene-cover{
-  opacity:1; visibility:visible; pointer-events:auto;
+.scene.is-active{
+  opacity:1; visibility:visible; z-index:6;
   transition: opacity .8s ease, visibility 0s;
 }
-/* 표지가 덮여 있는 동안 나머지 장면은 흐려 두었다가, 걷힐 때 함께 스르륵 드러난다 */
-.visit-page .scene:not(.scene-cover){ transition: opacity .8s ease }
-.cover-on .scene:not(.scene-cover){ opacity:0; transition: opacity .5s ease }
-html.cover-on, html.cover-leaving{ overflow:hidden }
+/* 세로 가운데 정렬. 장면이 화면보다 길어지면 위가 잘리지 않고 위에서부터 스크롤된다 */
+.scene > :first-child{ margin-top:auto !important }
+.scene > :last-child{ margin-bottom:auto !important }
+.visit-page .scene > section.card{ margin:0 }
+.visit-page .scene > section.card + section.card{ margin-top: 18px }
 /* 받아지는 중: 뒷배경만. 모든 애니메이션은 0초 지점에 멈춰 둔다 */
-html.visit-loading{ overflow:hidden }
 html.visit-loading .wrap, html.visit-loading .scene-dots{ visibility:hidden }
-html.visit-loading .scene-cover{ opacity:0 !important; transition:none !important }
 html.visit-loading *, html.visit-loading *::before, html.visit-loading *::after{ animation-play-state: paused !important }
 @media (prefers-reduced-motion: reduce){
-  .scene-cover, .cover-on .scene-cover, .visit-page .scene:not(.scene-cover){ transition:none }
+  .scene, .scene.is-active{ transition:none }
 }
+/* ① 표지 */
+.scene-cover{ padding-block: 0 }
 .scene-cover .hero{
   flex:1; display:flex; flex-direction:column; padding: 22px 0 18px;
 }
@@ -818,6 +806,7 @@ html.visit-loading *, html.visit-loading *::before, html.visit-loading *::after{
 .visit-page .scene-last{ padding-bottom: 0 }
 .visit-page .scene-last .thanks{ margin-block: auto 0 !important }
 .visit-page .scene-last footer{ margin-top:auto; padding-top:22px; padding-bottom:18px }
+.visit-page .scene-last > footer:last-child{ margin-bottom:0 !important }
 .quest-lead{
   margin:14px 0 4px; text-align:center;
   font-size:.86rem; line-height:1.7; color: var(--ink-soft);
@@ -1962,11 +1951,11 @@ try{
       var head = boardSec.querySelector('.section-head');
       var artistPath = Object.keys(PAGE_ARTISTS).filter(function(k){ return PAGE_ARTISTS[k] === PAGE_ARTIST; })[0];
       if(head && artistPath){
-        var go = document.createElement('a');
-        go.className = 'board-link';
-        go.href = '/' + artistPath + '?to=board';
-        go.innerHTML = '게시판 보러가기<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-        head.appendChild(go);
+        var boardLink = document.createElement('a');
+        boardLink.className = 'board-link';
+        boardLink.href = '/' + artistPath + '?to=board';
+        boardLink.innerHTML = '게시판 보러가기<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+        head.appendChild(boardLink);
       }
       ['board', 'boardEmpty', 'boardMoreRow'].forEach(function(id){
         var el = document.getElementById(id);
@@ -2013,10 +2002,20 @@ try{
       + '<svg viewBox="0 0 24 12"><path d="M5 2l7 7 7-7"/></svg>'
       + '<svg viewBox="0 0 24 12"><path d="M5 2l7 7 7-7"/></svg>'
       + '</span>';
-    hint.addEventListener('click', function(){ hideCover(); });
+    // 누르면 표지의 클릭으로 이어져 다음 장면으로 넘어간다
     if(hero) hero.appendChild(hint);
 
-    /* 오른쪽 점: 지금 몇 번째 장면인지. 누르면 그 장면으로 */
+    /* ── 장면 넘기기: 모든 장면 사이를 스크롤이 아니라 페이드로 오간다 ──
+       장면은 화면에 겹쳐 고정돼 있고 한 번에 하나만 보인다.
+       아래로 스크롤·스와이프·키 → 다음 장면, 위로 → 이전 장면.
+       장면이 화면보다 길면 그 안에서 먼저 스크롤되고, 끝에 닿은 뒤 한 번 더 밀어야 넘어간다.
+       첫 진입 때만 표지가 잠깐 보였다가 저절로 전시 안내로 넘어간다 */
+    var root = document.documentElement;
+    var FADE = 800;
+    var AUTO_HIDE = 2400 - FADE;      // 표지가 나타나 머무는 시간. 사라지는 FADE 까지 합쳐 2.4초 (사진·글꼴을 다 받은 뒤부터)
+    var current = -1, busyUntil = 0, autoTimer = null, loading = true;
+
+    // 오른쪽 점: 지금 몇 번째 장면인지. 누르면 그 장면으로
     var nav = document.createElement('nav');
     nav.className = 'scene-dots';
     nav.setAttribute('aria-label', '장면 이동');
@@ -2024,59 +2023,104 @@ try{
       var b = document.createElement('button');
       b.type = 'button';
       b.setAttribute('aria-label', (i + 1) + '. ' + sc.getAttribute('aria-label'));
-      b.addEventListener('click', function(){
-        if(i === 0){ showCover(); return; }
-        if(coverOn) hideCover();
-        sc.scrollIntoView({ behavior: coverOn ? 'auto' : 'smooth' });
-      });
+      b.addEventListener('click', function(){ go(i, true); });
       nav.appendChild(b);
       return b;
     });
     document.body.appendChild(nav);
-    function mark(i){
+
+    function go(i, force){
+      if(loading) return;
+      i = Math.max(0, Math.min(scenes.length - 1, i));
+      if(i === current) return;
+      var now = Date.now();
+      if(!force && now < busyUntil) return;          // 바뀌는 도중의 관성 스크롤로 여러 장 건너뛰지 않게
+      busyUntil = now + FADE + 250;
+      clearTimeout(autoTimer);
+      var prev = current;
+      current = i;
+      scenes.forEach(function(sc, k){
+        var on = k === i;
+        sc.classList.toggle('is-active', on);
+        if(on){ sc.removeAttribute('inert'); sc.removeAttribute('aria-hidden'); }
+        else { sc.setAttribute('inert', ''); sc.setAttribute('aria-hidden', 'true'); }
+      });
+      // 앞으로 넘어가면 그 장면의 맨 위부터, 뒤로 돌아오면 맨 아래부터 보이게
+      var sc = scenes[i];
+      sc.scrollTop = (prev > i) ? sc.scrollHeight : 0;
+      Array.prototype.forEach.call(sc.querySelectorAll('.reveal'), function(el){ el.classList.add('in'); });
       dots.forEach(function(b, k){
         b.classList.toggle('on', k === i);
         if(k === i) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current');
       });
       nav.classList.toggle('on-cover', i === 0);
+      root.classList.toggle('cover-on', i === 0);
     }
+    function next(){ go(current + 1); }
+    function prev(){ go(current - 1); }
 
-    /* ── 표지는 스크롤 흐름 밖의 덮개 ──
-       처음 들어오면 표지가 스르륵 나타났다가 잠시 뒤 스르륵 사라지며 전시 안내가 드러난다.
-       그 뒤로는 맨 위에서 위로 한 번 더 올리면 표지가 다시 스르륵 덮이고, 내리거나 누르면 걷힌다.
-       (표지와 전시 안내 사이는 스크롤로 이어지지 않고 페이드로만 오간다) */
-    var cover = scenes[0];
-    var root = document.documentElement;
-    var coverOn = false, autoTimer = null;
-    /* 첫 진입: 진입 → 표지가 나타나 머무름(AUTO_HIDE) → 스르륵 사라짐(FADE) → 스크롤 가능.
-       AUTO_HIDE + FADE = 2.4초 (사진·글꼴을 다 받은 뒤부터 잰다). 사라지는 동안에도 스크롤을 잠가 둔다 */
-    var FADE = 800;
-    var AUTO_HIDE = 2400 - FADE;
-    function showCover(){
-      if(coverOn) return;
-      coverOn = true;
-      window.scrollTo(0, 0);
-      cover.removeAttribute('inert');
-      cover.setAttribute('aria-hidden', 'false');
-      root.classList.add('cover-on');
-      mark(0);
-    }
-    function hideCover(){
-      clearTimeout(autoTimer);
-      if(!coverOn) return;
-      coverOn = false;
-      root.classList.add('cover-leaving');
-      root.classList.remove('cover-on');
-      setTimeout(function(){ if(!coverOn) root.classList.remove('cover-leaving'); }, FADE);
-      cover.setAttribute('inert', '');
-      cover.setAttribute('aria-hidden', 'true');
-      mark(1);
-    }
-    /* 첫 진입: 표지를 덮어 둔 채로(아직 안 보임) 사진·글꼴이 다 받아지길 기다린다.
-       준비되면 표지가 스르륵 나타나고, AUTO_HIDE 뒤 자동으로 걷힌다.
-       너무 오래 걸리면(6초) 기다리지 않고 시작한다 */
-    var loading = true;
-    showCover();
+    function atTop(sc){ return sc.scrollTop <= 1; }
+    function atBottom(sc){ return sc.scrollTop + sc.clientHeight >= sc.scrollHeight - 2; }
+    function typing(){ return root.classList.contains('is-typing'); }
+
+    // 휠 · 트랙패드: 장면 끝에 닿아 있을 때만 넘긴다.
+    // 트랙패드는 손을 뗀 뒤에도 관성으로 휠 신호가 1초 넘게 이어지므로,
+    // 한 번 넘긴 뒤에는 휠 신호가 잠깐(220ms) 끊길 때까지 다음 넘기기를 받지 않는다
+    var wheelLocked = false, wheelQuiet = null;
+    window.addEventListener('wheel', function(e){
+      if(loading || typing()) return;
+      var sc = scenes[current];
+      if(!sc) return;
+      var down = e.deltaY > 0 && atBottom(sc), up = e.deltaY < 0 && atTop(sc);
+      if(!down && !up) return;                      // 장면 안에서 스크롤 중
+      e.preventDefault();
+      clearTimeout(wheelQuiet);
+      wheelQuiet = setTimeout(function(){ wheelLocked = false; }, 220);
+      if(wheelLocked || Math.abs(e.deltaY) < 4) return;
+      wheelLocked = true;
+      if(down) next(); else prev();
+    }, { passive: false });
+
+    // 손가락: 밀기 시작할 때 장면 끝에 닿아 있었다면, 충분히 밀었을 때 넘긴다
+    var t0 = null, startTop = false, startBottom = false;
+    window.addEventListener('touchstart', function(e){
+      var sc = scenes[current];
+      t0 = e.touches[0].clientY;
+      startTop = sc ? atTop(sc) : true;
+      startBottom = sc ? atBottom(sc) : true;
+    }, { passive: true });
+    window.addEventListener('touchmove', function(e){
+      if(t0 === null || loading || typing()) return;
+      var dy = e.touches[0].clientY - t0;            // - : 위로 밀기(= 다음), + : 아래로 밀기(= 이전)
+      // 끝에 닿은 쪽으로 더 밀면 화면이 고무줄처럼 끌려가지 않게 막는다
+      if((dy < 0 && startBottom) || (dy > 0 && startTop)) e.preventDefault();
+      if(dy < -45 && startBottom){ t0 = null; next(); }
+      else if(dy > 45 && startTop){ t0 = null; prev(); }
+    }, { passive: false });
+    window.addEventListener('touchend', function(){ t0 = null; }, { passive: true });
+
+    // 키보드
+    document.addEventListener('keydown', function(e){
+      if(loading || typing() || e.altKey || e.ctrlKey || e.metaKey) return;
+      var sc = scenes[current];
+      if(/^(ArrowDown|PageDown| )$/.test(e.key) && (!sc || atBottom(sc))){ e.preventDefault(); next(); }
+      else if(/^(ArrowUp|PageUp)$/.test(e.key) && (!sc || atTop(sc))){ e.preventDefault(); prev(); }
+      else if(e.key === 'Home'){ e.preventDefault(); go(0, true); }
+      else if(e.key === 'End'){ e.preventDefault(); go(scenes.length - 1, true); }
+    });
+
+    // 표지는 누르기만 해도 다음으로
+    scenes[0].addEventListener('click', function(e){ if(!e.target.closest('a')) next(); });
+
+    // 장면 안의 링크·버튼이 다른 장면의 요소로 초점을 옮기면 그 장면으로 넘어간다 (탭 키 이동 등)
+    document.addEventListener('focusin', function(e){
+      for(var k = 0; k < scenes.length; k++){
+        if(scenes[k].contains(e.target)){ if(k !== current) go(k, true); break; }
+      }
+    });
+
+    /* 첫 진입: 사진·글꼴이 다 받아질 때까지는 뒷배경만. 준비되면 표지가 스르륵 나타나고,
+       AUTO_HIDE 뒤 저절로 전시 안내로 넘어간다. 너무 오래 걸리면(6초) 기다리지 않고 시작한다 */
     function whenImage(src){
       return new Promise(function(res){
         var im = new Image();
@@ -2096,50 +2140,18 @@ try{
     function start(){
       if(started) return;
       started = true;
-      loading = false;
       // 두 프레임 기다렸다가 떼야 멈춰 있던 애니메이션이 첫 장면부터 매끄럽게 재생된다
       requestAnimationFrame(function(){ requestAnimationFrame(function(){
+        loading = false;
         root.classList.remove('visit-loading');
-        if(coverOn) autoTimer = setTimeout(hideCover, AUTO_HIDE);
+        go(0, true);
+        autoTimer = setTimeout(function(){ if(current === 0) go(1, true); }, AUTO_HIDE);
       }); });
     }
     Promise.all(waits).then(start, start);
     setTimeout(start, 6000);
 
-    // 표지가 덮여 있을 때: 내리는 스크롤·스와이프·키·탭이면 걷는다
-    // 표지가 걷혀 있고 맨 위일 때: 위로 올리는 스크롤·스와이프면 다시 덮는다
-    window.addEventListener('wheel', function(e){
-      if(coverOn){ e.preventDefault(); if(e.deltaY > 0 && !loading) hideCover(); return; }
-      if(e.deltaY < -8 && window.scrollY <= 0) showCover();
-    }, { passive: false });
-    var touchY = null;
-    window.addEventListener('touchstart', function(e){ touchY = e.touches[0].clientY; }, { passive: true });
-    window.addEventListener('touchmove', function(e){
-      if(touchY === null) return;
-      var dy = e.touches[0].clientY - touchY;     // + : 손가락이 아래로 (= 위로 올리는 스크롤)
-      if(coverOn){
-        e.preventDefault();
-        if(dy < -30 && !loading){ touchY = null; hideCover(); }
-        return;
-      }
-      if(dy > 60 && window.scrollY <= 0 && !root.classList.contains('is-typing')){ touchY = null; showCover(); }
-    }, { passive: false });
-    window.addEventListener('touchend', function(){ touchY = null; }, { passive: true });
-    document.addEventListener('keydown', function(e){
-      if(coverOn && /^(ArrowDown|PageDown|Space| |Enter)$/.test(e.key)){ e.preventDefault(); if(!loading) hideCover(); }
-      else if(!coverOn && /^(ArrowUp|PageUp)$/.test(e.key) && window.scrollY <= 0) showCover();
-    });
-    cover.addEventListener('click', function(e){ if(!loading && !e.target.closest('a')) hideCover(); });
-
-    if('IntersectionObserver' in window){
-      var io = new IntersectionObserver(function(entries){
-        if(coverOn) return;
-        entries.forEach(function(e){ if(e.isIntersecting) mark(scenes.indexOf(e.target)); });
-      }, { rootMargin: '-45% 0px -45% 0px' });      // 화면 한가운데를 지나는 장면이 '지금'
-      scenes.slice(1).forEach(function(sc){ io.observe(sc); });
-    }
-
-    /* 글을 입력하는 동안은 스냅을 끈다 (키보드가 올라오며 화면이 바뀔 때 엉뚱한 곳으로 끌려가지 않게) */
+    /* 글을 입력하는 동안은 넘기기를 멈춘다 (키보드가 올라오며 화면이 바뀔 때 엉뚱한 장면으로 넘어가지 않게) */
     var typingOff = null;
     document.addEventListener('focusin', function(e){
       if(/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)){ clearTimeout(typingOff); root.classList.add('is-typing'); }
