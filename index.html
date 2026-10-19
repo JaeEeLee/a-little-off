@@ -697,9 +697,21 @@ html.visit-page.is-typing{ scroll-snap-type: none }
   border:0; background:none; padding:6px 10px; cursor:pointer;
   font: inherit; font-size:.74rem; letter-spacing:.04em; color: var(--spark);
 }
-.scene-hint svg{ width:20px; height:20px; animation: hintBob 1.8s ease-in-out infinite }
-@keyframes hintBob{ 0%,100%{ transform: translateY(0) } 50%{ transform: translateY(5px) } }
-@media (prefers-reduced-motion: reduce){ .scene-hint svg{ animation:none } }
+/* 촘촘히 겹친 셰브론 3개: 덩어리째 아래로 둥둥 떠내려가고, 위에서부터 차례로 밝아진다 */
+.chevrons{ display:flex; flex-direction:column; align-items:center; margin-top:4px; animation: hintFloat 2s ease-in-out infinite }
+.chevrons svg{ width:22px; height:11px; margin-top:-4px; overflow:visible }
+.chevrons svg:first-child{ margin-top:0 }
+.chevrons path{ fill:none; stroke:currentColor; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round }
+.chevrons svg{ animation: hintFade 2s ease-in-out infinite }
+.chevrons svg:nth-child(1){ animation-delay: 0s }
+.chevrons svg:nth-child(2){ animation-delay: .2s }
+.chevrons svg:nth-child(3){ animation-delay: .4s }
+@keyframes hintFloat{ 0%,100%{ transform: translateY(0) } 50%{ transform: translateY(7px) } }
+@keyframes hintFade{ 0%,100%{ opacity:.25 } 40%{ opacity:1 } }
+@media (prefers-reduced-motion: reduce){
+  .chevrons, .chevrons svg{ animation:none }
+  .chevrons svg:nth-child(1){ opacity:.35 } .chevrons svg:nth-child(2){ opacity:.65 }
+}
 /* 오른쪽 장면 점 */
 .scene-dots{
   position:fixed; right:2px; top:50%; transform: translateY(-50%); z-index:20;
@@ -762,6 +774,18 @@ html.visit-page.is-typing{ scroll-snap-type: none }
 .visit-page .scene-cover{ padding-block: 0 }
 .visit-page .scene .note-form{ gap:14px; margin-top:16px }
 .visit-page .scene .field{ gap:5px }
+/* ⑤ 쪽지 장면 제목줄 오른쪽 끝: 작가 페이지 게시판으로 가는 링크 */
+.board-link{
+  margin-left:auto; display:inline-flex; align-items:center; gap:2px;
+  font-size:.78rem; font-weight:500; color: var(--spark); text-decoration:none;
+  padding:4px 4px 4px 10px; border-radius:999px; border:1px solid rgba(30,86,184,.28);
+}
+.board-link svg{ width:14px; height:14px }
+.board-link{ white-space:nowrap }
+/* 휴대폰 폭에서는 영문 라벨을 빼서 링크가 제목과 한 줄에 들어가게 */
+@media (max-width: 420px){ .visit-page #boardSection .section-head .en{ display:none } }
+.board-link:hover{ background: rgba(30,86,184,.06) }
+.board-link:focus-visible{ outline:2px solid var(--spark); outline-offset:2px }
 /* ⑤ 쪽지: 게시판이 없으니 점선 구분선과 위 여백을 없애고, 제목과 겹치는 '○○ 작가에게' 줄은 숨긴다 */
 .visit-page #boardSection .board-write{ margin-top:0; padding-top:0; border-top:0 }
 .visit-page #boardSection .board-secret{ display:none }
@@ -1904,6 +1928,16 @@ try{
       var h2 = boardSec.querySelector('.section-head h2'), en = boardSec.querySelector('.section-head .en');
       if(h2) h2.textContent = '작가에게 한마디';
       if(en) en.textContent = 'LEAVE A NOTE';
+      // 쪽지 게시판은 작가 페이지에 있다. 그 페이지의 게시판 위치로 바로 데려간다
+      var head = boardSec.querySelector('.section-head');
+      var artistPath = Object.keys(PAGE_ARTISTS).filter(function(k){ return PAGE_ARTISTS[k] === PAGE_ARTIST; })[0];
+      if(head && artistPath){
+        var go = document.createElement('a');
+        go.className = 'board-link';
+        go.href = '/' + artistPath + '?to=board';
+        go.innerHTML = '게시판 보러가기<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+        head.appendChild(go);
+      }
       ['board', 'boardEmpty', 'boardMoreRow'].forEach(function(id){
         var el = document.getElementById(id);
         if(el){ el.hidden = true; el.style.display = 'none'; }
@@ -1942,7 +1976,13 @@ try{
     var hint = document.createElement('button');
     hint.type = 'button';
     hint.className = 'scene-hint';
-    hint.innerHTML = '<span>아래로 넘겨 보세요</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    hint.setAttribute('aria-label', '아래로 넘겨 보세요');
+    hint.innerHTML = '<span class="hint-text">아래로 넘겨 보세요</span>'
+      + '<span class="chevrons" aria-hidden="true">'
+      + '<svg viewBox="0 0 24 12"><path d="M5 2l7 7 7-7"/></svg>'
+      + '<svg viewBox="0 0 24 12"><path d="M5 2l7 7 7-7"/></svg>'
+      + '<svg viewBox="0 0 24 12"><path d="M5 2l7 7 7-7"/></svg>'
+      + '</span>';
     hint.addEventListener('click', function(){ if(scenes[1]) scenes[1].scrollIntoView({ behavior: 'smooth' }); });
     if(hero) hero.appendChild(hint);
 
@@ -2636,6 +2676,18 @@ try{
       empty.hidden = total > 0;
     }
 
+    // 예약 페이지의 '게시판 보러가기'(/jessie?to=board)로 들어왔으면 게시판으로 내려간다.
+    // 쪽지가 다 붙은 뒤에 움직여야 위치가 어긋나지 않는다
+    var wantBoard = new URLSearchParams(location.search).get('to') === 'board';
+    function jumpToBoard(){
+      if(!wantBoard) return;
+      wantBoard = false;
+      setTimeout(function(){
+        sec.classList.add('in');
+        sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 120);
+    }
+    if(wantBoard) sec.style.scrollMarginTop = '16px';
     board.innerHTML = '<span class="board-loading">쪽지를 가져오는 중…</span>';
     fetch(SHEET_ENDPOINT + '?type=board&artist=' + encodeURIComponent(PAGE_ARTIST))
       .then(function(r){ return r.json(); })
@@ -2647,8 +2699,10 @@ try{
         total = notes.length;
         setCount();
         paginate();
+        jumpToBoard();
       })
       .catch(function(){
+        jumpToBoard();
         board.innerHTML = '';
         empty.textContent = '쪽지를 불러오지 못했어요. 잠시 뒤에 다시 들러 주세요.';
         empty.hidden = false;
