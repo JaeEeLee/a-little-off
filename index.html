@@ -629,6 +629,27 @@ dd .sub{
   border:0; background: rgba(255,255,255,.9); font-size:1rem; cursor:pointer;
 }
 
+/* ── 관람 예약 페이지 (/jessie/visit) ── */
+/* 포스터와 겹친 그림을 기존의 절반 크기로 (겹친 그림은 포스터 폭의 50%라 함께 줄어든다) */
+.visit-page .frame.has-work{
+  --fw: min(150px, calc((100vw - 32px) / 2.44));
+  border-width:4px;
+  margin-bottom: 22px;
+}
+.visit-page .frame-work{ border-width:3px }
+.visit-page #infoSection{ margin-top: 20px }
+.quest-lead{
+  margin:14px 0 4px; text-align:center;
+  font-size:.86rem; line-height:1.7; color: var(--ink-soft);
+  word-break: keep-all;
+}
+.thanks{ text-align:center; padding-block: 34px 30px }
+.thanks-title{
+  margin:0 0 12px;
+  font-family:"Hahmlet", serif; font-weight:700; font-size:1.35rem; letter-spacing:-.01em;
+}
+.thanks-body{ margin:0; font-size:.95rem; line-height:1.8; word-break: keep-all }
+
 /* 재이 페이지 인사말 */
 .work-hello{ display:grid; gap:10px; margin-top:20px }
 .work-hello > p:first-child{ margin:0; font-size:.92rem; line-height:1.75 }
@@ -1254,10 +1275,19 @@ try{
       <h2>조금 이상한 질문</h2>
       <span class="en">A LITTLE OFF</span>
     </div>
+    <p class="quest-lead" id="questLead" hidden>전시장에서 그림을 조금 더 깊이 볼 수 있도록, 질문 하나를 미리 건네 드려요.<br>마음에 걸리는 질문을 품고 오시면, 같은 그림도 조금 다르게 보일 거예요.</p>
     <div class="quest">
       <p class="quest-text" id="questText">전시장에 들어서기 전에, 잠깐 이 질문을 들고 가 보세요.</p>
       <p class="quest-by" id="questBy"></p>
       <button class="btn" type="button" id="questNext">다른 질문 보기</button>
+    </div>
+  </section>
+
+  <!-- 예약 페이지(/jessie/visit)에서만 열린다. 인사말은 JS가 그림 카드에서 옮겨 온다 -->
+  <section class="card reveal" id="helloSection" hidden>
+    <div class="section-head">
+      <h2>인사말</h2>
+      <span class="en">HELLO</span>
     </div>
   </section>
 
@@ -1469,6 +1499,12 @@ try{
     </div>
   </section>
 
+  <!-- 예약 페이지(/jessie/visit)의 맨 마지막 인사 -->
+  <section class="card reveal thanks" id="thanksSection" hidden>
+    <p class="thanks-title">고맙습니다</p>
+    <p class="thanks-body">여기까지 둘러봐 주셔서 정말 고마워요.<br>시간을 내어 이 페이지를 읽어 주신 것만으로도 큰 힘이 돼요.<br>전시장에서 반갑게 만나요!</p>
+  </section>
+
   <footer class="reveal">
     조금 이상한 우리들 · Everyone Is a Little off<br>
     2026. 11. 12 (목) — 11. 17 (화) · 홍대 피시스 아카이브<br>
@@ -1488,7 +1524,12 @@ try{
      /jessie 처럼 들어오면 그 작가의 페이지로 바뀐다 (작품 섹션이 열리고, 이름이 강조되고,
      예약·한마디에 미리 골라진다). 링크 끝의 #이름이 있으면 그쪽이 먼저다 */
   var PAGE_ARTISTS = { jessie: '이재이' };
-  var PAGE_ARTIST = PAGE_ARTISTS[location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase()] || '';
+  /* 관람 예약 전용 주소 (/jessie/visit). 작가 페이지와 같은 작가로 열리되, 그림 카드는 빼고
+     포스터를 작게 줄인 뒤 전시 안내 → 예약 → 인사말 → 쪽지 → 질문 → 감사 인사 순으로 보여 준다 */
+  var PAGE_VISITS = { 'jessie/visit': '이재이' };
+  var PAGE_PATH = location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
+  var IS_VISIT = !!PAGE_VISITS[PAGE_PATH];
+  var PAGE_ARTIST = PAGE_ARTISTS[PAGE_PATH] || PAGE_VISITS[PAGE_PATH] || '';
   /* 작가 이름은 두 가지다. 화면에는 작가명(정연·재이), 시트와 링크에는 본명(배정연·이재이).
      명단의 <li data-name="본명">작가명</li> 에서 짝을 읽는다. 작가명이 본명과 같으면 data-name 이 없다 */
   var ARTIST_LABEL = {}, ARTIST_BY_LABEL = {};
@@ -1513,10 +1554,11 @@ try{
     return ARTIST_BY_LABEL[raw] || raw;
   }
   if(PAGE_ARTIST){
-    document.title = artistLabel(PAGE_ARTIST) + ' · 조금 이상한 우리들';
+    document.title = artistLabel(PAGE_ARTIST) + (IS_VISIT ? ' · 관람 예약' : '') + ' · 조금 이상한 우리들';
     var workSec = document.getElementById('workSection');
-    if(workSec) workSec.hidden = false;
+    if(workSec) workSec.hidden = IS_VISIT;          // 예약 페이지에서는 그림 카드를 빼 둔다
     document.documentElement.classList.add('artist-page');
+    if(IS_VISIT) document.documentElement.classList.add('visit-page');
 
     // 디데이 숫자를 카드에서 꺼내 '초대합니다' 문구 바로 아래에 글자로 둔다 (숫자는 그대로 매일 바뀐다)
     var ddayNum = document.getElementById('ddayNum');
@@ -1534,13 +1576,20 @@ try{
     var subtitle = titleCopy && titleCopy.querySelector('.subtitle');
     if(hello && titleCopy){
       if(subtitle) subtitle.hidden = true;
-      titleCopy.appendChild(hello);
+      // 예약 페이지에서는 인사말을 맨 위가 아니라 예약 카드 아래의 따로 된 카드에 둔다
+      var helloSec = document.getElementById('helloSection');
+      if(IS_VISIT && helloSec){
+        helloSec.appendChild(hello);
+        helloSec.hidden = false;
+      } else {
+        titleCopy.appendChild(hello);
+      }
     }
 
     // 전시가 끝나면 서버가 이 작가의 도슨트 글을 내준다. 그 전에는 아무것도 보이지 않는다
     // 전시 전에 미리 보려면 /jessie?k=도슨트열쇠 로 연다
     var previewKey = new URLSearchParams(location.search).get('k') || '';
-    fetch('/after-docent?artist=' + encodeURIComponent(PAGE_ARTIST) + (previewKey ? '&k=' + encodeURIComponent(previewKey) : ''), { cache: 'no-store' })
+    if(!IS_VISIT) fetch('/after-docent?artist=' + encodeURIComponent(PAGE_ARTIST) + (previewKey ? '&k=' + encodeURIComponent(previewKey) : ''), { cache: 'no-store' })
       .then(function(r){ return r.ok ? r.json() : null; })
       .then(function(d){
         if(!d || !d.paragraphs) return;
@@ -1581,11 +1630,22 @@ try{
     /* 카드 순서: 그림 → 쪽지(게시판 + 쓰는 칸) → 질문 → 전시 안내 → 지금 전시장에는 → 예약
        참여 작가·작가에게 한마디·함께 보기 카드는 숨긴다. 받는 사람은 이 작가로 정해져 있다 */
     var footer = document.querySelector('footer');
-    ['workSection', 'afterDocent', 'boardSection', 'questSection', 'infoSection', 'ondutySection', 'visitSection'].forEach(function(id){
+    var ORDER = IS_VISIT
+      ? ['infoSection', 'visitSection', 'helloSection', 'boardSection', 'questSection', 'thanksSection']
+      : ['workSection', 'afterDocent', 'boardSection', 'questSection', 'infoSection', 'ondutySection', 'visitSection'];
+    ORDER.forEach(function(id){
       var el = document.getElementById(id);
       if(el && footer) footer.parentNode.insertBefore(el, footer);
     });
-    ['artistsSection', 'noteSection', 'shareSection'].forEach(function(id){
+    var HIDE = ['artistsSection', 'noteSection', 'shareSection'];
+    if(IS_VISIT){
+      HIDE = HIDE.concat(['workSection', 'afterDocent', 'ondutySection']);
+      ['questLead', 'thanksSection'].forEach(function(id){
+        var el = document.getElementById(id);
+        if(el) el.hidden = false;
+      });
+    }
+    HIDE.forEach(function(id){
       var el = document.getElementById(id);
       if(el) el.hidden = true;
     });
@@ -2661,6 +2721,7 @@ try{
     var timeEl  = document.getElementById('ondutyTime');
     var footEl  = document.getElementById('ondutyFoot');
     if(!section || !listEl) return;
+    if(IS_VISIT) return;                  // 예약 페이지에서는 보여 주지 않는다
 
     // 한국 시간 기준으로 '지금'을 계산한다 — 기기 시계가 다른 곳에 맞춰져 있어도 같은 결과
     function nowKST(){
