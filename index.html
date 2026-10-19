@@ -728,7 +728,13 @@ html.visit-loading *, html.visit-loading *::before, html.visit-loading *::after{
   transform: scaleX(0); transform-origin:left center;
 }
 .intro-run .intro-bar i{ transform: scaleX(1); transition: transform var(--intro-ms, 1950ms) linear }
-.intro-done .intro-bar{ display:none }     /* 표지로 다시 돌아왔을 때는 없다 */
+.intro-done .intro-bar, .intro-done .intro-text{ display:none }     /* 표지로 다시 돌아왔을 때는 없다 */
+/* 진행 막대 바로 위의 안내 한 줄 */
+.intro-text{
+  position:absolute; left:0; right:0; bottom:66px; margin:0; text-align:center;
+  font-size:.78rem; letter-spacing:.02em; color:#fff;
+  text-shadow: 0 1px 8px rgba(80,30,30,.35);
+}
 /* 첫 진입 때 잠깐 보이는 표지에서는 넘기기 안내를 숨긴다 (다시 표지로 돌아오면 보인다) */
 .visit-page:not(.intro-done) .scene-hint{ visibility:hidden }
 /* 촘촘히 겹친 셰브론 3개: 덩어리째 아래로 둥둥 떠내려가고, 위에서부터 차례로 밝아진다 */
@@ -2139,6 +2145,10 @@ try{
     introBar.setAttribute('aria-hidden', 'true');
     introBar.innerHTML = '<i></i>';
     if(hero) hero.appendChild(introBar);
+    var introText = document.createElement('p');
+    introText.className = 'intro-text';
+    introText.textContent = '잠시 뒤 전시 안내로 넘어가요';
+    if(hero) hero.appendChild(introText);
 
     /* ── 장면 넘기기: 모든 장면 사이를 스크롤이 아니라 페이드로 오간다 ──
        장면은 화면에 겹쳐 고정돼 있고 한 번에 하나만 보인다.
