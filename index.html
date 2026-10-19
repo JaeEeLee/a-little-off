@@ -842,8 +842,8 @@ button.cal-day:focus-visible b{ box-shadow: 0 0 0 2px var(--accent) }
 .visit-cta{
   position:fixed; left:50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); z-index:25;
   transform: translate(-50%, 16px); opacity:0; visibility:hidden; pointer-events:none;
-  padding: 12px 26px; border:0; border-radius:999px; cursor:pointer;
-  font: inherit; font-size:.92rem; font-weight:600; color:#fff; white-space:nowrap;
+  padding: 14px 34px; border:0; border-radius:999px; cursor:pointer;
+  font: inherit; font-size:1.06rem; font-weight:700; letter-spacing:-.01em; color:#fff; white-space:nowrap;
   background: linear-gradient(135deg, var(--ember) 0%, #D9708A 45%, var(--accent) 100%);
   box-shadow: 0 8px 22px rgba(60,40,90,.28), 0 2px 6px rgba(60,40,90,.18);
   text-shadow: 0 1px 2px rgba(40,20,40,.25);
@@ -853,12 +853,13 @@ button.cal-day:focus-visible b{ box-shadow: 0 0 0 2px var(--accent) }
 .is-typing .visit-cta, .visit-loading .visit-cta{ opacity:0 !important; visibility:hidden !important; pointer-events:none !important }
 .visit-cta.is-done{ background: rgba(255,255,255,.95); color: var(--accent); text-shadow:none; box-shadow: 0 6px 18px rgba(60,40,90,.16), inset 0 0 0 1.5px rgba(30,86,184,.35) }
 /* 버튼에 가리지 않도록 장면 아래쪽에 자리를 비워 둔다 */
-.cta-on .scene:not(.scene-cover){ padding-bottom: 72px }
+.cta-on .scene:not(.scene-cover){ padding-bottom: 80px }
 .note-ask{ font-weight:600; color: var(--accent) }
 .visit-page .scene .note{ word-break:keep-all }   /* 안내 문구가 낱말 중간에서 끊기지 않게 */
 /* 전시 안내 장소 줄 아래: 지도 아이콘(왼쪽) + 예약으로 넘기라는 안내(오른쪽) */
 .map-row{ grid-column: 1 / -1; display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:12px }
 .map-links.icon-only{ display:flex !important; flex-wrap:nowrap; flex:0 0 auto; gap:6px; margin:0; grid-column:auto }
+.map-links.icon-only.in-dd{ margin-top:10px }
 .map-links.icon-only a{ width:32px; height:32px; padding:0 !important; justify-content:center; border-radius:9px }
 .map-links.icon-only .map-ico{ width:20px; height:20px; font-size:.74rem }
 /* 예약 페이지 카드의 위아래 여백을 맞춘다.
@@ -1996,10 +1997,11 @@ try{
             Array.prototype.slice.call(a.childNodes).forEach(function(n){ if(n.nodeType === 3) n.remove(); });
             a.title = a.getAttribute('aria-label') || '';
           });
-          var mapRow = document.createElement('div');
-          mapRow.className = 'map-row';
-          mapRow.appendChild(maps);
-          placeRow.appendChild(mapRow);
+          // 영문 장소명(Pieces Archive) 자리에 지도 아이콘을 둔다
+          var enSub = placeDd.querySelector('.sub');
+          if(enSub) enSub.remove();
+          maps.classList.add('in-dd');
+          placeDd.appendChild(maps);
         }
         addrRow.remove();
       }
