@@ -2810,3 +2810,37 @@ html:not(.artist-page) #questSection {
     padding-block: 15px 13px;
   }
 }
+
+/* ── 작가 인스타그램 링크 (작가 · 예약 페이지 카드 제목줄 오른쪽) ── */
+.artist-insta {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px 4px 7px;
+  border-radius: 999px;
+  border: 1px solid rgba(30, 86, 184, 0.28);
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--spark);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.artist-insta svg {
+  width: 14px;
+  height: 14px;
+}
+.artist-insta:hover {
+  background: rgba(30, 86, 184, 0.06);
+}
+.artist-insta:focus-visible {
+  outline: 2px solid var(--spark);
+  outline-offset: 2px;
+}
+/* 휴대폰 폭에서는 영문 라벨을 빼서 링크가 제목과 한 줄에 들어가게 */
+@media (max-width: 420px) {
+  #workSection .section-head .en,
+  .visit-page #helloSection .section-head .en {
+    display: none;
+  }
+}

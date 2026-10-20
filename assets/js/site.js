@@ -169,6 +169,23 @@
         .catch(function () {});
 
     // 포스터에 작가 그림을 살짝 겹쳐 붙인다
+    // 작가 인스타그램: 작품 카드(/jessie)와 인사말 카드(/jessie/visit) 제목줄 오른쪽에 링크로
+    var ARTIST_INSTA = { 이재이: 'jaei_i' };
+    var insta = ARTIST_INSTA[PAGE_ARTIST];
+    var instaHead = document.querySelector(IS_VISIT ? '#helloSection .section-head' : '#workSection .section-head');
+    if (insta && instaHead) {
+      var instaLink = document.createElement('a');
+      instaLink.className = 'artist-insta';
+      instaLink.href = 'https://www.instagram.com/' + insta + '/';
+      instaLink.target = '_blank';
+      instaLink.rel = 'noopener';
+      instaLink.setAttribute('aria-label', artistLabel(PAGE_ARTIST) + ' 작가 인스타그램 @' + insta);
+      instaLink.innerHTML =
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor"/></svg>';
+      instaLink.appendChild(document.createTextNode('@' + insta));
+      instaHead.appendChild(instaLink);
+    }
+
     var ARTIST_COVER = { 이재이: '/works/jessie/01-s.jpg' };
     var posterFrame = document.querySelector('.hero .frame');
     if (posterFrame && ARTIST_COVER[PAGE_ARTIST]) {

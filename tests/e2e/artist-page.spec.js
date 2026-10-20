@@ -91,3 +91,10 @@ test.describe('전시 후 도슨트 글', () => {
     await expect(page.locator('#docentSoon')).toBeHidden();
   });
 });
+
+test('작품 카드 제목줄에 작가 인스타그램 링크', async ({ page, sheet }) => {
+  await page.goto('/jessie');
+  const link = page.locator('#workSection .artist-insta');
+  await expect(link).toHaveText('@jaei_i');
+  await expect(link).toHaveAttribute('href', 'https://www.instagram.com/jaei_i/');
+});
