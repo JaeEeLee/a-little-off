@@ -48,6 +48,33 @@
     raw = raw || PAGE_ARTIST;
     return ARTIST_BY_LABEL[raw] || raw;
   }
+  /* 메인: 디데이는 히어로 카드 대신 전시 안내 '전시 기간' 줄 오른쪽 끝에 붙인다 */
+  if (!PAGE_ARTIST) {
+    (function () {
+      var num = document.getElementById('ddayNum');
+      var heroDday = document.querySelector('.hero .dday');
+      var period = null;
+      Array.prototype.forEach.call(document.querySelectorAll('#infoSection .row'), function (r) {
+        var dt = r.querySelector('dt');
+        if (dt && dt.textContent.trim() === '전시 기간') period = r;
+      });
+      if (!num || !period) return;
+      // 날짜는 한 줄을 다 쓰고, 그 아래 '엿새간 열립니다' 줄의 오른쪽 끝에 디데이를 둔다
+      var dd = period.querySelector('dd');
+      var sub = dd && dd.querySelector('.sub');
+      var foot = document.createElement('span');
+      foot.className = 'period-foot';
+      if (sub) foot.appendChild(sub);
+      var badge = document.createElement('span');
+      badge.className = 'dday-badge';
+      badge.appendChild(num);
+      foot.appendChild(badge);
+      dd.appendChild(foot);
+      period.classList.add('has-dday');
+      if (heroDday) heroDday.hidden = true;
+    })();
+  }
+
   if (PAGE_ARTIST) {
     document.title = artistLabel(PAGE_ARTIST) + (IS_VISIT ? ' · 관람 예약' : '') + ' · 조금 이상한 우리들';
     // 작가 개인 페이지는 검색에 나오지 않게 한다 (_headers 의 X-Robots-Tag 와 같은 뜻을 페이지에도 적어 둔다)

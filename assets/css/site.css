@@ -2714,3 +2714,73 @@ footer a {
   color: var(--ink-soft);
   word-break: keep-all;
 }
+
+/* ── 메인: 전시 기간 줄 오른쪽의 디데이 ('엿새간 열립니다' 줄 오른쪽 끝) ── */
+.period-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+}
+.period-foot .sub {
+  margin-top: 4px;
+}
+.dday-badge {
+  white-space: nowrap;
+  line-height: 1;
+}
+.dday-badge .dday-num {
+  font-size: 1.25rem;
+}
+
+/* ── 메인: 소개 문구 아래 ~ 첫 카드 사이를 32px 로 (디데이 카드가 빠진 자리) ── */
+html:not(.artist-page) .hero {
+  padding-bottom: 0;
+}
+html:not(.artist-page) .hero .title-block {
+  padding-bottom: 0;
+}
+/* 메인의 첫 카드는 '조금 이상한 질문' (작품 · 게시판 카드는 메인에서 숨어 있다).
+   주최 줄 글자 아래 줄 여유 약 4px + 28px = 32px */
+html:not(.artist-page) #questSection {
+  margin-top: 28px;
+  position: relative;
+  z-index: 2; /* 카드가 가까워져 제목 뒤 밝은 베일이 카드 위로 번지지 않게, 카드를 위로 올린다 */
+}
+
+/* ── 메인: 소개 문구 아래 옅은 주최 표기 · 학원 링크 ── */
+.host-inline {
+  margin: 12px 0 0;
+  font-size: 0.74rem;
+  letter-spacing: 0.02em;
+  color: #332519;
+  opacity: 0.55;
+}
+.host-inline-links {
+  margin-left: 6px;
+  white-space: nowrap;
+}
+.host-inline a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+.host-inline a:hover,
+.host-inline a:focus-visible {
+  opacity: 1;
+}
+.host-inline:hover,
+.host-inline:focus-within {
+  opacity: 0.85;
+}
+.artist-page .host-inline {
+  display: none;
+}
+/* 메인은 위에 주최 표기가 있으니 맨 아래 '주최' 줄은 뺀다 */
+html:not(.artist-page) #hostLine {
+  display: none;
+}
+.nowrap {
+  white-space: nowrap;
+}
