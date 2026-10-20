@@ -2777,10 +2777,6 @@ html:not(.artist-page) #questSection {
 .artist-page .host-inline {
   display: none;
 }
-/* 메인은 위에 주최 표기가 있으니 맨 아래 '주최' 줄은 뺀다 */
-html:not(.artist-page) #hostLine {
-  display: none;
-}
 .nowrap {
   white-space: nowrap;
 }
