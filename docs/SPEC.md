@@ -177,7 +177,7 @@ Cloudflare Pages는 `404.html`이 없으면 없는 주소에 `index.html`을 내
 - 작가 개인 페이지(`/jessie`, `/jessie/visit`)는 지인에게 보내는 초대 링크라 `_headers`의 `X-Robots-Tag: noindex`와 페이지 안 `<meta name="robots">`로 검색에서 뺍니다. `/docent`는 잠금 함수가 `noindex`를 붙입니다.
 - `<script type="application/ld+json">`에 schema.org `ExhibitionEvent`(기간 · 장소 · 입장료 · 주최)를 적어, 검색 결과에 전시 일정이 함께 보일 수 있게 합니다.
 - 링크 미리보기: Open Graph(`og:*`), Twitter 카드, 1200×630 `og-image.jpg`.
-- 검색 엔진 등록(구글 서치 콘솔, 네이버 서치어드바이저)은 소유 확인이 필요해 각 서비스에서 직접 합니다. 확인용 `<meta>` 태그나 HTML 파일을 받으면 `index.html` 머리나 루트에 넣습니다.
+- 구글 서치 콘솔(URL 접두어 속성), 네이버 서치어드바이저에 등록했고, 소유 확인은 `index.html` 머리의 `google-site-verification`, `naver-site-verification` 메타 태그로 합니다(지우면 안 됨). 과정과 메시지 해석은 [SEO.md](SEO.md).
 
 ## 8. 접근성
 

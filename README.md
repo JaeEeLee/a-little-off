@@ -7,6 +7,7 @@
 - 호스팅: Cloudflare Pages (`main` 브랜치에 푸시하면 자동 배포)
 - 빌드 과정 없음: HTML · CSS · JS 파일을 그대로 올리는 정적 사이트 + Cloudflare Pages Functions
 - 기술 명세(사용 기술 · 구조 · 연동 규격 · 테스트): [docs/SPEC.md](docs/SPEC.md)
+- 검색 노출(SEO) 작업 기록 · 구글/네이버 등록 과정: [docs/SEO.md](docs/SEO.md)
 
 ---
 
@@ -163,6 +164,7 @@ flowchart LR
 ├── _redirects                README · docs · tests 를 사이트 주소로 열면 첫 화면으로 돌린다
 ├── robots.txt, sitemap.xml   검색 엔진 안내 (메인만 색인, 작가 페이지 · 도슨트 제외)
 ├── docs/SPEC.md              기술 명세
+├── docs/SEO.md               검색 노출 작업 기록
 ├── tests/                    테스트 (따로 package.json 을 둔다. 배포에 영향 없음)
 ├── og-image.jpg, favicon-*.png, apple-touch-icon.png
 │                             링크 미리보기 · 아이콘. 이미 공유된 링크가 이 주소를 쓰므로 루트에 둔다
