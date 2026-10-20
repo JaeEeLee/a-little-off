@@ -171,7 +171,7 @@
       var el = document.getElementById(id);
       if (el && footer) footer.parentNode.insertBefore(el, footer);
     });
-    var HIDE = ['artistsSection', 'noteSection', 'shareSection'];
+    var HIDE = ['artistsSection', 'noteSection', 'shareSection', 'aboutSection']; // 전시 소개는 메인 전용
     if (IS_VISIT) {
       HIDE = HIDE.concat(['workSection', 'afterDocent', 'ondutySection']);
       ['questLead', 'thanksSection'].forEach(function (id) {

@@ -2613,3 +2613,81 @@ footer a {
     transform: none !important;
   }
 }
+
+/* ── 전시 소개 · 자주 묻는 질문 (메인) ── */
+.about {
+  display: grid;
+  gap: 12px;
+  font-size: 0.93rem;
+  line-height: 1.8;
+  word-break: keep-all;
+}
+.about p {
+  margin: 0;
+}
+.about strong {
+  font-weight: 600;
+}
+.about-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.about-tags li {
+  padding: 3px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 0.76rem;
+  color: var(--ink-soft);
+  background: var(--surface);
+}
+.faq-title {
+  margin: 26px 0 8px;
+  font-family: 'Hahmlet', serif;
+  font-size: 1rem;
+  font-weight: 500;
+}
+.faq details {
+  border-top: 1px solid var(--line);
+}
+.faq details:last-child {
+  border-bottom: 1px solid var(--line);
+}
+.faq summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 2px;
+  cursor: pointer;
+  list-style: none;
+  font-size: 0.92rem;
+  font-weight: 500;
+}
+.faq summary::-webkit-details-marker {
+  display: none;
+}
+.faq summary::after {
+  content: '+';
+  flex: 0 0 auto;
+  color: var(--ink-soft);
+  font-size: 1.1rem;
+  line-height: 1;
+}
+.faq details[open] summary::after {
+  content: '−';
+}
+.faq summary:focus-visible {
+  outline: 2px solid var(--spark);
+  outline-offset: 2px;
+}
+.faq details p {
+  margin: 0 2px 14px;
+  font-size: 0.88rem;
+  line-height: 1.75;
+  color: var(--ink-soft);
+  word-break: keep-all;
+}
