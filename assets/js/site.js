@@ -153,13 +153,9 @@
       posterFrame.appendChild(cover);
     }
 
-    // 작가 전용 페이지에서는 상단 학원 표기·링크를 숨기고, 맨 아래 '주최' 줄로 대신한다
-    var studio = document.querySelector('.studio-links');
-    if (studio) studio.hidden = true;
+    // 작가 전용 페이지에서는 상단 학원 표기도 숨긴다 (학원 링크는 모든 페이지에서 맨 아래 '주최'에 있다)
     var eyebrow = document.querySelector('.hero .eyebrow');
     if (eyebrow) eyebrow.hidden = true;
-    var hostLine = document.getElementById('hostLine');
-    if (hostLine) hostLine.hidden = false;
 
     /* 카드 순서: 그림 → 쪽지(게시판 + 쓰는 칸) → 질문 → 전시 안내 → 지금 전시장에는 → 예약
        참여 작가·작가에게 한마디·함께 보기 카드는 숨긴다. 받는 사람은 이 작가로 정해져 있다 */

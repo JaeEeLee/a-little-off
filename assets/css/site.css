@@ -806,12 +806,35 @@ dd .sub {
   color: inherit;
 }
 
+/* 맨 아래 주최 · 학원 링크 (모든 페이지) */
+.host {
+  margin-top: 16px;
+}
 .host-line {
-  margin: 14px 0 0;
+  margin: 0;
   font-size: 0.76rem;
 }
-.host-line a {
-  margin-left: 4px;
+.host .studio-links {
+  justify-content: flex-start;
+  margin: 8px 0 0;
+}
+.host .studio-links a {
+  padding: 4px 11px 4px 8px;
+  font-size: 0.76rem;
+  color: var(--ink-soft);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.host .studio-links a:hover {
+  color: var(--ink);
+  background: var(--surface);
+  border-color: var(--ink-soft);
+}
+.host .studio-links svg {
+  width: 15px;
+  height: 15px;
 }
 /* ── 작가 전용 페이지의 작품 ─────────────── */
 .work-notice {
