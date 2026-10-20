@@ -2780,3 +2780,33 @@ html:not(.artist-page) #questSection {
 .nowrap {
   white-space: nowrap;
 }
+
+/* ── 예약 페이지 전시 안내: 달력과 아래 줄들에 숨 쉴 여백 ── */
+.visit-page #infoSection .cal-tip {
+  margin-bottom: 14px;
+}
+.visit-page #infoSection .cal-grid {
+  row-gap: 8px;
+}
+.visit-page #infoSection .cal-legend {
+  margin-top: 16px;
+}
+.visit-page #infoSection .cal {
+  padding-bottom: 22px;
+}
+/* 위 · 아래 차이(2px)는 글자 줄 여유 차이를 메워 글자를 선 사이 한가운데 둔다 */
+.visit-page #infoSection .row {
+  padding-block: 18px 16px;
+}
+.visit-page #infoSection .map-links.in-dd {
+  margin-top: 12px;
+}
+/* 화면이 낮은 휴대폰(높이 700px 이하)에서는 한 화면에 들어가도록 여백을 조금 줄인다 */
+@media (max-height: 700px) {
+  .visit-page #infoSection .cal-grid {
+    row-gap: 6px;
+  }
+  .visit-page #infoSection .row {
+    padding-block: 15px 13px;
+  }
+}
