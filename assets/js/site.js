@@ -132,7 +132,7 @@
             '<strong class="q">언제 가면 만날 수 있나요?</strong> <em>11월 14일 토요일</em>에는 하루 종일 있어요. 다른 날도 퇴근하고 언제든 달려갈게요.';
         if (hp[2])
           hp[2].innerHTML =
-            '<strong class="q">전시장에서는 또 뭘 즐길 수 있나요?</strong> <strong>스무 명의 그림</strong>과 QR로 듣는 <strong>도슨트</strong>, <strong>굿즈</strong>와 <strong>포토 스팟</strong>, <strong>웰컴 드링크</strong>까지 준비돼 있어요!';
+            '<strong class="q">전시장에서는 또 뭘 즐길 수 있나요?</strong> <strong>스무 명의 그림</strong>과 QR로 듣는 <strong>도슨트</strong>, <strong>굿즈</strong>와 <strong>포토 스팟</strong>까지 준비돼 있어요!';
         helloSec.hidden = false;
       } else {
         titleCopy.appendChild(hello);
