@@ -2844,3 +2844,8 @@ html:not(.artist-page) #questSection {
     display: none;
   }
 }
+
+/* 맨 위 학원 링크는 메인에서만 (작가 · 예약 페이지는 맨 아래 '주최'만) */
+.artist-page .studio-top {
+  display: none;
+}
