@@ -15,7 +15,7 @@
   var ENDPOINT = window.__GOODS_ENDPOINT__ || GOODS_ENDPOINT; // 테스트에서 가짜 주소를 넣을 수 있게
   var DEMO = !ENDPOINT;
 
-  var PAYS = ['현금', '계좌이체', '카드'];
+  var PAYS = ['현금', '계좌이체'];
   var DEMO_ITEMS = [
     { name: '엽서', price: 2000 },
     { name: '마그넷', price: 5000 },

@@ -26,7 +26,7 @@ const PIN = '0000'; // ← 스태프 비밀번호로 바꾸세요
 const SALES = '판매';
 const ITEMS = '상품';
 const SUMMARY = '요약';
-const PAYS = ['현금', '계좌이체', '카드'];
+const PAYS = ['현금', '계좌이체'];
 const HEAD = ['시각', '판매번호', '굿즈', '단가', '개수', '금액', '결제', '상태'];
 
 function setup() {
