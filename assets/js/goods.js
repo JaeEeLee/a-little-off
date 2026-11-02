@@ -309,13 +309,27 @@
     Object.keys(perItem).forEach(function (n) {
       if (names.indexOf(n) < 0) names.push(n);
     });
+    // 재고를 적은 굿즈가 하나라도 있으면 '남은 재고' 열을 붙인다 (오늘 · 전체 탭과 상관없이 지금 남은 수)
+    var hasStock = items.some(function (i) {
+      return typeof i.stock === 'number';
+    });
+    var sold = soldCounts();
     var rows = names
       .map(function (n) {
         var p = perItem[n] || { qty: 0, amount: 0 };
-        return '<tr><td>' + esc(n) + '</td><td>' + p.qty + '개</td><td>' + won(p.amount) + '원</td></tr>';
+        var left = '';
+        if (hasStock) {
+          var l = leftOf(n, sold);
+          left =
+            l == null
+              ? '<td class="left">–</td>'
+              : '<td class="left' + (l === 0 ? ' out' : l <= 3 ? ' low' : '') + '">' + (l === 0 ? '품절' : l + '개') + '</td>';
+        }
+        return '<tr><td>' + esc(n) + '</td><td>' + p.qty + '개</td><td>' + won(p.amount) + '원</td>' + left + '</tr>';
       })
       .join('');
-    $('byItem').innerHTML = '<tr><th>굿즈</th><th>판매 개수</th><th>금액</th></tr>' + rows;
+    $('byItem').innerHTML =
+      '<tr><th>굿즈</th><th>판매 개수</th><th>금액</th>' + (hasStock ? '<th>남은 재고</th>' : '') + '</tr>' + rows;
 
     $('byPay').textContent = PAYS.filter(function (p) {
       return perPay[p];

@@ -255,6 +255,10 @@ test('재고를 적으면 남은 개수가 보이고, 다 팔리면 버튼이 �
   await expect(page.locator('.item[data-name="엽서"] .badge')).toHaveText('2');
   await page.locator('#cartSubmit').click();
   await expect(page.locator('.item[data-name="엽서"] .stock')).toHaveText('품절');
+  // 판매 합계 표에도 남은 재고가 보인다 (재고를 안 적은 굿즈는 –)
+  await expect(page.locator('#byItem')).toContainText('남은 재고');
+  await expect(page.locator('#byItem tr', { hasText: '엽서' }).locator('.left')).toHaveText('품절');
+  await expect(page.locator('#byItem tr', { hasText: '마그넷' }).locator('.left')).toHaveText('–');
   await expect(page.locator('.item[data-name="엽서"]')).toBeDisabled();
 });
 

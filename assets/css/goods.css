@@ -633,3 +633,13 @@ h2.first {
   .item .badge.pop,
   .done.run .done-bar { animation: none; }
 }
+
+/* 판매 합계 표의 남은 재고 */
+.table .left {
+  font-variant-numeric: tabular-nums;
+}
+.table .left.low,
+.table .left.out {
+  color: #c8401b;
+  font-weight: 600;
+}
