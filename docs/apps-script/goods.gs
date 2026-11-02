@@ -80,6 +80,7 @@ function setup() {
   }
 
   // 시트에서 바로 보는 합계 (취소된 판매는 빼고)
+  // 판매가 하나도 없으면 QUERY가 숫자 열을 글자로 봐서 #VALUE! 가 나므로, 그때는 안내 문구를 보여 준다
   const sum = ss.getSheetByName(SUMMARY) || ss.insertSheet(SUMMARY);
   sum.clear();
   sum.getRange('A1').setValue('총 판매금액');
@@ -89,12 +90,12 @@ function setup() {
   sum
     .getRange('A4')
     .setFormula(
-      "=QUERY('" + SALES + "'!A:H,\"select C, sum(E), sum(F) where H = '정상' group by C label C '굿즈', sum(E) '판매 개수', sum(F) '금액'\",1)"
+      "=IFERROR(QUERY('" + SALES + "'!A:H,\"select C, sum(E), sum(F) where H = '정상' group by C label C '굿즈', sum(E) '판매 개수', sum(F) '금액'\",1), \"아직 판매 기록이 없어요\")"
     );
   sum
     .getRange('E4')
     .setFormula(
-      "=QUERY('" + SALES + "'!A:H,\"select toDate(A), sum(E), sum(F) where H = '정상' group by toDate(A) label toDate(A) '날짜', sum(E) '판매 개수', sum(F) '금액'\",1)"
+      "=IFERROR(QUERY('" + SALES + "'!A:H,\"select toDate(A), sum(E), sum(F) where H = '정상' group by toDate(A) label toDate(A) '날짜', sum(E) '판매 개수', sum(F) '금액'\",1), \"아직 판매 기록이 없어요\")"
     );
   sum.getRange('A1:A2').setFontWeight('bold');
 }
