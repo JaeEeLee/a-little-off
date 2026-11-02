@@ -247,6 +247,8 @@ h2.first {
   transform: scale(0.97);
 }
 .item b {
+  word-break: keep-all; /* "앨리스의 열쇠 (골드)"가 글자 중간에서 끊기지 않게 */
+  padding-right: 18px; /* 오른쪽 위 개수 표시와 겹치지 않게 */
   font-size: 1.05rem;
 }
 .item span {

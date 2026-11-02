@@ -168,7 +168,7 @@ test('시트 주소가 없으면 연습 모드: 이 휴대폰에만 저장된다
   await page.goto('/goods');
   await expect(page.locator('#demoNote')).toBeVisible();
   await expect(page.locator('#sync')).toHaveText('연습 모드');
-  await page.locator('.item[data-name="키링"]').click();
+  await page.locator('.item[data-name="아트 책갈피"]').click();
   await page.locator('#cartSubmit').click();
   await expect(page.locator('#sumTotal')).toHaveText('8,000');
   await page.reload();

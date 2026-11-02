@@ -17,9 +17,14 @@
 
   var PAYS = ['현금', '계좌이체'];
   var DEMO_ITEMS = [
-    { name: '엽서', price: 2000 },
-    { name: '마그넷', price: 5000 },
-    { name: '키링', price: 8000 }
+    { name: 'THE WONDER BOX', price: 25000 },
+    { name: '아트 엽서', price: 3000 },
+    { name: '엽서 4장 세트', price: 10000 },
+    { name: '아트 마그넷', price: 15000 },
+    { name: '아트 책갈피', price: 8000 },
+    { name: '작가 아크릴 키링', price: 18000 },
+    { name: '앨리스의 열쇠 (골드)', price: 25000 },
+    { name: '앨리스의 열쇠 (실버)', price: 18000 }
   ];
   var POLL_MS = 20000; // 다른 휴대폰에서 기록한 판매를 가져오는 간격
   var KEY = { pin: 'alo.goods.pin', queue: 'alo.goods.queue', demo: 'alo.goods.demo', pay: 'alo.goods.pay' };

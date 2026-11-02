@@ -7,7 +7,7 @@
  *  3. 아래 PIN 을 스태프 비밀번호로 바꾼다 (이 저장소에는 올리지 않는다)
  *  4. 위쪽 함수 목록에서 setup 을 골라 ▶ 실행 → 권한 허용
  *     → '판매' · '상품' · '요약' 탭이 생긴다
- *  5. '상품' 탭에 굿즈 이름과 가격을 적는다 (가격이 빈 굿즈는 페이지에서 누를 수 없다)
+ *  5. '상품' 탭에 굿즈 8개와 가격이 채워졌는지 확인한다 (가격이 빈 굿즈는 페이지에서 누를 수 없다)
  *  6. 배포 → 새 배포 → 유형: 웹 앱 / 실행: 나 / 액세스: 모든 사용자 → 배포
  *  7. 나온 웹앱 주소(…/exec)를 assets/js/goods.js 의 GOODS_ENDPOINT 에 넣는다
  *
@@ -27,6 +27,19 @@ const SALES = '판매';
 const ITEMS = '상품';
 const SUMMARY = '요약';
 const PAYS = ['현금', '계좌이체'];
+
+// setup 을 처음 실행할 때 '상품' 탭에 채워 넣는 굿즈 [이름, 가격, 메모]
+// 이름이 휴대폰 버튼에 그대로 나오므로 짧게 둔다. 나중에는 '상품' 탭에서 바로 고치면 된다
+const GOODS = [
+  ['THE WONDER BOX', 25000, '아트 엽서 2장 + 마그넷 1개 + 책갈피 1개 (이상한 나라의 작은 수집함)'],
+  ['아트 엽서', 3000, ''],
+  ['엽서 4장 세트', 10000, ''],
+  ['아트 마그넷', 15000, ''],
+  ['아트 책갈피', 8000, ''],
+  ['작가 아크릴 키링', 18000, ''],
+  ['앨리스의 열쇠 (골드)', 25000, ''],
+  ['앨리스의 열쇠 (실버)', 18000, '']
+];
 const HEAD = ['시각', '판매번호', '굿즈', '단가', '개수', '금액', '결제', '상태'];
 
 function setup() {
@@ -43,12 +56,12 @@ function setup() {
 
   const it = ss.getSheetByName(ITEMS) || ss.insertSheet(ITEMS);
   if (it.getLastRow() === 0) {
-    it.appendRow(['굿즈', '가격']);
-    it.appendRow(['엽서', '']);
-    it.appendRow(['마그넷', '']);
-    it.appendRow(['키링', '']);
+    it.appendRow(['굿즈', '가격', '메모']);
+    GOODS.forEach((g) => it.appendRow(g));
     it.setFrozenRows(1);
     it.getRange('B:B').setNumberFormat('#,##0');
+    it.setColumnWidth(1, 180);
+    it.setColumnWidth(3, 260);
   }
 
   // 시트에서 바로 보는 합계 (취소된 판매는 빼고)
