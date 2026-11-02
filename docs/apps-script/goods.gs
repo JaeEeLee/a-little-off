@@ -2,17 +2,22 @@
  * 굿즈 판매 장부 — Google Apps Script 웹앱 (사이트의 /goods 페이지가 쓴다)
  *
  * 설치 (처음 한 번, 컴퓨터에서 하는 게 편하다)
- *  1. 구글 시트를 새로 만든다 (예: '조금 이상한 우리들 굿즈 장부')
- *  2. 확장 프로그램 → Apps Script → 이 파일 내용을 통째로 붙여 넣는다
- *  3. 아래 PIN 을 스태프 비밀번호로 바꾼다 (이 저장소에는 올리지 않는다)
- *  4. 위쪽 함수 목록에서 setup 을 골라 ▶ 실행 → 권한 허용
- *     → '판매' · '상품' · '요약' 탭이 생긴다
- *  5. '상품' 탭에 굿즈 8개와 가격이 채워졌는지 확인한다 (가격이 빈 굿즈는 페이지에서 누를 수 없다)
- *  6. 배포 → 새 배포 → 유형: 웹 앱 / 실행: 나 / 액세스: 모든 사용자 → 배포
- *  7. 나온 웹앱 주소(…/exec)를 assets/js/goods.js 의 GOODS_ENDPOINT 에 넣는다
+ *  방명록 시트에 함께 쓰는 경우 (지금 설정)
+ *   - 방명록 시트에는 이미 방명록 Apps Script가 붙어 있어 함수 이름이 겹친다. 그래서 이 코드는
+ *     시트의 '확장 프로그램'이 아니라 script.google.com 에서 '새 프로젝트'로 따로 만든다.
+ *   - 아래 SHEET_ID 로 방명록 시트를 찾아가 '굿즈 판매내역' · '굿즈 상품' · '굿즈 요약' 탭에 쓴다.
+ *  따로 새 시트를 쓰는 경우: 그 시트의 확장 프로그램 → Apps Script 에 붙이고 SHEET_ID 를 '' 로 둔다.
+ *
+ *  1. script.google.com → 새 프로젝트 → 이 파일 내용을 통째로 붙여 넣는다
+ *  2. 아래 PIN 을 스태프 비밀번호로 바꾼다 (이 저장소에는 올리지 않는다)
+ *  3. 위쪽 함수 목록에서 setup 을 골라 ▶ 실행 → 권한 허용
+ *     → '굿즈 판매내역'(비어 있으면 머리글을 채움) · '굿즈 상품' · '굿즈 요약' 탭이 준비된다
+ *  4. '굿즈 상품' 탭에 굿즈 8개와 가격이 채워졌는지 확인한다 (가격이 빈 굿즈는 페이지에서 누를 수 없다)
+ *  5. 배포 → 새 배포 → 유형: 웹 앱 / 실행: 나 / 액세스: 모든 사용자 → 배포
+ *  6. 나온 웹앱 주소(…/exec)를 assets/js/goods.js 의 GOODS_ENDPOINT 에 넣는다
  *
  * 나중에 이 코드를 고치면: 배포 → 배포 관리 → 연필 → 버전 '새 버전' → 배포 (주소는 그대로)
- * 굿즈나 가격만 바꿀 때는 '상품' 탭만 고치면 된다. 다시 배포할 필요 없다.
+ * 굿즈나 가격만 바꿀 때는 '굿즈 상품' 탭만 고치면 된다. 다시 배포할 필요 없다.
  *
  * 주고받는 내용
  *  GET  ?type=state&pin=     → { ok, items:[{name,price}], sales:[{id,at,pay,lines,amount,cancelled}] }
@@ -23,12 +28,18 @@
 
 const PIN = '0000'; // ← 스태프 비밀번호로 바꾸세요
 
-const SALES = '판매';
-const ITEMS = '상품';
-const SUMMARY = '요약';
+// 판매 기록을 쌓을 스프레드시트. 비우면('') 이 스크립트가 붙은 시트를 쓴다
+const SHEET_ID = '15t_YTUhzkAqSxealdi97ldYUTH3exo-Fpk3TtdjcqiA'; // 방명록 시트
+const SALES = '굿즈 판매내역';
+const ITEMS = '굿즈 상품';
+const SUMMARY = '굿즈 요약';
+
+function book() {
+  return SHEET_ID ? SpreadsheetApp.openById(SHEET_ID) : SpreadsheetApp.getActive();
+}
 const PAYS = ['현금', '계좌이체'];
 
-// setup 을 처음 실행할 때 '상품' 탭에 채워 넣는 굿즈 [이름, 가격, 메모]
+// setup 을 처음 실행할 때 '굿즈 상품' 탭에 채워 넣는 굿즈 [이름, 가격, 메모]
 // 이름이 휴대폰 버튼에 그대로 나오므로 짧게 둔다. 나중에는 '상품' 탭에서 바로 고치면 된다
 const GOODS = [
   ['THE WONDER BOX', 25000, '아트 엽서 2장 + 마그넷 1개 + 책갈피 1개 (이상한 나라의 작은 수집함)'],
@@ -43,9 +54,13 @@ const GOODS = [
 const HEAD = ['시각', '판매번호', '굿즈', '단가', '개수', '금액', '결제', '상태'];
 
 function setup() {
-  const ss = SpreadsheetApp.getActive();
+  const ss = book();
 
   const s = ss.getSheetByName(SALES) || ss.insertSheet(SALES);
+  // 이미 다른 내용이 적혀 있으면 덮어쓰지 않고 멈춘다
+  if (s.getLastRow() > 0 && String(s.getRange(1, 1).getValue()) !== HEAD[0]) {
+    throw new Error("'" + SALES + "' 탭이 비어 있지 않아요. 비우거나 1행을 지운 뒤 다시 실행해 주세요.");
+  }
   if (s.getLastRow() === 0) {
     s.appendRow(HEAD);
     s.setFrozenRows(1);
@@ -68,18 +83,18 @@ function setup() {
   const sum = ss.getSheetByName(SUMMARY) || ss.insertSheet(SUMMARY);
   sum.clear();
   sum.getRange('A1').setValue('총 판매금액');
-  sum.getRange('B1').setFormula("=SUMIF('판매'!H:H,\"정상\",'판매'!F:F)").setNumberFormat('#,##0');
+  sum.getRange('B1').setFormula("=SUMIF('" + SALES + "'!H:H,\"정상\",'" + SALES + "'!F:F)").setNumberFormat('#,##0');
   sum.getRange('A2').setValue('총 판매 개수');
-  sum.getRange('B2').setFormula("=SUMIF('판매'!H:H,\"정상\",'판매'!E:E)");
+  sum.getRange('B2').setFormula("=SUMIF('" + SALES + "'!H:H,\"정상\",'" + SALES + "'!E:E)");
   sum
     .getRange('A4')
     .setFormula(
-      "=QUERY('판매'!A:H,\"select C, sum(E), sum(F) where H = '정상' group by C label C '굿즈', sum(E) '판매 개수', sum(F) '금액'\",1)"
+      "=QUERY('" + SALES + "'!A:H,\"select C, sum(E), sum(F) where H = '정상' group by C label C '굿즈', sum(E) '판매 개수', sum(F) '금액'\",1)"
     );
   sum
     .getRange('E4')
     .setFormula(
-      "=QUERY('판매'!A:H,\"select toDate(A), sum(E), sum(F) where H = '정상' group by toDate(A) label toDate(A) '날짜', sum(E) '판매 개수', sum(F) '금액'\",1)"
+      "=QUERY('" + SALES + "'!A:H,\"select toDate(A), sum(E), sum(F) where H = '정상' group by toDate(A) label toDate(A) '날짜', sum(E) '판매 개수', sum(F) '금액'\",1)"
     );
   sum.getRange('A1:A2').setFontWeight('bold');
 }
@@ -111,7 +126,7 @@ function doPost(e) {
 }
 
 function readItems() {
-  const sh = SpreadsheetApp.getActive().getSheetByName(ITEMS);
+  const sh = book().getSheetByName(ITEMS);
   if (!sh || sh.getLastRow() < 2) return [];
   return sh
     .getRange(2, 1, sh.getLastRow() - 1, 2)
@@ -124,7 +139,7 @@ function readItems() {
 }
 
 function readSales() {
-  const sh = SpreadsheetApp.getActive().getSheetByName(SALES);
+  const sh = book().getSheetByName(SALES);
   if (!sh || sh.getLastRow() < 2) return [];
   const rows = sh.getRange(2, 1, sh.getLastRow() - 1, HEAD.length).getValues();
   const byId = {};
@@ -156,7 +171,7 @@ function readSales() {
 function addSale(b) {
   const id = String(b.id || '');
   if (!/^[\w-]{6,40}$/.test(id)) return { ok: false, error: 'id' };
-  const sh = SpreadsheetApp.getActive().getSheetByName(SALES);
+  const sh = book().getSheetByName(SALES);
   // 신호가 끊겼다 다시 보낸 같은 판매는 한 번만 적는다
   if (sh.getLastRow() > 1 && sh.getRange('B2:B').createTextFinder(id).matchEntireCell(true).findNext()) {
     return { ok: true, dup: true };
@@ -193,7 +208,7 @@ function addSale(b) {
 }
 
 function cancelSale(id) {
-  const sh = SpreadsheetApp.getActive().getSheetByName(SALES);
+  const sh = book().getSheetByName(SALES);
   if (!id || sh.getLastRow() < 2) return { ok: true, found: 0 };
   const ids = sh.getRange(2, 2, sh.getLastRow() - 1, 1).getValues();
   let found = 0;
