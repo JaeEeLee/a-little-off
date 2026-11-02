@@ -79,25 +79,50 @@ function setup() {
     it.setColumnWidth(3, 260);
   }
 
-  // 시트에서 바로 보는 합계 (취소된 판매는 빼고)
-  // 판매가 하나도 없으면 QUERY가 숫자 열을 글자로 봐서 #VALUE! 가 나므로, 그때는 안내 문구를 보여 준다
+  buildSummary();
+}
+
+/* '굿즈 요약' 탭: 맨 위에 전체 합계, 아래에 굿즈별 판매 개수 · 금액, 오른쪽에 날짜별 합계.
+   모두 수식이라 판매가 들어오면 저절로 바뀐다. 취소된 판매는 빼고 센다.
+   이 함수만 다시 실행해도 요약 탭을 새로 그린다 (판매내역 · 상품 탭은 건드리지 않는다) */
+function buildSummary() {
+  const ss = book();
   const sum = ss.getSheetByName(SUMMARY) || ss.insertSheet(SUMMARY);
   sum.clear();
-  sum.getRange('A1').setValue('총 판매금액');
-  sum.getRange('B1').setFormula("=SUMIF('" + SALES + "'!H:H,\"정상\",'" + SALES + "'!F:F)").setNumberFormat('#,##0');
-  sum.getRange('A2').setValue('총 판매 개수');
-  sum.getRange('B2').setFormula("=SUMIF('" + SALES + "'!H:H,\"정상\",'" + SALES + "'!E:E)");
-  sum
-    .getRange('A4')
-    .setFormula(
-      "=IFERROR(QUERY('" + SALES + "'!A:H,\"select C, sum(E), sum(F) where H = '정상' group by C label C '굿즈', sum(E) '판매 개수', sum(F) '금액'\",1), \"아직 판매 기록이 없어요\")"
-    );
-  sum
-    .getRange('E4')
-    .setFormula(
-      "=IFERROR(QUERY('" + SALES + "'!A:H,\"select toDate(A), sum(E), sum(F) where H = '정상' group by toDate(A) label toDate(A) '날짜', sum(E) '판매 개수', sum(F) '금액'\",1), \"아직 판매 기록이 없어요\")"
-    );
+  const S = "'" + SALES + "'";
+  const I = "'" + ITEMS + "'";
+  const ok = S + '!H:H, "정상"';
+
+  // 전체 합계
+  sum.getRange('A1:B2').setValues([
+    ['전체 판매금액', '=SUMIFS(' + S + '!F:F, ' + ok + ')'],
+    ['전체 판매 개수', '=SUMIFS(' + S + '!E:E, ' + ok + ')']
+  ]);
   sum.getRange('A1:A2').setFontWeight('bold');
+  sum.getRange('B1:B2').setFontWeight('bold').setFontSize(13);
+  sum.getRange('B1').setNumberFormat('#,##0"원"');
+  sum.getRange('B2').setNumberFormat('#,##0"개"');
+
+  // 굿즈별: '굿즈 상품' 탭의 굿즈를 모두 줄로 세우고, 안 팔린 굿즈는 0
+  sum.getRange('A4:D4').setValues([['굿즈', '가격', '판매 개수', '판매 금액']]).setFontWeight('bold').setBackground('#F0EFEC');
+  sum.getRange('A5').setFormula('=FILTER(' + I + '!A2:B, ' + I + '!A2:A<>"")');
+  // SUMIFS 는 ARRAYFORMULA 로 여러 줄을 한 번에 세지 않으므로, MAP 으로 굿즈마다 따로 센다
+  sum.getRange('C5').setFormula('=MAP(A5:A, LAMBDA(n, IF(n="", "", SUMIFS(' + S + '!E:E, ' + S + '!C:C, n, ' + ok + '))))');
+  sum.getRange('D5').setFormula('=MAP(A5:A, LAMBDA(n, IF(n="", "", SUMIFS(' + S + '!F:F, ' + S + '!C:C, n, ' + ok + '))))');
+  sum.getRange('B5:B').setNumberFormat('#,##0');
+  sum.getRange('C5:C').setNumberFormat('#,##0');
+  sum.getRange('D5:D').setNumberFormat('#,##0');
+
+  // 날짜별 (판매가 없으면 안내 문구)
+  sum.getRange('F4').setFormula(
+    '=IFERROR(QUERY(' + S + "!A:H,\"select toDate(A), sum(E), sum(F) where H = '정상' group by toDate(A) label toDate(A) '날짜', sum(E) '판매 개수', sum(F) '금액'\",1), \"아직 판매 기록이 없어요\")"
+  );
+  sum.getRange('F4:H4').setFontWeight('bold');
+
+  sum.setFrozenRows(4);
+  sum.setColumnWidth(1, 170);
+  sum.setColumnWidths(2, 3, 90);
+  sum.setColumnWidth(6, 110);
 }
 
 function doGet(e) {
