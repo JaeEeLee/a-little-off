@@ -67,6 +67,40 @@ test('비밀번호가 틀리면 열리지 않고, 맞으면 장부가 열린다'
   await expect(page.locator('#app')).toBeVisible();
 });
 
+test('비밀번호는 입력한 때부터 48시간 동안만 기억한다', async ({ page }) => {
+  await fakeSheet(page);
+  // 47시간 전에 입력한 비밀번호 → 그대로 열린다
+  await page.addInitScript(() => {
+    if (!sessionStorage.getItem('seeded')) {
+      sessionStorage.setItem('seeded', '1');
+      localStorage.setItem('alo.goods.pin', JSON.stringify({ v: '1234', exp: Date.now() + 1 * 3600e3 }));
+    }
+  });
+  await page.goto('/goods');
+  await expect(page.locator('#app')).toBeVisible();
+
+  // 48시간이 지난 비밀번호 → 잠기고 다시 묻는다
+  await page.evaluate(() => localStorage.setItem('alo.goods.pin', JSON.stringify({ v: '1234', exp: Date.now() - 1000 })));
+  await page.reload();
+  await expect(page.locator('#lock')).toBeVisible();
+  await expect(page.locator('#app')).toBeHidden();
+});
+
+test('예전 방식으로 기한 없이 저장된 비밀번호는 48시간 기한으로 바뀐다', async ({ page }) => {
+  await fakeSheet(page);
+  await page.addInitScript(() => {
+    if (!sessionStorage.getItem('seeded')) {
+      sessionStorage.setItem('seeded', '1');
+      localStorage.setItem('alo.goods.pin', JSON.stringify('1234'));
+    }
+  });
+  await page.goto('/goods');
+  await expect(page.locator('#app')).toBeVisible();
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('alo.goods.pin')));
+  expect(saved.v).toBe('1234');
+  expect(saved.exp - Date.now()).toBeGreaterThan(47 * 3600e3);
+});
+
 test('굿즈를 담아 기록하면 판매 개수와 총 판매금액이 쌓인다', async ({ page }) => {
   await at(page, '2026-11-14T15:00:00');
   const sheet = await fakeSheet(page);

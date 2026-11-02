@@ -78,7 +78,24 @@
   var cart = {}; // 상품 이름 → 개수
   var pay = PAYS.indexOf(load(KEY.pay, '')) >= 0 ? load(KEY.pay, '') : PAYS[0];
   var range = 'today';
-  var pin = load(KEY.pin, '');
+  // 비밀번호는 입력한 때부터 48시간 동안만 이 휴대폰에 기억한다
+  var PIN_TTL = 48 * 60 * 60 * 1000;
+  function loadPin() {
+    var v = load(KEY.pin, '');
+    if (typeof v === 'string') {
+      // 예전 방식(기한 없이 저장)으로 남은 비밀번호는 지금부터 48시간으로 바꿔 둔다
+      if (v) store(KEY.pin, { v: v, exp: Date.now() + PIN_TTL });
+      return v;
+    }
+    if (v && v.v && v.exp > Date.now()) return v.v;
+    store(KEY.pin, null);
+    return '';
+  }
+  function pinExpired() {
+    var v = load(KEY.pin, null);
+    return !!pin && !(v && v.exp > Date.now());
+  }
+  var pin = loadPin();
   var online = true; // 마지막 통신이 성공했는지
   var syncedAt = null;
   var flushing = false;
@@ -508,7 +525,7 @@
   $('lock').addEventListener('submit', function (e) {
     e.preventDefault();
     pin = $('pin').value.trim();
-    store(KEY.pin, pin);
+    store(KEY.pin, { v: pin, exp: Date.now() + PIN_TTL });
     $('lockMsg').textContent = '확인하는 중…';
     refresh().then(flush);
   });
@@ -566,7 +583,21 @@
     refresh().then(flush);
   }
 
+  // 48시간이 지나면 열어 둔 화면도 잠근다 (아직 못 보낸 기록은 휴대폰에 남았다가 다시 열면 보낸다)
+  function checkPinAge() {
+    if (DEMO || !pinExpired()) return false;
+    pin = '';
+    store(KEY.pin, null);
+    $('pin').value = '';
+    lock('48시간이 지나 다시 잠겼어요. 비밀번호를 입력해 주세요.');
+    return true;
+  }
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden) checkPinAge();
+  });
+
   setInterval(function () {
+    if (checkPinAge()) return;
     if (document.hidden || !$('lock').hidden) return;
     if (queue.length) flush();
     else refresh();
