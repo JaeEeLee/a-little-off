@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <meta name="color-scheme" content="light only" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>굿즈 판매 장부 · 조금 이상한 우리들</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@500;700&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap"
+    />
+    <link rel="stylesheet" href="/assets/css/goods.css" />
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="top">
+        <div>
+          <p class="eyebrow">조금 이상한 우리들 · GOODS</p>
+          <h1>굿즈 판매 장부</h1>
+        </div>
+        <span class="sync" id="sync" role="status"></span>
+      </header>
+
+      <p class="demo-note" id="demoNote" hidden>
+        <b>연습 모드</b> · 기록이 이 휴대폰에만 저장돼요. 시트를 연결하면 실제 장부로 바뀝니다.
+        <button type="button" class="link" id="demoReset">연습 기록 지우기</button>
+      </p>
+
+      <!-- 비밀번호: 판매 금액은 스태프만 보도록 잠가 둔다 -->
+      <form class="lock" id="lock" hidden>
+        <label for="pin">스태프 비밀번호</label>
+        <input id="pin" type="password" inputmode="numeric" autocomplete="off" required />
+        <button type="submit">열기</button>
+        <p class="lock-msg" id="lockMsg" role="alert"></p>
+      </form>
+
+      <main id="app" hidden>
+        <section>
+          <h2 class="first">굿즈 담기</h2>
+          <p class="hint">손님이 고른 굿즈를 누르면 아래에 담겨요.</p>
+          <div class="items" id="items"></div>
+        </section>
+
+        <section class="summary" aria-label="판매 합계">
+          <div class="tabs" role="tablist">
+            <button type="button" role="tab" data-range="today" aria-selected="true">오늘</button>
+            <button type="button" role="tab" data-range="all" aria-selected="false">전체</button>
+          </div>
+          <p class="sum-label" id="sumLabel"></p>
+          <p class="sum-total"><b id="sumTotal">0</b>원</p>
+          <p class="sum-sub" id="sumSub"></p>
+          <table class="table" id="byItem"></table>
+          <p class="by-pay" id="byPay"></p>
+          <table class="table by-day" id="byDay" hidden></table>
+        </section>
+
+        <section>
+          <h2 id="recentTitle">판매 기록</h2>
+          <ol class="recent" id="recent"></ol>
+        </section>
+
+        <p class="foot">
+          <button type="button" class="link" id="logout">이 휴대폰에서 잠그기</button>
+        </p>
+      </main>
+    </div>
+
+    <!-- 담은 굿즈: 손님 한 명의 결제 한 번 -->
+    <div class="cart" id="cart" hidden>
+      <div class="cart-in">
+        <ul class="cart-lines" id="cartLines"></ul>
+        <div class="pays" id="pays" role="radiogroup" aria-label="결제 방법"></div>
+        <div class="cart-actions">
+          <button type="button" class="clear" id="cartClear">비우기</button>
+          <button type="button" class="submit" id="cartSubmit"></button>
+        </div>
+      </div>
+    </div>
+
+    <p class="toast" id="toast" role="status" aria-live="polite"></p>
+
+    <script src="/assets/js/goods.js"></script>
+  </body>
+</html>

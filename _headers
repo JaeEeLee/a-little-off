@@ -15,3 +15,9 @@
   X-Robots-Tag: noindex, follow
 /jessie/*
   X-Robots-Tag: noindex, follow
+
+# 굿즈 판매 장부는 스태프용이라 검색에 나오지 않게 한다
+/goods
+  X-Robots-Tag: noindex, nofollow
+/goods/*
+  X-Robots-Tag: noindex, nofollow
