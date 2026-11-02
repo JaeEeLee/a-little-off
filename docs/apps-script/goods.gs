@@ -9,7 +9,7 @@
  *  따로 새 시트를 쓰는 경우: 그 시트의 확장 프로그램 → Apps Script 에 붙이고 SHEET_ID 를 '' 로 둔다.
  *
  *  1. script.google.com → 새 프로젝트 → 이 파일 내용을 통째로 붙여 넣는다
- *  2. 아래 PIN 을 스태프 비밀번호로 바꾼다 (이 저장소에는 올리지 않는다)
+ *  2. 비밀번호는 같은 숫자 4개(1111 ~ 9999, 0000 제외)면 무엇이든 열린다. 바꾸려면 아래 pinOk 를 고친다
  *  3. 위쪽 함수 목록에서 setup 을 골라 ▶ 실행 → 권한 허용
  *     → '굿즈 판매내역'(비어 있으면 머리글을 채움) · '굿즈 상품' · '굿즈 요약' 탭이 준비된다
  *  4. '굿즈 상품' 탭에 굿즈 8개와 가격이 채워졌는지 확인한다 (가격이 빈 굿즈는 페이지에서 누를 수 없다)
@@ -23,10 +23,14 @@
  *  GET  ?type=state&pin=     → { ok, items:[{name,price}], sales:[{id,at,pay,lines,amount,cancelled}] }
  *  POST {type:'sale', pin, id, at, pay, lines:[{name,qty}]}  → { ok }   같은 id 는 한 번만 적는다
  *  POST {type:'cancel', pin, id}                              → { ok }   그 판매의 상태를 '취소'로
- *  비밀번호가 틀리면 { ok:false, error:'pin' }
+ *  비밀번호(같은 숫자 4개, 0000 제외)가 아니면 { ok:false, error:'pin' }
  */
 
-const PIN = '0000'; // ← 스태프 비밀번호로 바꾸세요
+// 스태프 비밀번호: 같은 숫자 4개(1111, 2222 … 9999)면 연다. 0000 은 막는다
+// 외우기 쉬운 대신 맞히기도 쉬우므로, 장부 주소(/goods)는 스태프끼리만 공유한다
+function pinOk(pin) {
+  return /^([1-9])\1{3}$/.test(String(pin || ''));
+}
 
 // 판매 기록을 쌓을 스프레드시트. 비우면('') 이 스크립트가 붙은 시트를 쓴다
 const SHEET_ID = '15t_YTUhzkAqSxealdi97ldYUTH3exo-Fpk3TtdjcqiA'; // 방명록 시트
@@ -130,7 +134,7 @@ function buildSummary() {
 
 function doGet(e) {
   const p = (e && e.parameter) || {};
-  if (String(p.pin || '') !== PIN) return out({ ok: false, error: 'pin' });
+  if (!pinOk(p.pin)) return out({ ok: false, error: 'pin' });
   return out({ ok: true, items: readItems(), sales: readSales() });
 }
 
@@ -141,7 +145,7 @@ function doPost(e) {
   } catch (x) {
     return out({ ok: false, error: 'body' });
   }
-  if (String(b.pin || '') !== PIN) return out({ ok: false, error: 'pin' });
+  if (!pinOk(b.pin)) return out({ ok: false, error: 'pin' });
 
   const lock = LockService.getScriptLock();
   if (!lock.tryLock(15000)) return out({ ok: false, error: 'busy' });
