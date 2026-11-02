@@ -308,7 +308,7 @@
   function renderItems() {
     var box = $('items');
     if (!items.length) {
-      box.innerHTML = '<p class="empty">시트의 \'상품\' 탭에 굿즈와 가격을 적어 주세요.</p>';
+      box.innerHTML = '<p class="empty">시트의 \'굿즈 상품\' 탭에 굿즈와 가격을 적어 주세요.</p>';
       return;
     }
     box.innerHTML = '';
