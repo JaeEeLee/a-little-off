@@ -92,6 +92,8 @@ function setup() {
    이 함수만 다시 실행해도 요약 탭을 새로 그린다 (판매내역 · 상품 탭은 건드리지 않는다) */
 function buildSummary() {
   const ss = book();
+  // 날짜를 한국 기준으로 묶는다. 시트 시간대가 다른 나라면 자정 직후 판매가 전날로 들어간다
+  if (ss.getSpreadsheetTimeZone() !== 'Asia/Seoul') ss.setSpreadsheetTimeZone('Asia/Seoul');
   const sum = ss.getSheetByName(SUMMARY) || ss.insertSheet(SUMMARY);
   sum.clear();
   const S = "'" + SALES + "'";
@@ -125,6 +127,8 @@ function buildSummary() {
     '=IFERROR(QUERY(' + S + "!A:H,\"select toDate(A), sum(E), sum(F) where H = '정상' group by toDate(A) label toDate(A) '날짜', sum(E) '판매 개수', sum(F) '금액'\",1), \"아직 판매 기록이 없어요\")"
   );
   sum.getRange('G4:I4').setFontWeight('bold');
+  sum.getRange('G5:G').setNumberFormat('yyyy-mm-dd (ddd)'); // 날짜가 숫자로 보이지 않게
+  sum.getRange('H5:I').setNumberFormat('#,##0');
 
   sum.setFrozenRows(4);
   sum.setColumnWidth(1, 170);
