@@ -165,6 +165,7 @@ test('신호가 끊겨도 기록이 휴대폰에 남았다가, 연결되면 한 
 });
 
 test('시트 주소가 없으면 연습 모드: 이 휴대폰에만 저장된다', async ({ page }) => {
+  await page.addInitScript(() => (window.__GOODS_ENDPOINT__ = ''));
   await page.goto('/goods');
   await expect(page.locator('#demoNote')).toBeVisible();
   await expect(page.locator('#sync')).toHaveText('연습 모드');

@@ -11,8 +11,9 @@
   'use strict';
 
   /* ▼ Apps Script 웹앱 주소 (docs/apps-script/goods.gs 를 배포한 뒤 붙여 넣는다) */
-  var GOODS_ENDPOINT = '';
-  var ENDPOINT = window.__GOODS_ENDPOINT__ || GOODS_ENDPOINT; // 테스트에서 가짜 주소를 넣을 수 있게
+  var GOODS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzj5BtE_6bPV7ZN26QfzlRUNrIlCU3K7v6ZprFwpvweLlVhILfYnwCj6d1cjej7JTJhGg/exec';
+  // 테스트에서 가짜 주소를 넣거나('' 로) 비워 연습 모드를 시험할 수 있게
+  var ENDPOINT = '__GOODS_ENDPOINT__' in window ? window.__GOODS_ENDPOINT__ : GOODS_ENDPOINT;
   var DEMO = !ENDPOINT;
 
   var PAYS = ['현금', '계좌이체'];
