@@ -140,6 +140,29 @@
     for (var i = 0; i < items.length; i++) if (items[i].name === name) return items[i].price;
     return null;
   }
+  /* 재고: '굿즈 상품' 탭 재고 칸 - 지금까지 팔린 개수(취소 제외). 재고 칸이 비어 있으면 null(제한 없음) */
+  function soldCounts() {
+    var n = {};
+    view().forEach(function (s) {
+      if (s.cancelled) return;
+      s.lines.forEach(function (l) {
+        n[l.name] = (n[l.name] || 0) + l.qty;
+      });
+    });
+    return n;
+  }
+  function leftOf(name, sold) {
+    for (var i = 0; i < items.length; i++) {
+      var it = items[i];
+      if (it.name === name) return typeof it.stock === 'number' ? Math.max(0, it.stock - (sold[name] || 0)) : null;
+    }
+    return null;
+  }
+  // 장바구니에 하나 더 담을 수 있나 (재고를 넘지 않게)
+  function canAdd(name, sold) {
+    var left = leftOf(name, sold || soldCounts());
+    return left == null || (cart[name] || 0) < left;
+  }
 
   /* ── 서버 ── */
   function getState() {
@@ -329,23 +352,37 @@
       return;
     }
     box.innerHTML = '';
+    var sold = soldCounts();
     items.forEach(function (it) {
       var b = document.createElement('button');
       b.type = 'button';
-      b.className = 'item' + (cart[it.name] ? ' in' : '');
+      var left = leftOf(it.name, sold);
+      var soldOut = left === 0;
+      b.className = 'item' + (cart[it.name] ? ' in' : '') + (soldOut ? ' out' : '');
       b.dataset.name = it.name;
       var priced = typeof it.price === 'number' && it.price >= 0;
-      b.disabled = !priced;
+      b.disabled = !priced || soldOut;
+      var stockText =
+        left == null ? '' : soldOut ? '<i class="stock">품절</i>' : '<i class="stock' + (left <= 3 ? ' low' : '') + '">남은 ' + left + '개</i>';
       b.innerHTML =
         '<b>' +
         esc(it.name) +
         '</b><span>' +
         (priced ? won(it.price) + '원' : '가격 미정') +
         '</span>' +
+        stockText +
         (cart[it.name] ? '<em class="badge">' + cart[it.name] + '</em>' : '');
       b.addEventListener('click', function () {
+        if (!canAdd(it.name)) {
+          toast('남은 재고가 없어요');
+          return;
+        }
         cart[it.name] = (cart[it.name] || 0) + 1;
+        buzz();
         render();
+        // 방금 누른 버튼의 개수 표시를 톡 튀게
+        var badge = document.querySelector('.item[data-name="' + cssEsc(it.name) + '"] .badge');
+        if (badge) badge.classList.add('pop');
       });
       box.appendChild(b);
     });
@@ -368,7 +405,11 @@
   function renderCart() {
     var lines = cartLines();
     $('cart').hidden = !lines.length;
-    if (!lines.length) return;
+    if (!lines.length) {
+      received = 0;
+      fitCart();
+      return;
+    }
     var ul = $('cartLines');
     ul.innerHTML = '';
     lines.forEach(function (l) {
@@ -391,8 +432,11 @@
         if (cart[l.name] <= 0) delete cart[l.name];
         render();
       });
+      if (!canAdd(l.name)) bs[1].disabled = true;
       bs[1].addEventListener('click', function () {
+        if (!canAdd(l.name)) return;
         cart[l.name] += 1;
+        buzz();
         render();
       });
       ul.appendChild(li);
@@ -412,7 +456,55 @@
       });
       pays.appendChild(b);
     });
+    renderChange(amountOf(lines));
     $('cartSubmit').textContent = won(amountOf(lines)) + '원 판매 기록';
+    fitCart();
+  }
+
+  /* 현금일 때: 받은 돈 빠른 버튼 → 거스름돈 (스태프 계산용, 시트에는 남기지 않는다) */
+  var received = 0;
+  function renderChange(total) {
+    var box = $('change');
+    box.hidden = pay !== '현금';
+    if (box.hidden) return;
+    if (received && received < total) received = 0;
+    var opts = [total];
+    [10000, 20000, 30000, 50000, 100000].forEach(function (u) {
+      var v = Math.ceil(total / u) * u;
+      if (v > total && opts.indexOf(v) < 0) opts.push(v);
+    });
+    opts = opts.sort(function (a, b) { return a - b; }).slice(0, 4);
+    var row = $('changeOpts');
+    row.innerHTML = '';
+    opts.forEach(function (v) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = v === total ? '딱 맞게' : won(v);
+      b.setAttribute('aria-pressed', String(received === v));
+      b.addEventListener('click', function () {
+        received = received === v ? 0 : v;
+        renderChange(total);
+      });
+      row.appendChild(b);
+    });
+    $('changeOut').textContent = received ? '거스름돈 ' + won(received - total) + '원' : '받은 돈을 고르면 거스름돈이 나와요';
+    $('changeOut').classList.toggle('on', !!received);
+  }
+
+  // 장바구니가 아래 굿즈를 가리지 않게, 그 높이만큼 페이지 아래에 여백을 둔다
+  function fitCart() {
+    var c = $('cart');
+    document.body.style.paddingBottom = c.hidden ? '' : c.offsetHeight + 16 + 'px';
+  }
+
+  // 누를 때 짧은 진동 (안드로이드만. 아이폰은 조용히 넘어간다)
+  function buzz() {
+    try {
+      if (navigator.vibrate) navigator.vibrate(12);
+    } catch (e) {}
+  }
+  function cssEsc(v) {
+    return window.CSS && CSS.escape ? CSS.escape(v) : String(v).replace(/"/g, '\\"');
   }
 
   $('cartClear').addEventListener('click', function () {
@@ -423,13 +515,45 @@
     var lines = cartLines();
     if (!lines.length) return;
     var op = { type: 'sale', id: newId(), at: new Date().toISOString(), pay: pay, lines: lines };
+    var change = pay === '현금' && received > amountOf(lines) ? received - amountOf(lines) : 0;
     queue.push(op);
     store(KEY.queue, queue);
     cart = {};
+    received = 0;
+    buzz();
     render();
-    toast(won(amountOf(lines)) + '원 · ' + pay + ' 기록했어요');
+    showDone(op, change);
     flush();
   });
+
+  /* 기록 직후 5초 동안: 무엇을 얼마에 기록했는지 + 되돌리기 (담았던 굿즈는 장바구니로 돌아온다) */
+  var doneTimer;
+  function showDone(op, change) {
+    var bar = $('done');
+    var what = op.lines
+      .map(function (l) {
+        return l.name + (l.qty > 1 ? ' ' + l.qty + '개' : '');
+      })
+      .join(', ');
+    $('doneTitle').textContent = won(amountOf(op.lines)) + '원 · ' + op.pay + ' 기록 완료';
+    $('doneSub').textContent = what + (change ? ' · 거스름돈 ' + won(change) + '원' : '');
+    bar.hidden = false;
+    bar.classList.remove('run');
+    void bar.offsetWidth;
+    bar.classList.add('run');
+    $('doneUndo').onclick = function () {
+      clearTimeout(doneTimer);
+      bar.hidden = true;
+      op.lines.forEach(function (l) {
+        cart[l.name] = (cart[l.name] || 0) + l.qty;
+      });
+      cancel(op.id, '되돌렸어요. 굿즈를 장바구니에 다시 담았어요');
+    };
+    clearTimeout(doneTimer);
+    doneTimer = setTimeout(function () {
+      bar.hidden = true;
+    }, 5000);
+  }
 
   /* ── 화면: 판매 기록 ── */
   function renderRecent() {
@@ -482,7 +606,7 @@
     });
   }
 
-  function cancel(id) {
+  function cancel(id, msg) {
     // 아직 못 보낸 판매는 보낼 목록에서 빼기만 한다
     var i = -1;
     queue.forEach(function (op, k) {
@@ -495,7 +619,7 @@
     }
     store(KEY.queue, queue);
     render();
-    toast('판매를 취소했어요');
+    toast(msg || '판매를 취소했어요');
     flush();
   }
 
@@ -521,6 +645,22 @@
   function unlock() {
     $('lock').hidden = true;
     $('app').hidden = false;
+    keepAwake();
+  }
+
+  // 장부를 연 동안 휴대폰 화면이 꺼지지 않게 (지원하는 브라우저에서만. 다른 앱에 다녀오면 다시 건다)
+  var wakeLock = null;
+  function keepAwake() {
+    if (!('wakeLock' in navigator) || wakeLock || document.hidden || $('app').hidden) return;
+    navigator.wakeLock
+      .request('screen')
+      .then(function (l) {
+        wakeLock = l;
+        l.addEventListener('release', function () {
+          wakeLock = null;
+        });
+      })
+      .catch(function () {});
   }
   $('lock').addEventListener('submit', function (e) {
     e.preventDefault();
@@ -593,8 +733,9 @@
     return true;
   }
   document.addEventListener('visibilitychange', function () {
-    if (!document.hidden) checkPinAge();
+    if (!document.hidden && !checkPinAge()) keepAwake();
   });
+  window.addEventListener('resize', fitCart);
 
   setInterval(function () {
     if (checkPinAge()) return;

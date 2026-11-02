@@ -198,6 +198,58 @@ test('신호가 끊겨도 기록이 휴대폰에 남았다가, 연결되면 한 
   await expect(page.locator('#sumTotal')).toHaveText('2,000');
 });
 
+test('기록 직후 되돌리기를 누르면 판매가 빠지고 굿즈가 장바구니로 돌아온다', async ({ page }) => {
+  const sheet = await fakeSheet(page);
+  await openWithPin(page);
+  await page.locator('.item[data-name="엽서"]').click();
+  await page.locator('#cartSubmit').click();
+  await expect(page.locator('#done')).toBeVisible();
+  await expect(page.locator('#doneTitle')).toHaveText('2,000원 · 현금 기록 완료');
+  await page.locator('#doneUndo').click();
+  await expect(page.locator('#done')).toBeHidden();
+  await expect(page.locator('#sumTotal')).toHaveText('0');
+  await expect(page.locator('#cart')).toBeVisible();
+  await expect(page.locator('.item[data-name="엽서"] .badge')).toHaveText('1');
+  // 이미 보냈다면 취소가 따라가고, 아직이면 보내지 않는다 — 어느 쪽이든 시트 합계는 0
+  await expect.poll(() => sheet.sales.filter((s) => !s.cancelled).length).toBe(0);
+});
+
+test('현금이면 받은 돈을 골라 거스름돈을 본다', async ({ page }) => {
+  await fakeSheet(page);
+  await openWithPin(page);
+  await page.locator('.item[data-name="마그넷"]').click(); // 5,000원
+  await page.getByRole('radio', { name: '현금' }).click();
+  await expect(page.locator('#change')).toBeVisible();
+  await page.locator('#changeOpts button', { hasText: '10,000' }).click();
+  await expect(page.locator('#changeOut')).toHaveText('거스름돈 5,000원');
+  await page.getByRole('radio', { name: '계좌이체' }).click();
+  await expect(page.locator('#change')).toBeHidden();
+});
+
+test('재고를 적으면 남은 개수가 보이고, 다 팔리면 버튼이 꺼진다', async ({ page }) => {
+  await fakeSheet(page, { items: [{ name: '엽서', price: 2000, stock: 2 }, { name: '마그넷', price: 5000, stock: null }] });
+  await openWithPin(page);
+  await expect(page.locator('.item[data-name="엽서"] .stock')).toHaveText('남은 2개');
+  await expect(page.locator('.item[data-name="마그넷"] .stock')).toHaveCount(0);
+  await page.locator('.item[data-name="엽서"]').click();
+  await page.locator('.item[data-name="엽서"]').click();
+  await page.locator('.item[data-name="엽서"]').click(); // 재고 2개를 넘는 세 번째는 담기지 않는다
+  await expect(page.locator('.item[data-name="엽서"] .badge')).toHaveText('2');
+  await page.locator('#cartSubmit').click();
+  await expect(page.locator('.item[data-name="엽서"] .stock')).toHaveText('품절');
+  await expect(page.locator('.item[data-name="엽서"]')).toBeDisabled();
+});
+
+test('장바구니가 아래 굿즈를 가리지 않는다', async ({ page }) => {
+  await fakeSheet(page);
+  await openWithPin(page);
+  await page.locator('.item[data-name="엽서"]').click();
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  const last = await page.locator('.item').last().boundingBox();
+  const cart = await page.locator('#cart').boundingBox();
+  expect(last.y + last.height).toBeLessThanOrEqual(cart.y + 1);
+});
+
 test('시트 주소가 없으면 연습 모드: 이 휴대폰에만 저장된다', async ({ page }) => {
   await page.addInitScript(() => (window.__GOODS_ENDPOINT__ = ''));
   await page.goto('/goods');

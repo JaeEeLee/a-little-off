@@ -39,17 +39,18 @@ function book() {
 }
 const PAYS = ['현금', '계좌이체'];
 
-// setup 을 처음 실행할 때 '굿즈 상품' 탭에 채워 넣는 굿즈 [이름, 가격, 메모]
+// setup 을 처음 실행할 때 '굿즈 상품' 탭에 채워 넣는 굿즈 [이름, 가격, 메모, 재고]
+// 재고는 비워 두면 제한 없이 팔 수 있다. 숫자를 적으면 장부에 '남은 n개'가 나오고 다 팔리면 버튼이 꺼진다
 // 이름이 휴대폰 버튼에 그대로 나오므로 짧게 둔다. 나중에는 '상품' 탭에서 바로 고치면 된다
 const GOODS = [
-  ['THE WONDER BOX', 25000, '아트 엽서 2장 + 마그넷 1개 + 책갈피 1개 (이상한 나라의 작은 수집함)'],
-  ['아트 엽서', 3000, ''],
-  ['엽서 4장 세트', 10000, ''],
-  ['아트 마그넷', 15000, ''],
-  ['아트 책갈피', 8000, ''],
-  ['작가 아크릴 키링', 18000, ''],
-  ['앨리스의 열쇠 (골드)', 25000, ''],
-  ['앨리스의 열쇠 (실버)', 18000, '']
+  ['THE WONDER BOX', 25000, '아트 엽서 2장 + 마그넷 1개 + 책갈피 1개 (이상한 나라의 작은 수집함)', ''],
+  ['아트 엽서', 3000, '', ''],
+  ['엽서 4장 세트', 10000, '', ''],
+  ['아트 마그넷', 15000, '', ''],
+  ['아트 책갈피', 8000, '', ''],
+  ['작가 아크릴 키링', 18000, '', ''],
+  ['앨리스의 열쇠 (골드)', 25000, '', ''],
+  ['앨리스의 열쇠 (실버)', 18000, '', '']
 ];
 const HEAD = ['시각', '판매번호', '굿즈', '단가', '개수', '금액', '결제', '상태'];
 
@@ -71,7 +72,7 @@ function setup() {
 
   const it = ss.getSheetByName(ITEMS) || ss.insertSheet(ITEMS);
   if (it.getLastRow() === 0) {
-    it.appendRow(['굿즈', '가격', '메모']);
+    it.appendRow(['굿즈', '가격', '메모', '재고']);
     GOODS.forEach((g) => it.appendRow(g));
     it.setFrozenRows(1);
     it.getRange('B:B').setNumberFormat('#,##0');
@@ -104,25 +105,27 @@ function buildSummary() {
   sum.getRange('B2').setNumberFormat('#,##0"개"');
 
   // 굿즈별: '굿즈 상품' 탭의 굿즈를 모두 줄로 세우고, 안 팔린 굿즈는 0
-  sum.getRange('A4:D4').setValues([['굿즈', '가격', '판매 개수', '판매 금액']]).setFontWeight('bold').setBackground('#F0EFEC');
+  sum.getRange('A4:E4').setValues([['굿즈', '가격', '판매 개수', '판매 금액', '남은 재고']]).setFontWeight('bold').setBackground('#F0EFEC');
   sum.getRange('A5').setFormula('=FILTER(' + I + '!A2:B, ' + I + '!A2:A<>"")');
   // SUMIFS 는 ARRAYFORMULA 로 여러 줄을 한 번에 세지 않으므로, MAP 으로 굿즈마다 따로 센다
   sum.getRange('C5').setFormula('=MAP(A5:A, LAMBDA(n, IF(n="", "", SUMIFS(' + S + '!E:E, ' + S + '!C:C, n, ' + ok + '))))');
   sum.getRange('D5').setFormula('=MAP(A5:A, LAMBDA(n, IF(n="", "", SUMIFS(' + S + '!F:F, ' + S + '!C:C, n, ' + ok + '))))');
+  // 남은 재고 = '굿즈 상품' 재고 칸 - 판매 개수 (재고 칸이 비어 있으면 빈칸)
+  sum.getRange('E5').setFormula('=MAP(A5:A, C5:C, LAMBDA(n, c, IF(n="", "", LET(s, IFERROR(XLOOKUP(n, ' + I + '!A2:A, ' + I + '!D2:D), ""), IF(s="", "", s - c)))))');
   sum.getRange('B5:B').setNumberFormat('#,##0');
   sum.getRange('C5:C').setNumberFormat('#,##0');
   sum.getRange('D5:D').setNumberFormat('#,##0');
 
   // 날짜별 (판매가 없으면 안내 문구)
-  sum.getRange('F4').setFormula(
+  sum.getRange('G4').setFormula(
     '=IFERROR(QUERY(' + S + "!A:H,\"select toDate(A), sum(E), sum(F) where H = '정상' group by toDate(A) label toDate(A) '날짜', sum(E) '판매 개수', sum(F) '금액'\",1), \"아직 판매 기록이 없어요\")"
   );
-  sum.getRange('F4:H4').setFontWeight('bold');
+  sum.getRange('G4:I4').setFontWeight('bold');
 
   sum.setFrozenRows(4);
   sum.setColumnWidth(1, 170);
-  sum.setColumnWidths(2, 3, 90);
-  sum.setColumnWidth(6, 110);
+  sum.setColumnWidths(2, 4, 90);
+  sum.setColumnWidth(7, 110);
 }
 
 function doGet(e) {
@@ -155,12 +158,13 @@ function readItems() {
   const sh = book().getSheetByName(ITEMS);
   if (!sh || sh.getLastRow() < 2) return [];
   return sh
-    .getRange(2, 1, sh.getLastRow() - 1, 2)
+    .getRange(2, 1, sh.getLastRow() - 1, 4) // 굿즈 · 가격 · 메모 · 재고
     .getValues()
     .filter((r) => String(r[0]).trim())
     .map((r) => ({
       name: String(r[0]).trim(),
-      price: r[1] === '' || isNaN(Number(r[1])) ? null : Number(r[1])
+      price: r[1] === '' || isNaN(Number(r[1])) ? null : Number(r[1]),
+      stock: r[3] === '' || isNaN(Number(r[3])) ? null : Number(r[3]) // 비어 있으면 제한 없음
     }));
 }
 

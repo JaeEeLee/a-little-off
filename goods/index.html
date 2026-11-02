@@ -75,11 +75,25 @@
       <div class="cart-in">
         <ul class="cart-lines" id="cartLines"></ul>
         <div class="pays" id="pays" role="radiogroup" aria-label="결제 방법"></div>
+        <!-- 현금일 때만: 받은 돈을 고르면 거스름돈 (스태프 계산용) -->
+        <div class="change" id="change" hidden>
+          <div class="change-opts" id="changeOpts" aria-label="받은 돈"></div>
+          <p class="change-out" id="changeOut" aria-live="polite"></p>
+        </div>
         <div class="cart-actions">
           <button type="button" class="clear" id="cartClear">비우기</button>
           <button type="button" class="submit" id="cartSubmit"></button>
         </div>
       </div>
+    </div>
+
+    <!-- 기록 직후 5초: 결과 + 되돌리기 -->
+    <div class="done" id="done" hidden role="status" aria-live="polite">
+      <div class="done-in">
+        <p class="done-text"><b id="doneTitle"></b><span id="doneSub"></span></p>
+        <button type="button" class="done-undo" id="doneUndo">되돌리기</button>
+      </div>
+      <i class="done-bar" aria-hidden="true"></i>
     </div>
 
     <p class="toast" id="toast" role="status" aria-live="polite"></p>
