@@ -378,6 +378,7 @@
           return;
         }
         cart[it.name] = (cart[it.name] || 0) + 1;
+        hideDone(); // 다음 손님 주문: 알림이 장바구니 버튼을 가리지 않게 바로 닫는다
         buzz();
         render();
         // 방금 누른 버튼의 개수 표시를 톡 튀게
@@ -558,10 +559,13 @@
       cancel(op.id, '되돌렸어요. 굿즈를 장바구니에 다시 담았어요');
     };
     clearTimeout(doneTimer);
-    doneTimer = setTimeout(function () {
-      bar.hidden = true;
-    }, 5000);
+    doneTimer = setTimeout(hideDone, 5000);
   }
+  function hideDone() {
+    clearTimeout(doneTimer);
+    $('done').hidden = true;
+  }
+  $('doneClose').addEventListener('click', hideDone);
 
   /* ── 화면: 판매 기록 ── */
   function renderRecent() {

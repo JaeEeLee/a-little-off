@@ -595,6 +595,27 @@ h2.first {
   color: inherit;
   font-weight: 600;
 }
+.done-close {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  margin: -4px -6px -4px -4px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  opacity: 0.75;
+}
+.done-close:active {
+  background: rgba(255, 255, 255, 0.15);
+}
+.done-close svg {
+  width: 18px;
+  height: 18px;
+}
 .done-bar {
   display: block;
   height: 3px;

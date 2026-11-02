@@ -214,6 +214,24 @@ test('기록 직후 되돌리기를 누르면 판매가 빠지고 굿즈가 장�
   await expect.poll(() => sheet.sales.filter((s) => !s.cancelled).length).toBe(0);
 });
 
+test('기록 알림은 X로 바로 닫히고, 다음 굿즈를 담아도 닫힌다', async ({ page }) => {
+  await fakeSheet(page);
+  await openWithPin(page);
+  await page.locator('.item[data-name="엽서"]').click();
+  await page.locator('#cartSubmit').click();
+  await expect(page.locator('#done')).toBeVisible();
+  await page.getByRole('button', { name: '닫기' }).click();
+  await expect(page.locator('#done')).toBeHidden();
+  await expect(page.locator('#sumTotal')).toHaveText('2,000'); // 닫아도 기록은 그대로
+
+  await page.locator('.item[data-name="마그넷"]').click();
+  await page.locator('#cartSubmit').click();
+  await expect(page.locator('#done')).toBeVisible();
+  await page.locator('.item[data-name="엽서"]').click(); // 다음 손님
+  await expect(page.locator('#done')).toBeHidden();
+  await expect(page.locator('#cartSubmit')).toBeVisible();
+});
+
 test('현금이면 받은 돈을 골라 거스름돈을 본다', async ({ page }) => {
   await fakeSheet(page);
   await openWithPin(page);
