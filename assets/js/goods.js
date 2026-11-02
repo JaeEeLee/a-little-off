@@ -425,7 +425,9 @@
         esc(l.name) +
         ' 하나 더">+</button></span><span class="sub">' +
         won(l.price * l.qty) +
-        '원</span>';
+        '원</span><button type="button" class="del" aria-label="' +
+        esc(l.name) +
+        ' 모두 빼기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>';
       var bs = li.querySelectorAll('button');
       bs[0].addEventListener('click', function () {
         cart[l.name] -= 1;
@@ -433,6 +435,12 @@
         render();
       });
       if (!canAdd(l.name)) bs[1].disabled = true;
+      // 휴지통: 수량과 상관없이 이 굿즈를 한 번에 뺀다
+      bs[2].addEventListener('click', function () {
+        delete cart[l.name];
+        buzz();
+        render();
+      });
       bs[1].addEventListener('click', function () {
         if (!canAdd(l.name)) return;
         cart[l.name] += 1;

@@ -369,21 +369,46 @@ h2.first {
 .cart-lines li {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   padding: 4px 0;
 }
 .cart-lines .nm {
   flex: 1;
+  min-width: 0;
+  word-break: keep-all; /* 긴 이름은 단어 단위로 두 줄 */
+  line-height: 1.3;
 }
 .cart-lines .sub {
-  min-width: 72px;
+  min-width: 66px;
   text-align: right;
   font-variant-numeric: tabular-nums;
+}
+/* 휴지통: 그 굿즈를 한 번에 빼기 */
+.cart-lines .del {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin-right: -4px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink-soft);
+}
+.cart-lines .del:active {
+  background: var(--line);
+  color: #c8401b;
+}
+.cart-lines .del svg {
+  width: 19px;
+  height: 19px;
 }
 .step {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 .step button {
   width: 32px;

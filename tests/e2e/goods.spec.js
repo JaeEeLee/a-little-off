@@ -240,6 +240,18 @@ test('재고를 적으면 남은 개수가 보이고, 다 팔리면 버튼이 �
   await expect(page.locator('.item[data-name="엽서"]')).toBeDisabled();
 });
 
+test('휴지통을 누르면 수량과 상관없이 그 굿즈를 한 번에 뺀다', async ({ page }) => {
+  await fakeSheet(page);
+  await openWithPin(page);
+  for (let i = 0; i < 3; i++) await page.locator('.item[data-name="엽서"]').click();
+  await page.locator('.item[data-name="마그넷"]').click();
+  await page.getByRole('button', { name: '엽서 모두 빼기' }).click();
+  await expect(page.locator('.item[data-name="엽서"] .badge')).toHaveCount(0);
+  await expect(page.locator('#cartSubmit')).toHaveText('5,000원 판매 기록');
+  await page.getByRole('button', { name: '마그넷 모두 빼기' }).click();
+  await expect(page.locator('#cart')).toBeHidden();
+});
+
 test('장바구니가 아래 굿즈를 가리지 않는다', async ({ page }) => {
   await fakeSheet(page);
   await openWithPin(page);
