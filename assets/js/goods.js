@@ -5,16 +5,24 @@
  *  - 상품별 판매 개수 · 총 판매금액을 오늘 / 전체로 본다. 잘못 누른 건 '취소'로 지운다 (시트에는 '취소'로 남는다)
  *  - 기록은 구글 시트(Apps Script 웹앱, docs/apps-script/goods.gs)에 저장된다. 여러 휴대폰이 같은 장부를 본다
  *  - 지하라 신호가 끊겨도 기록은 휴대폰에 먼저 쌓였다가, 연결되면 자동으로 보낸다 (판매번호로 중복 방지)
- *  - GOODS_ENDPOINT 가 비어 있으면 '연습 모드': 이 휴대폰에만 저장한다
+ *  - GOODS_ENDPOINT 가 비어 있거나 전시 시작(OPEN_AT) 전이면 '연습 모드': 이 휴대폰에만 저장한다.
+ *    전시가 시작되는 순간 페이지가 저절로 새로 고쳐져 실제 장부로 바뀐다 (연습 기록은 실제 장부로 넘어가지 않는다)
  */
 (function () {
   'use strict';
 
   /* ▼ Apps Script 웹앱 주소 (docs/apps-script/goods.gs 를 배포한 뒤 붙여 넣는다) */
-  var GOODS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzj5BtE_6bPV7ZN26QfzlRUNrIlCU3K7v6ZprFwpvweLlVhILfYnwCj6d1cjej7JTJhGg/exec';
+  var GOODS_ENDPOINT =
+    'https://script.google.com/macros/s/AKfycbzj5BtE_6bPV7ZN26QfzlRUNrIlCU3K7v6ZprFwpvweLlVhILfYnwCj6d1cjej7JTJhGg/exec';
   // 테스트에서 가짜 주소를 넣거나('' 로) 비워 연습 모드를 시험할 수 있게
   var ENDPOINT = '__GOODS_ENDPOINT__' in window ? window.__GOODS_ENDPOINT__ : GOODS_ENDPOINT;
-  var DEMO = !ENDPOINT;
+
+  /* ▼ 전시 시작 시각. 이 전에는 시트에 적지 않고 연습 모드로만 돈다 (테스트에서 바꿀 수 있게) */
+  var OPEN_AT = new Date(
+    '__GOODS_OPEN_AT__' in window ? window.__GOODS_OPEN_AT__ : '2026-11-12T13:00:00+09:00'
+  ).getTime();
+  var PREOPEN = !!ENDPOINT && Date.now() < OPEN_AT;
+  var DEMO = !ENDPOINT || PREOPEN;
 
   var PAYS = ['현금', '계좌이체'];
   var DEMO_ITEMS = [
@@ -29,6 +37,8 @@
   ];
   var POLL_MS = 20000; // 다른 휴대폰에서 기록한 판매를 가져오는 간격
   var KEY = { pin: 'alo.goods.pin', queue: 'alo.goods.queue', demo: 'alo.goods.demo', pay: 'alo.goods.pay' };
+  // 연습 기록이 실제 장부로 보내지지 않게, 연습 모드는 보낼 목록을 따로 쓴다
+  if (DEMO) KEY.queue = 'alo.goods.demo.queue';
 
   /* ── 저장소 (사생활 보호 모드 등에서 막혀도 페이지는 돌아가게) ── */
   function load(k, d) {
@@ -75,6 +85,14 @@
   var items = DEMO ? DEMO_ITEMS : []; // [{name, price}]
   var sales = []; // 시트에 저장된 판매 [{id, at, pay, lines:[{name,price,qty}], amount, cancelled}]
   var queue = load(KEY.queue, []); // 아직 못 보낸 기록 [{type:'sale'|'cancel', ...}]
+  if (!DEMO) {
+    // 전시 시작 전에 눌러 둔 판매가 남아 있으면 실제 장부로 보내지 않고 버린다
+    var before = queue.length;
+    queue = queue.filter(function (op) {
+      return !(op.type === 'sale' && new Date(op.at).getTime() < OPEN_AT);
+    });
+    if (queue.length !== before) store(KEY.queue, queue);
+  }
   var cart = {}; // 상품 이름 → 개수
   var pay = PAYS.indexOf(load(KEY.pay, '')) >= 0 ? load(KEY.pay, '') : PAYS[0];
   var range = 'today';
@@ -239,6 +257,13 @@
           flushing = false;
           return lock('비밀번호가 바뀌었어요. 다시 입력해 주세요.');
         }
+        if (r && r.error === 'not_open') {
+          // 휴대폰 시계가 조금 빨라 시트가 아직 전시 전이라고 할 때: 버리지 않고 잠시 뒤 다시 보낸다
+          flushing = false;
+          online = true;
+          renderSync();
+          return;
+        }
         queue.shift();
         store(KEY.queue, queue);
         if (r && r.ok === false) {
@@ -323,7 +348,11 @@
           left =
             l == null
               ? '<td class="left">–</td>'
-              : '<td class="left' + (l === 0 ? ' out' : l <= 3 ? ' low' : '') + '">' + (l === 0 ? '품절' : l + '개') + '</td>';
+              : '<td class="left' +
+                (l === 0 ? ' out' : l <= 3 ? ' low' : '') +
+                '">' +
+                (l === 0 ? '품절' : l + '개') +
+                '</td>';
         }
         return '<tr><td>' + esc(n) + '</td><td>' + p.qty + '개</td><td>' + won(p.amount) + '원</td>' + left + '</tr>';
       })
@@ -377,7 +406,11 @@
       var priced = typeof it.price === 'number' && it.price >= 0;
       b.disabled = !priced || soldOut;
       var stockText =
-        left == null ? '' : soldOut ? '<i class="stock">품절</i>' : '<i class="stock' + (left <= 3 ? ' low' : '') + '">남은 ' + left + '개</i>';
+        left == null
+          ? ''
+          : soldOut
+            ? '<i class="stock">품절</i>'
+            : '<i class="stock' + (left <= 3 ? ' low' : '') + '">남은 ' + left + '개</i>';
       b.innerHTML =
         '<b>' +
         esc(it.name) +
@@ -496,7 +529,11 @@
       var v = Math.ceil(total / u) * u;
       if (v > total && opts.indexOf(v) < 0) opts.push(v);
     });
-    opts = opts.sort(function (a, b) { return a - b; }).slice(0, 4);
+    opts = opts
+      .sort(function (a, b) {
+        return a - b;
+      })
+      .slice(0, 4);
     var row = $('changeOpts');
     row.innerHTML = '';
     opts.forEach(function (v) {
@@ -510,7 +547,9 @@
       });
       row.appendChild(b);
     });
-    $('changeOut').textContent = received ? '거스름돈 ' + won(received - total) + '원' : '받은 돈을 고르면 거스름돈이 나와요';
+    $('changeOut').textContent = received
+      ? '거스름돈 ' + won(received - total) + '원'
+      : '받은 돈을 고르면 거스름돈이 나와요';
     $('changeOut').classList.toggle('on', !!received);
   }
 
@@ -734,6 +773,13 @@
   /* ── 시작 ── */
   if (DEMO) {
     $('demoNote').hidden = false;
+    if (PREOPEN) {
+      $('demoText').innerHTML =
+        '<b>연습 모드</b> · 전시가 시작되는 <b>11월 12일 (목) 13:00</b> 전까지는 기록이 이 휴대폰에만 남고 실제 장부에는 적히지 않아요. 13:00가 되면 저절로 실제 장부로 바뀌어요.';
+      // 전시 시작 시각이 되면 실제 장부로 다시 연다 (열어 둔 채로 기다려도 바뀌게)
+      var wait = OPEN_AT - Date.now();
+      if (wait < 864e5) setTimeout(reopenIfStarted, wait + 500);
+    }
     $('logout').hidden = true;
     $('demoReset').addEventListener('click', function () {
       store(KEY.demo, null);
@@ -758,13 +804,18 @@
     lock('48시간이 지나 다시 잠겼어요. 비밀번호를 입력해 주세요.');
     return true;
   }
+  function reopenIfStarted() {
+    if (!PREOPEN || Date.now() < OPEN_AT) return false;
+    location.reload();
+    return true;
+  }
   document.addEventListener('visibilitychange', function () {
-    if (!document.hidden && !checkPinAge()) keepAwake();
+    if (!document.hidden && !reopenIfStarted() && !checkPinAge()) keepAwake();
   });
   window.addEventListener('resize', fitCart);
 
   setInterval(function () {
-    if (checkPinAge()) return;
+    if (reopenIfStarted() || checkPinAge()) return;
     if (document.hidden || !$('lock').hidden) return;
     if (queue.length) flush();
     else refresh();

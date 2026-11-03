@@ -206,7 +206,11 @@ function readSales() {
   return list;
 }
 
+// 전시 시작 전에는 판매를 받지 않는다 (사이트도 그 전에는 연습 모드라 보내지 않는다. 혹시 모를 시험 기록 막기)
+const OPEN_AT = new Date('2026-11-12T13:00:00+09:00');
+
 function addSale(b) {
+  if (new Date() < OPEN_AT) return { ok: false, error: 'not_open' };
   const id = String(b.id || '');
   if (!/^[\w-]{6,40}$/.test(id)) return { ok: false, error: 'id' };
   const sh = book().getSheetByName(SALES);

@@ -4,7 +4,7 @@ import { test, expect, at } from './fixtures.js';
 const ENDPOINT = 'https://script.google.com/macros/s/GOODS/exec';
 
 /** Apps Script(docs/apps-script/goods.gs)를 흉내 내는 가짜 시트 */
-async function fakeSheet(page, { pin = '1234', items } = {}) {
+async function fakeSheet(page, { pin = '1234', items, openAt = '2000-01-01T00:00:00Z' } = {}) {
   const sheet = {
     pin,
     items: items || [
@@ -16,7 +16,13 @@ async function fakeSheet(page, { pin = '1234', items } = {}) {
     posts: [],
     down: false
   };
-  await page.addInitScript((u) => (window.__GOODS_ENDPOINT__ = u), ENDPOINT);
+  await page.addInitScript(
+    ([u, o]) => {
+      window.__GOODS_ENDPOINT__ = u;
+      if (o) window.__GOODS_OPEN_AT__ = o; // 기본은 이미 시작한 전시. null 이면 실제 시작 시각
+    },
+    [ENDPOINT, openAt]
+  );
   await page.route(ENDPOINT + '**', async (route) => {
     if (sheet.down) return route.abort();
     const req = route.request();
@@ -319,4 +325,64 @@ test('시트 주소가 없으면 연습 모드: 이 휴대폰에만 저장된다
   await expect(page.locator('#sumTotal')).toHaveText('8,000');
   await page.getByRole('button', { name: '연습 기록 지우기' }).click();
   await expect(page.locator('#sumTotal')).toHaveText('0');
+});
+
+test.describe('전시 시작 전에는 실제 장부에 적지 않는다', () => {
+  test('시작 전: 연습 모드로 열리고 시트에는 아무것도 보내지 않는다', async ({ page }) => {
+    await at(page, '2026-11-12T12:30:00');
+    const sheet = await fakeSheet(page, { openAt: null });
+    await page.goto('/goods');
+    await expect(page.locator('#lock')).toBeHidden(); // 연습이라 비밀번호 없이 열린다
+    await expect(page.locator('#sync')).toHaveText('연습 모드');
+    await expect(page.locator('#demoText')).toContainText('11월 12일 (목) 13:00');
+    await page.locator('.item:not([disabled])').first().click();
+    await page.locator('#cartSubmit').click();
+    await expect(page.locator('#recent li').first()).not.toHaveClass(/empty/);
+    expect(sheet.posts).toHaveLength(0);
+  });
+
+  test('13:00가 되면 실제 장부로 바뀌고, 연습 기록은 넘어가지 않는다', async ({ page }) => {
+    await at(page, '2026-11-12T12:59:00');
+    const sheet = await fakeSheet(page, { openAt: null });
+    await page.goto('/goods');
+    await page.locator('.item:not([disabled])').first().click();
+    await page.locator('#cartSubmit').click();
+    await expect(page.locator('#sync')).toHaveText('연습 모드');
+
+    await at(page, '2026-11-12T13:00:05');
+    await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange')));
+    await expect(page.locator('#lock')).toBeVisible(); // 실제 장부: 비밀번호를 묻는다
+    await page.locator('#pin').fill('1234');
+    await page.getByRole('button', { name: '열기' }).click();
+    await expect(page.locator('#sync')).toHaveText(/저장됨/);
+    await expect(page.locator('#sumTotal')).toHaveText('0');
+    expect(sheet.posts.filter((p) => p.type === 'sale')).toHaveLength(0);
+
+    await page.locator('.item[data-name="엽서"]').click();
+    await page.locator('#cartSubmit').click();
+    await expect(page.locator('#sumTotal')).toHaveText('2,000');
+    expect(sheet.sales).toHaveLength(1);
+  });
+
+  test('시작 전에 실제 장부용으로 쌓여 있던 판매는 시작 뒤에도 보내지 않는다', async ({ page }) => {
+    await at(page, '2026-11-12T14:00:00');
+    const sheet = await fakeSheet(page, { openAt: null });
+    await page.addInitScript(() => {
+      localStorage.setItem(
+        'alo.goods.queue',
+        JSON.stringify([
+          {
+            type: 'sale',
+            id: 'gtest01',
+            at: '2026-11-03T09:00:00.000Z',
+            pay: '현금',
+            lines: [{ name: '엽서', price: 2000, qty: 1 }]
+          }
+        ])
+      );
+    });
+    await openWithPin(page);
+    await expect(page.locator('#sync')).toHaveText(/저장됨/);
+    expect(sheet.posts.filter((p) => p.type === 'sale')).toHaveLength(0);
+  });
 });
