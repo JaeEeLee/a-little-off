@@ -770,6 +770,20 @@
     });
   }
 
+  /* ── 확대 막기: 판매 중 손가락이 닿아 화면이 커지지 않게 (아이폰 사파리는 viewport 설정을 무시해서 여기서 막는다) ── */
+  ['gesturestart', 'gesturechange'].forEach(function (t) {
+    document.addEventListener(t, function (e) {
+      e.preventDefault();
+    });
+  });
+  document.addEventListener(
+    'touchmove',
+    function (e) {
+      if (e.touches && e.touches.length > 1) e.preventDefault(); // 두 손가락 벌리기
+    },
+    { passive: false }
+  );
+
   /* ── 시작 ── */
   if (DEMO) {
     $('demoNote').hidden = false;

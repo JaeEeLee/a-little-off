@@ -386,3 +386,9 @@ test.describe('전시 시작 전에는 실제 장부에 적지 않는다', () =>
     expect(sheet.posts.filter((p) => p.type === 'sale')).toHaveLength(0);
   });
 });
+
+test('확대가 꺼져 있다 (두 번 탭 · 두 손가락 확대)', async ({ page }) => {
+  await page.goto('/goods');
+  await expect(page.locator('meta[name="viewport"]')).toHaveAttribute('content', /maximum-scale=1,user-scalable=no/);
+  expect(await page.evaluate(() => getComputedStyle(document.documentElement).touchAction)).toBe('manipulation');
+});

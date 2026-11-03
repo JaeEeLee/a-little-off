@@ -17,6 +17,7 @@
 }
 html {
   -webkit-text-size-adjust: 100%;
+  touch-action: manipulation; /* 버튼을 빠르게 연달아 눌러도 두 번 탭 확대가 되지 않게 */
 }
 body {
   margin: 0;
