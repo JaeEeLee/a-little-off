@@ -98,6 +98,9 @@ h2.first {
   color: var(--ink-soft);
   white-space: nowrap;
 }
+.sync:empty {
+  display: none; /* 잠금 화면처럼 아직 상태가 없을 때 빈 알약이 보이지 않게 */
+}
 .sync.wait {
   color: var(--warn);
   border-color: currentColor;
@@ -116,6 +119,7 @@ h2.first {
 /* ── 잠금 ── */
 .lock {
   display: grid;
+  grid-template-columns: minmax(0, 1fr); /* 입력칸의 기본 너비 때문에 카드 밖으로 삐져나가지 않게 */
   gap: 10px;
   margin-top: 40px;
   padding: 22px;
@@ -127,11 +131,19 @@ h2.first {
   font-weight: 600;
 }
 .lock input {
+  width: 100%;
+  min-width: 0;
   padding: 12px;
   border: 1px solid var(--line);
   border-radius: 8px;
   font-size: 1.2rem;
   letter-spacing: 0.3em;
+  background: var(--surface);
+}
+.lock input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(30, 86, 184, 0.15);
 }
 .lock button {
   padding: 12px;
@@ -508,9 +520,15 @@ h2.first {
   animation: badgePop 0.28s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 @keyframes badgePop {
-  0% { transform: scale(0.6); }
-  60% { transform: scale(1.25); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(0.6);
+  }
+  60% {
+    transform: scale(1.25);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 .cart-lines .step button:disabled {
   opacity: 0.35;
@@ -626,12 +644,18 @@ h2.first {
   animation: doneBar 5s linear forwards;
 }
 @keyframes doneBar {
-  from { transform: scaleX(1); }
-  to { transform: scaleX(0); }
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   .item .badge.pop,
-  .done.run .done-bar { animation: none; }
+  .done.run .done-bar {
+    animation: none;
+  }
 }
 
 /* 판매 합계 표의 남은 재고 */

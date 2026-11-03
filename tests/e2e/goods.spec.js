@@ -67,6 +67,22 @@ test('비밀번호가 틀리면 열리지 않고, 맞으면 장부가 열린다'
   await expect(page.locator('#app')).toBeVisible();
 });
 
+for (const width of [360, 390]) {
+  test(`잠금 화면(${width}px): 입력칸과 버튼이 카드 안에 들어가고, 빈 상태 알약은 숨는다`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 760 });
+    await fakeSheet(page);
+    await page.goto('/goods');
+    const card = await page.locator('#lock').boundingBox();
+    for (const sel of ['#pin', '#lock button[type="submit"]']) {
+      const box = await page.locator(sel).boundingBox();
+      expect(box.x).toBeGreaterThanOrEqual(card.x);
+      expect(box.x + box.width).toBeLessThanOrEqual(card.x + card.width);
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+    await expect(page.locator('#sync')).toBeHidden();
+  });
+}
+
 test('비밀번호는 입력한 때부터 48시간 동안만 기억한다', async ({ page }) => {
   await fakeSheet(page);
   // 47시간 전에 입력한 비밀번호 → 그대로 열린다
@@ -80,7 +96,9 @@ test('비밀번호는 입력한 때부터 48시간 동안만 기억한다', asyn
   await expect(page.locator('#app')).toBeVisible();
 
   // 48시간이 지난 비밀번호 → 잠기고 다시 묻는다
-  await page.evaluate(() => localStorage.setItem('alo.goods.pin', JSON.stringify({ v: '1234', exp: Date.now() - 1000 })));
+  await page.evaluate(() =>
+    localStorage.setItem('alo.goods.pin', JSON.stringify({ v: '1234', exp: Date.now() - 1000 }))
+  );
   await page.reload();
   await expect(page.locator('#lock')).toBeVisible();
   await expect(page.locator('#app')).toBeHidden();
@@ -245,7 +263,12 @@ test('현금이면 받은 돈을 골라 거스름돈을 본다', async ({ page }
 });
 
 test('재고를 적으면 남은 개수가 보이고, 다 팔리면 버튼이 꺼진다', async ({ page }) => {
-  await fakeSheet(page, { items: [{ name: '엽서', price: 2000, stock: 2 }, { name: '마그넷', price: 5000, stock: null }] });
+  await fakeSheet(page, {
+    items: [
+      { name: '엽서', price: 2000, stock: 2 },
+      { name: '마그넷', price: 5000, stock: null }
+    ]
+  });
   await openWithPin(page);
   await expect(page.locator('.item[data-name="엽서"] .stock')).toHaveText('남은 2개');
   await expect(page.locator('.item[data-name="마그넷"] .stock')).toHaveCount(0);
