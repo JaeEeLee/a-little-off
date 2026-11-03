@@ -36,7 +36,13 @@
     { name: '앨리스의 열쇠 (실버)', price: 18000 }
   ];
   var POLL_MS = 20000; // 다른 휴대폰에서 기록한 판매를 가져오는 간격
-  var KEY = { pin: 'alo.goods.pin', queue: 'alo.goods.queue', demo: 'alo.goods.demo', pay: 'alo.goods.pay' };
+  var KEY = {
+    pin: 'alo.goods.pin',
+    queue: 'alo.goods.queue',
+    demo: 'alo.goods.demo',
+    pay: 'alo.goods.pay',
+    device: 'alo.goods.device'
+  };
   // 연습 기록이 실제 장부로 보내지지 않게, 연습 모드는 보낼 목록을 따로 쓴다
   if (DEMO) KEY.queue = 'alo.goods.demo.queue';
 
@@ -576,6 +582,7 @@
   $('cartSubmit').addEventListener('click', function () {
     var lines = cartLines();
     if (!lines.length) return;
+    practicePing('sale');
     var op = { type: 'sale', id: newId(), at: new Date().toISOString(), pay: pay, lines: lines };
     var change = pay === '현금' && received > amountOf(lines) ? received - amountOf(lines) : 0;
     queue.push(op);
@@ -770,6 +777,23 @@
     });
   }
 
+  /* ── 연습 현황: 전시 전 연습 모드에서 '이 휴대폰이 연습했다'만 시트에 알린다 (이름 · 판매 내용은 보내지 않는다) ── */
+  function practicePing(ev) {
+    if (!PREOPEN) return;
+    var device = load(KEY.device, '');
+    if (!/^[a-z0-9]{6,24}$/.test(device)) {
+      device = (Date.now().toString(36) + Math.random().toString(36).slice(2, 8)).slice(0, 16);
+      store(KEY.device, device);
+    }
+    try {
+      fetch(ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ type: 'practice', device: device, event: ev })
+      }).catch(function () {});
+    } catch (e) {}
+  }
+
   /* ── 확대 막기: 판매 중 손가락이 닿아 화면이 커지지 않게 (아이폰 사파리는 viewport 설정을 무시해서 여기서 막는다) ── */
   ['gesturestart', 'gesturechange'].forEach(function (t) {
     document.addEventListener(t, function (e) {
@@ -791,6 +815,7 @@
       $('demoText').innerHTML =
         '<b>연습 모드</b> · 전시가 시작되는 <b>11월 12일 (목) 13:00</b> 전까지는 기록이 이 휴대폰에만 남고 실제 장부에는 적히지 않아요. 13:00가 되면 저절로 실제 장부로 바뀌어요.';
       // 전시 시작 시각이 되면 실제 장부로 다시 연다 (열어 둔 채로 기다려도 바뀌게)
+      practicePing('open');
       var wait = OPEN_AT - Date.now();
       if (wait < 864e5) setTimeout(reopenIfStarted, wait + 500);
     }

@@ -338,7 +338,13 @@ test.describe('전시 시작 전에는 실제 장부에 적지 않는다', () =>
     await page.locator('.item:not([disabled])').first().click();
     await page.locator('#cartSubmit').click();
     await expect(page.locator('#recent li').first()).not.toHaveClass(/empty/);
-    expect(sheet.posts).toHaveLength(0);
+    // 판매 내용은 보내지 않고, 익명 연습 현황(열어 봄 · 연습 판매)만 알린다
+    await expect.poll(() => sheet.posts.length).toBe(2);
+    expect(sheet.posts.map((p) => p.type)).toEqual(['practice', 'practice']);
+    expect(sheet.posts.map((p) => p.event)).toEqual(['open', 'sale']);
+    expect(sheet.posts[0].device).toMatch(/^[a-z0-9]{6,24}$/);
+    expect(sheet.posts[1].device).toBe(sheet.posts[0].device);
+    expect(Object.keys(sheet.posts[1]).sort()).toEqual(['device', 'event', 'type']);
   });
 
   test('13:00가 되면 실제 장부로 바뀌고, 연습 기록은 넘어가지 않는다', async ({ page }) => {

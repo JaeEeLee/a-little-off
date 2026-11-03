@@ -23,6 +23,7 @@
  *  GET  ?type=state&pin=     → { ok, items:[{name,price}], sales:[{id,at,pay,lines,amount,cancelled}] }
  *  POST {type:'sale', pin, id, at, pay, lines:[{name,qty}]}  → { ok }   같은 id 는 한 번만 적는다
  *  POST {type:'cancel', pin, id}                              → { ok }   그 판매의 상태를 '취소'로
+ *  POST {type:'practice', device, event:'open'|'sale'}         → { ok }   전시 전 연습 현황 (비밀번호 없음, 익명)
  *  비밀번호(같은 숫자 4개, 0000 제외)가 아니면 { ok:false, error:'pin' }
  */
 
@@ -37,6 +38,8 @@ const SHEET_ID = '15t_YTUhzkAqSxealdi97ldYUTH3exo-Fpk3TtdjcqiA'; // 방명록 �
 const SALES = '굿즈 판매내역';
 const ITEMS = '굿즈 상품';
 const SUMMARY = '굿즈 요약';
+const PRACTICE = '굿즈 연습 현황'; // 전시 전 연습 모드를 쓴 휴대폰 수 (누구인지는 남기지 않는다)
+const PRACTICE_HEAD = ['휴대폰(익명)', '처음 연습', '마지막 연습', '열어 본 횟수', '연습 판매 수'];
 
 function book() {
   return SHEET_ID ? SpreadsheetApp.openById(SHEET_ID) : SpreadsheetApp.getActive();
@@ -149,6 +152,18 @@ function doPost(e) {
   } catch (x) {
     return out({ ok: false, error: 'body' });
   }
+
+  // 연습 현황은 비밀번호 없이 받는다 (연습 모드는 비밀번호 없이 열리므로). 매출 시트와는 상관없다
+  if (b.type === 'practice') {
+    const pl = LockService.getScriptLock();
+    if (!pl.tryLock(10000)) return out({ ok: false, error: 'busy' });
+    try {
+      return out(logPractice(b));
+    } finally {
+      pl.releaseLock();
+    }
+  }
+
   if (!pinOk(b.pin)) return out({ ok: false, error: 'pin' });
 
   const lock = LockService.getScriptLock();
@@ -261,6 +276,36 @@ function cancelSale(id) {
     }
   });
   return { ok: true, found: found };
+}
+
+// 휴대폰마다 한 줄: 처음 · 마지막 연습 시각, 열어 본 횟수, 연습 판매 수. 전시가 시작되면 더 받지 않는다
+function logPractice(b) {
+  if (new Date() >= OPEN_AT) return { ok: false, error: 'open' };
+  const device = String(b.device || '');
+  if (!/^[a-z0-9]{6,24}$/.test(device)) return { ok: false, error: 'device' };
+  const ev = b.event === 'sale' ? 'sale' : 'open';
+
+  const ss = book();
+  let sh = ss.getSheetByName(PRACTICE);
+  if (!sh) {
+    sh = ss.insertSheet(PRACTICE);
+    sh.appendRow(PRACTICE_HEAD);
+    sh.setFrozenRows(1);
+    sh.getRange('B:C').setNumberFormat('mm/dd hh:mm');
+    sh.setColumnWidths(1, 5, 110);
+  }
+  const now = new Date();
+  const hit = sh.getLastRow() > 1 && sh.getRange('A2:A').createTextFinder(device).matchEntireCell(true).findNext();
+  if (!hit) {
+    sh.appendRow([device, now, now, ev === 'open' ? 1 : 0, ev === 'sale' ? 1 : 0]);
+  } else {
+    const r = hit.getRow();
+    const v = sh.getRange(r, 4, 1, 2).getValues()[0];
+    sh.getRange(r, 3).setValue(now);
+    if (ev === 'open') sh.getRange(r, 4).setValue((Number(v[0]) || 0) + 1);
+    else sh.getRange(r, 5).setValue((Number(v[1]) || 0) + 1);
+  }
+  return { ok: true };
 }
 
 function out(o) {
