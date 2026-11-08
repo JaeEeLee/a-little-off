@@ -1817,6 +1817,73 @@
     });
   })();
 
+  /* ── 떠 있는 '관람 예약하기' 버튼 ──
+     예약 카드가 몇 화면 아래에 있어서, 내려가는 길을 화면 아래에 띄워 둔다 (메인 · 작가 페이지. 예약 전용 페이지는 장면마다 버튼이 있다)
+     - 첫 화면(포스터)을 지나면 나타나고, 예약 카드가 보이거나 글을 입력하는 동안 · 알림이 떠 있는 동안은 숨는다
+     - 예약을 마쳤거나(이 휴대폰에서) 전시가 끝나면 띄우지 않는다 */
+  (function () {
+    var sec = document.getElementById('visitSection');
+    var END = new Date('2026-11-17T20:00:00+09:00').getTime();
+    if (IS_VISIT || !sec || sec.hidden || Date.now() >= END) return;
+    try {
+      if (localStorage.getItem('visit-sent')) return;
+    } catch (e) {}
+
+    var fab = document.createElement('button');
+    fab.type = 'button';
+    fab.className = 'fab-visit';
+    fab.id = 'fabVisit';
+    fab.innerHTML =
+      '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 10h17M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>' +
+      '<span>관람 예약하기</span><small>11.12 – 11.17</small>';
+    document.body.appendChild(fab);
+
+    var foot = document.querySelector('footer');
+    var typing = false;
+    var ticking = false;
+    function update() {
+      ticking = false;
+      if (!fab.isConnected) return;
+      var vh = window.innerHeight;
+      var r = sec.getBoundingClientRect();
+      var show =
+        !sec.hidden &&
+        window.scrollY > vh * 0.8 && // 첫 화면을 지났고
+        !(r.top < vh && r.bottom > 0) && // 예약 카드가 화면에 없고
+        !(foot && foot.getBoundingClientRect().top < vh) && // 맨 아래 학원 링크를 가리지 않게
+        !typing && // 키보드가 올라와 있지 않고
+        !document.querySelector('.toast'); // 알림과 겹치지 않게
+      fab.classList.toggle('on', show);
+      fab.setAttribute('aria-hidden', String(!show));
+      fab.tabIndex = show ? 0 : -1;
+    }
+    function queue() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(update);
+    }
+    window.addEventListener('scroll', queue, { passive: true });
+    window.addEventListener('resize', queue);
+    document.addEventListener('focusin', function (e) {
+      typing = /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName);
+      queue();
+    });
+    document.addEventListener('focusout', function () {
+      typing = false;
+      queue();
+    });
+    new MutationObserver(queue).observe(document.body, { childList: true }); // 알림이 생기고 사라질 때
+    queue();
+
+    fab.addEventListener('click', function () {
+      var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+      sec.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+    });
+    window.addEventListener('visit-done', function () {
+      fab.remove();
+    });
+  })();
+
   /* ── 작가별 공유 링크 (#이름) ── */
   (function () {
     var items = document.querySelectorAll('.artists li');

@@ -2312,7 +2312,8 @@ button.cal-day:focus-visible b {
 }
 .field select {
   appearance: none;
-  background-image: linear-gradient(45deg, transparent 50%, var(--ink-soft) 50%),
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--ink-soft) 50%),
     linear-gradient(135deg, var(--ink-soft) 50%, transparent 50%);
   background-position:
     calc(100% - 18px) 50%,
@@ -2528,6 +2529,54 @@ footer a {
   box-shadow: 0 6px 22px var(--shadow);
   z-index: 50;
   animation: toastIn 0.32s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+/* ── 떠 있는 관람 예약 버튼 (site.js 가 메인 · 작가 페이지에 붙인다) ── */
+.fab-visit {
+  position: fixed;
+  left: 50%;
+  bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+  z-index: 40; /* 그림 크게 보기(50) · 알림(50) 아래 */
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 22px 13px 18px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 6px 20px rgba(30, 86, 184, 0.35);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 16px);
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
+}
+.fab-visit.on {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, 0);
+}
+.fab-visit:active {
+  transform: translate(-50%, 0) scale(0.97);
+}
+.fab-visit small {
+  font-size: 0.75rem;
+  font-weight: 400;
+  opacity: 0.8;
+}
+@media (prefers-reduced-motion: reduce) {
+  .fab-visit {
+    transition: opacity 0.2s;
+    transform: translate(-50%, 0);
+  }
 }
 
 /* ── 모션 ─────────────────────────────────── */
