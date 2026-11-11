@@ -21,7 +21,8 @@
  *
  * 주고받는 내용
  *  GET  ?type=state&pin=     → { ok, items:[{name,price}], sales:[{id,at,pay,lines,amount,cancelled}] }
- *  POST {type:'sale', pin, id, at, pay, lines:[{name,qty}]}  → { ok }   같은 id 는 한 번만 적는다
+ *  POST {type:'sale', pin, id, at, pay, lines:[{name,qty}], early?}  → { ok }   같은 id 는 한 번만 적는다
+ *       전시 시작 전에는 early:true (스태프가 '실제 판매 기록'으로 바꾼 휴대폰) 판매만 받는다
  *  POST {type:'cancel', pin, id}                              → { ok }   그 판매의 상태를 '취소'로
  *  POST {type:'practice', device, event:'open'|'sale'}         → { ok }   전시 전 연습 현황 (비밀번호 없음, 익명)
  *  비밀번호(같은 숫자 4개, 0000 제외)가 아니면 { ok:false, error:'pin' }
@@ -225,7 +226,8 @@ function readSales() {
 const OPEN_AT = new Date('2026-11-12T13:00:00+09:00');
 
 function addSale(b) {
-  if (new Date() < OPEN_AT) return { ok: false, error: 'not_open' };
+  // 시작 전이라도 스태프가 '실제 판매 기록'으로 바꿔서 보낸 판매(early)는 받는다
+  if (new Date() < OPEN_AT && b.early !== true) return { ok: false, error: 'not_open' };
   const id = String(b.id || '');
   if (!/^[\w-]{6,40}$/.test(id)) return { ok: false, error: 'id' };
   const sh = book().getSheetByName(SALES);

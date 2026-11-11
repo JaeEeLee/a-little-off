@@ -102,6 +102,18 @@ h2.first {
 .sync:empty {
   display: none; /* 잠금 화면처럼 아직 상태가 없을 때 빈 알약이 보이지 않게 */
 }
+.sync.switch {
+  cursor: pointer;
+  border-color: var(--ink-soft);
+  color: var(--ink);
+  -webkit-tap-highlight-color: transparent;
+}
+.sync.switch:active {
+  background: var(--wall);
+}
+.demo-note.early {
+  background: #e8f0fc;
+}
 .sync.wait {
   color: var(--warn);
   border-color: currentColor;

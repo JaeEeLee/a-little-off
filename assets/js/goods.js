@@ -21,7 +21,16 @@
   var OPEN_AT = new Date(
     '__GOODS_OPEN_AT__' in window ? window.__GOODS_OPEN_AT__ : '2026-11-12T13:00:00+09:00'
   ).getTime();
-  var PREOPEN = !!ENDPOINT && Date.now() < OPEN_AT;
+  var BEFORE_OPEN = !!ENDPOINT && Date.now() < OPEN_AT;
+  // 시작 전이라도 실제로 사 가는 손님이 있으면, 위쪽 '연습 모드' 칩을 눌러 이 휴대폰만 실제 장부로 바꿀 수 있다
+  var EARLY_KEY = 'alo.goods.live';
+  var EARLY = false;
+  try {
+    if (!BEFORE_OPEN)
+      localStorage.removeItem(EARLY_KEY); // 전시가 시작되면 필요 없는 표시
+    else EARLY = localStorage.getItem(EARLY_KEY) === '1';
+  } catch (e) {}
+  var PREOPEN = BEFORE_OPEN && !EARLY;
   var DEMO = !ENDPOINT || PREOPEN;
 
   var PAYS = ['현금', '계좌이체'];
@@ -95,8 +104,9 @@
   if (!DEMO) {
     // 전시 시작 전에 눌러 둔 판매가 남아 있으면 실제 장부로 보내지 않고 버린다
     var before = queue.length;
+    // (칩으로 일부러 실제 장부로 바꿔 기록한 판매(early)는 진짜 판매라 그대로 보낸다)
     queue = queue.filter(function (op) {
-      return !(op.type === 'sale' && new Date(op.at).getTime() < OPEN_AT);
+      return !(op.type === 'sale' && !op.early && new Date(op.at).getTime() < OPEN_AT);
     });
     if (queue.length !== before) store(KEY.queue, queue);
   }
@@ -585,6 +595,7 @@
     if (!lines.length) return;
     practicePing('sale');
     var op = { type: 'sale', id: newId(), at: new Date().toISOString(), pay: pay, lines: lines };
+    if (EARLY) op.early = true; // 시트가 전시 시작 전 판매를 받아 주도록
     var change = pay === '현금' && received > amountOf(lines) ? received - amountOf(lines) : 0;
     queue.push(op);
     store(KEY.queue, queue);
@@ -701,8 +712,9 @@
     var el = $('sync');
     var waiting = queue.length;
     el.classList.toggle('wait', !!waiting || !online);
-    if (DEMO) el.textContent = '연습 모드';
+    if (DEMO) el.textContent = BEFORE_OPEN ? '연습 모드 ⇄' : '연습 모드';
     else if (waiting) el.textContent = '전송 대기 ' + waiting + '건';
+    else if (EARLY && online) el.textContent = '실제 기록 중 ⇄';
     else if (!online) el.textContent = '연결 끊김';
     else el.textContent = syncedAt ? '저장됨 ' + TIME_FMT.format(syncedAt) : '불러오는 중';
   }
@@ -808,6 +820,43 @@
     },
     { passive: false }
   );
+
+  /* ── 연습 모드 ⇄ 실제 장부 (전시 시작 전에만) ── */
+  if (BEFORE_OPEN) {
+    var chip = $('sync');
+    chip.classList.add('switch');
+    chip.setAttribute('role', 'button');
+    chip.tabIndex = 0;
+    chip.setAttribute('aria-label', EARLY ? '연습 모드로 돌아가기' : '실제 판매 기록으로 바꾸기');
+    chip.textContent = EARLY ? '실제 기록 중 ⇄' : '연습 모드 ⇄'; // 잠금 화면에서도 보이게
+    var flip = function () {
+      var ok = EARLY
+        ? window.confirm('연습 모드로 돌아갈까요?\n\n이 휴대폰에서 누르는 판매가 다시 실제 장부에 남지 않아요.')
+        : window.confirm(
+            '실제 판매를 기록할까요?\n\n전시 시작 전이지만, 지금부터 이 휴대폰에서 기록하는 판매는 실제 장부(시트)에 남아요.\n실제로 결제한 손님이 있을 때만 바꿔 주세요.'
+          );
+      if (!ok) return;
+      try {
+        if (EARLY) localStorage.removeItem(EARLY_KEY);
+        else localStorage.setItem(EARLY_KEY, '1');
+      } catch (e) {}
+      location.reload();
+    };
+    chip.addEventListener('click', flip);
+    chip.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        flip();
+      }
+    });
+    if (EARLY) {
+      $('demoNote').hidden = false;
+      $('demoNote').classList.add('early');
+      $('demoText').innerHTML =
+        '<b>실제 판매 기록 중</b> · 전시 시작 전이지만 이 휴대폰의 기록은 실제 장부에 남아요. 연습하려면 위쪽 칩을 눌러 연습 모드로 돌아가세요.';
+      $('demoReset').hidden = true;
+    }
+  }
 
   /* ── 시작 ── */
   if (DEMO) {

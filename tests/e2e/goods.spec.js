@@ -333,7 +333,7 @@ test.describe('전시 시작 전에는 실제 장부에 적지 않는다', () =>
     const sheet = await fakeSheet(page, { openAt: null });
     await page.goto('/goods');
     await expect(page.locator('#lock')).toBeHidden(); // 연습이라 비밀번호 없이 열린다
-    await expect(page.locator('#sync')).toHaveText('연습 모드');
+    await expect(page.locator('#sync')).toHaveText('연습 모드 ⇄');
     await expect(page.locator('#demoText')).toContainText('11월 12일 (목) 13:00');
     await page.locator('.item:not([disabled])').first().click();
     await page.locator('#cartSubmit').click();
@@ -353,7 +353,7 @@ test.describe('전시 시작 전에는 실제 장부에 적지 않는다', () =>
     await page.goto('/goods');
     await page.locator('.item:not([disabled])').first().click();
     await page.locator('#cartSubmit').click();
-    await expect(page.locator('#sync')).toHaveText('연습 모드');
+    await expect(page.locator('#sync')).toHaveText('연습 모드 ⇄');
 
     await at(page, '2026-11-12T13:00:05');
     await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange')));
@@ -397,4 +397,64 @@ test('확대가 꺼져 있다 (두 번 탭 · 두 손가락 확대)', async ({ p
   await page.goto('/goods');
   await expect(page.locator('meta[name="viewport"]')).toHaveAttribute('content', /maximum-scale=1,user-scalable=no/);
   expect(await page.evaluate(() => getComputedStyle(document.documentElement).touchAction)).toBe('manipulation');
+});
+
+test.describe('시작 전 실제 판매로 바꾸기 (연습 모드 칩)', () => {
+  test('칩을 누르고 확인하면 실제 장부로 바뀌어 시트에 early 판매로 남는다', async ({ page }) => {
+    await at(page, '2026-11-11T21:00:00');
+    const sheet = await fakeSheet(page, { openAt: null });
+    await page.goto('/goods');
+    await expect(page.locator('#sync')).toHaveText('연습 모드 ⇄');
+
+    page.once('dialog', (d) => {
+      expect(d.message()).toContain('실제 판매를 기록할까요?');
+      d.accept();
+    });
+    await page.locator('#sync').click();
+    await expect(page.locator('#lock')).toBeVisible(); // 실제 장부라 비밀번호를 묻는다
+    await expect(page.locator('#sync')).toHaveText('실제 기록 중 ⇄');
+    await page.locator('#pin').fill('1234');
+    await page.getByRole('button', { name: '열기' }).click();
+    await expect(page.locator('#demoNote')).toContainText('실제 판매 기록 중');
+
+    await page.locator('.item[data-name="엽서"]').click();
+    await page.locator('.item[data-name="엽서"]').click();
+    await page.locator('#cartSubmit').click();
+    await expect.poll(() => sheet.sales.length).toBe(1);
+    const sale = sheet.posts.find((p) => p.type === 'sale');
+    expect(sale).toMatchObject({ early: true });
+    await expect(page.locator('#sync')).toHaveText('실제 기록 중 ⇄');
+
+    // 다시 열어도 실제 장부 그대로, 보낸 판매도 버리지 않는다
+    await page.reload();
+    await expect(page.locator('#sumTotal')).toHaveText('4,000');
+  });
+
+  test('취소하면 연습 모드 그대로, 다시 누르면 연습 모드로 돌아간다', async ({ page }) => {
+    await at(page, '2026-11-11T21:00:00');
+    const sheet = await fakeSheet(page, { openAt: null });
+    await page.goto('/goods');
+    page.once('dialog', (d) => d.dismiss());
+    await page.locator('#sync').click();
+    await expect(page.locator('#sync')).toHaveText('연습 모드 ⇄');
+    await expect(page.locator('#lock')).toBeHidden();
+
+    await page.evaluate(() => localStorage.setItem('alo.goods.live', '1'));
+    await page.reload();
+    await expect(page.locator('#sync')).toHaveText('실제 기록 중 ⇄');
+    page.once('dialog', (d) => {
+      expect(d.message()).toContain('연습 모드로 돌아갈까요?');
+      d.accept();
+    });
+    await page.locator('#sync').click();
+    await expect(page.locator('#sync')).toHaveText('연습 모드 ⇄');
+    expect(sheet.posts.filter((p) => p.type === 'sale')).toHaveLength(0);
+  });
+
+  test('전시가 시작되면 칩은 바꾸기 버튼이 아니다', async ({ page }) => {
+    await at(page, '2026-11-12T14:00:00');
+    await fakeSheet(page, { openAt: null });
+    await openWithPin(page);
+    await expect(page.locator('#sync')).not.toHaveClass(/switch/);
+  });
 });
