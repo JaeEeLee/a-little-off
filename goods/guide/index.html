@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <meta name="color-scheme" content="light only" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>굿즈 장부 사용법 · 조금 이상한 우리들</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@500;700&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap"
+    />
+    <link rel="stylesheet" href="/assets/css/goods.css" />
+    <style>
+      /* 사용법 안내 (/goods/guide) — 장부와 같은 색 · 글꼴 */
+      .guide {
+        padding-bottom: 48px;
+      }
+      .guide .lead {
+        margin: 0 0 20px;
+        color: var(--ink-soft);
+        font-size: 0.92rem;
+        word-break: keep-all;
+      }
+      .open {
+        display: block;
+        margin: 0 0 28px;
+        padding: 14px;
+        border-radius: var(--radius);
+        background: var(--accent);
+        color: var(--on-accent);
+        text-align: center;
+        text-decoration: none;
+        font-weight: 600;
+      }
+      .pin {
+        margin: 0 0 28px;
+        padding: 14px 16px;
+        border-radius: var(--radius);
+        background: #fff6e8;
+        font-size: 0.9rem;
+        word-break: keep-all;
+      }
+      .pin b {
+        font-size: 1rem;
+      }
+      .g-step {
+        margin: 0 0 34px;
+      }
+      .g-step h2 {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin: 0 0 8px;
+        font-size: 1.05rem;
+      }
+      .g-step h2 i {
+        flex: none;
+        display: grid;
+        place-items: center;
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: var(--ink);
+        color: #fff;
+        font-style: normal;
+        font-size: 0.8rem;
+      }
+      .g-step p,
+      .g-step li {
+        margin: 0 0 8px;
+        font-size: 0.92rem;
+        word-break: keep-all;
+      }
+      .g-step ul {
+        margin: 0 0 10px;
+        padding-left: 20px;
+      }
+      .g-step img {
+        display: block;
+        width: 100%;
+        max-width: 390px;
+        height: auto;
+        margin: 12px auto 0;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        box-shadow: 0 6px 18px var(--shadow);
+      }
+      .g-step img.tall {
+        max-width: 300px;
+      }
+      .faq dt {
+        margin: 16px 0 4px;
+        font-weight: 600;
+        font-size: 0.92rem;
+      }
+      .faq dd {
+        margin: 0;
+        font-size: 0.9rem;
+        color: var(--ink-soft);
+        word-break: keep-all;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap guide">
+      <header class="top">
+        <div>
+          <p class="eyebrow">조금 이상한 우리들 · GOODS</p>
+          <h1>굿즈 장부 사용법</h1>
+        </div>
+      </header>
+
+      <p class="lead">
+        2층 굿즈 판매를 맡은 분들을 위한 안내예요. 휴대폰으로 장부를 열어 손님이 산 굿즈를 누르기만 하면, 판매 내역이 방명록
+        구글 시트에 자동으로 쌓여요.
+      </p>
+      <a class="open" href="/goods/">굿즈 장부 열기</a>
+
+      <p class="pin">🔑 <b>비밀번호</b>는 굿즈 담당 단톡방 안내를 확인해 주세요. 한 번 열면 그 휴대폰에서는 48시간 동안 다시 묻지 않아요.</p>
+
+      <section class="g-step">
+        <h2><i>1</i>장부 열기</h2>
+        <p>장부 주소로 들어가 비밀번호를 넣고 <b>열기</b>를 눌러요.</p>
+        <p>처음 연 휴대폰에서는 <b>사용법 따라하기</b>가 한 번 떠요. 따라 하는 동안 누른 판매는 장부에 남지 않으니 편하게 눌러 보세요.</p>
+        <img src="1-lock.png" alt="비밀번호를 넣는 잠금 화면" width="1024" height="1103" loading="lazy" />
+      </section>
+
+      <section class="g-step">
+        <h2><i>2</i>굿즈 담고 결제 방법 고르기</h2>
+        <ul>
+          <li>손님이 고른 굿즈를 눌러요. 두 개면 두 번 누르면 돼요.</li>
+          <li>아래에 담긴 목록에서 <b>+ / −</b>로 개수를 바꾸고, <b>휴지통</b>으로 통째로 뺄 수 있어요.</li>
+          <li><b>현금</b>인지 <b>계좌이체</b>인지 골라요. 다음 손님에게도 같은 방법이 미리 골라져 있어요.</li>
+        </ul>
+        <img class="tall" src="2-cart.png" alt="굿즈를 담고 결제 방법을 고른 화면" width="1024" height="1995" loading="lazy" />
+      </section>
+
+      <section class="g-step">
+        <h2><i>3</i>N원 판매 누르기</h2>
+        <p>금액을 확인하고 파란 <b>N원 판매</b> 버튼을 누르면 끝이에요.</p>
+        <p>5초 동안 알림이 떠요. 잘못 눌렀으면 <b>되돌리기</b>(담았던 굿즈가 다시 담겨요), 바로 다음 손님을 받아야 하면 <b>✕</b>로 닫아요.</p>
+        <img src="3-done.png" alt="판매 직후 뜨는 되돌리기 알림" width="1024" height="525" loading="lazy" />
+      </section>
+
+      <section class="g-step">
+        <h2><i>4</i>THE WONDER BOX로 바꾸기</h2>
+        <p>
+          <b>아트 엽서 2 + 아트 마그넷 1 + 아트 책갈피 1</b>을 담으면 THE WONDER BOX와 구성이 같아서, 위에 주황색 안내가 떠요.
+          버튼을 누르면 세 굿즈가 THE WONDER BOX 하나로 바뀌어 손님이 4,000원 아껴요.
+        </p>
+        <img src="4-bundle.png" alt="THE WONDER BOX로 바꾸라는 주황색 안내" width="1024" height="1005" loading="lazy" />
+      </section>
+
+      <section class="g-step">
+        <h2><i>5</i>판매 합계 보기</h2>
+        <p>
+          화면 가운데에서 <b>오늘</b> / <b>전체</b> 판매금액과 굿즈별 판매 개수를 볼 수 있어요. 여러 휴대폰에서 판 것도 모두 모여요.
+          재고를 적어 둔 굿즈는 남은 개수도 보여요.
+        </p>
+        <img src="5-summary.png" alt="오늘 판매 합계와 굿즈별 판매 개수" width="940" height="1746" loading="lazy" />
+      </section>
+
+      <section class="g-step">
+        <h2><i>6</i>나중에 판매 취소하기</h2>
+        <p>
+          5초가 지난 뒤에 잘못을 알았다면, 아래 판매 기록에서 그 줄의 <b>취소</b>를 눌러요. 실수로 지우지 않게 <b>정말 취소</b>를 한
+          번 더 눌러야 취소돼요.
+        </p>
+        <img src="6-cancel.png" alt="판매 기록의 정말 취소 버튼" width="940" height="226" loading="lazy" />
+      </section>
+
+      <section class="g-step">
+        <h2><i>7</i>오른쪽 위 저장 상태</h2>
+        <p>
+          <b>저장됨</b>이면 시트에 잘 올라간 거예요. 지하라 신호가 약해 <b>전송 대기</b>나 <b>연결 끊김</b>이 떠도 괜찮아요. 판매는
+          휴대폰에 먼저 저장했다가, 인터넷이 다시 연결되면 알아서 올라가요. 장부 화면만 닫지 말아 주세요.
+        </p>
+        <img src="7-sync.png" alt="오른쪽 위 저장 상태 표시" width="940" height="273" loading="lazy" />
+      </section>
+
+      <section class="g-step faq">
+        <h2><i>?</i>자주 묻는 것</h2>
+        <dl>
+          <dt>판매 내역은 어디서 보나요?</dt>
+          <dd>방명록 구글 시트의 '굿즈 판매내역' 탭에 한 건씩 쌓이고, '굿즈 요약' 탭에서 합계를 볼 수 있어요.</dd>
+          <dt>새 굿즈를 추가하거나 가격을 바꾸려면?</dt>
+          <dd>시트의 '굿즈 상품' 탭을 고치면 돼요. 장부를 새로 고치면 바로 반영돼요.</dd>
+          <dt>사용법을 다시 보고 싶어요</dt>
+          <dd>장부 맨 아래 <b>사용법 다시 보기</b>를 누르면 따라하기가 다시 떠요.</dd>
+        </dl>
+      </section>
+    </div>
+  </body>
+</html>

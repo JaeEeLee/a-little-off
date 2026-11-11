@@ -456,3 +456,135 @@ test.describe('시작 전 실제 판매로 바꾸기 (연습 모드 칩)', () =>
     await expect(page.locator('#sync')).not.toHaveClass(/switch/);
   });
 });
+
+test.describe('사용법 따라하기', () => {
+  test('처음 열면 뜨고, 직접 눌러 따라 해도 판매는 시트에 남지 않는다', async ({ page }) => {
+    const sheet = await fakeSheet(page);
+    await page.addInitScript(() => (window.__GOODS_TOUR_OFF__ = false));
+    await openWithPin(page);
+
+    const tip = page.locator('.tour-tip');
+    await expect(tip).toContainText('굿즈 장부 사용법');
+    await page.getByRole('button', { name: '시작하기' }).click();
+
+    await expect(tip).toContainText('1. 굿즈 담기');
+    await expect(page.locator('#tourNext')).toBeHidden(); // 직접 눌러야 넘어간다
+    await page.locator('.item[data-name="엽서"]').click();
+    await expect(tip).toContainText('2. 담긴 굿즈');
+    await page.locator('#tourNext').click();
+    await expect(tip).toContainText('3. 결제 방법');
+    await page.getByRole('radio', { name: '계좌이체' }).click();
+    await expect(tip).toContainText('4. 판매');
+    await page.locator('#cartSubmit').click();
+    await expect(tip).toContainText('5. 실수했다면 되돌리기');
+    await expect(page.locator('#doneSub')).toContainText('따라하기라 저장하지 않았어요');
+    await page.waitForTimeout(5500);
+    await expect(page.locator('#done')).toBeVisible(); // 따라하는 동안은 저절로 닫히지 않는다
+    await page.locator('#doneClose').click();
+    await expect(tip).toContainText('6. 저장 상태');
+    await page.locator('#tourNext').click();
+    await expect(tip).toContainText('7. 판매 합계');
+    await page.locator('#tourNext').click();
+    await expect(tip).toContainText('8. 판매 취소');
+    await page.locator('#tourNext').click();
+    await expect(tip).toContainText('이제 판매할 준비 끝');
+    await page.getByRole('button', { name: '장부로 돌아가기' }).click();
+    await expect(page.locator('.tour')).toBeHidden();
+
+    expect(sheet.posts.filter((p) => p.type === 'sale')).toHaveLength(0);
+    await expect(page.locator('#sumTotal')).toHaveText('0');
+    await expect(page.locator('#cart')).toBeHidden();
+
+    // 다 본 휴대폰은 다시 열어도 뜨지 않고, '사용법 다시 보기'로 다시 본다
+    await page.reload();
+    await expect(page.locator('#app')).toBeVisible();
+    await page.waitForTimeout(800);
+    await expect(page.locator('.tour')).toHaveCount(0);
+    await page.getByRole('button', { name: '사용법 다시 보기' }).click();
+    await expect(tip).toContainText('굿즈 장부 사용법');
+  });
+
+  test('따라하기 중 밝힌 곳 밖은 눌리지 않고, 새로 고치면 다시 뜨지 않고 원래대로 판매된다', async ({ page }) => {
+    const sheet = await fakeSheet(page);
+    await page.addInitScript(() => (window.__GOODS_TOUR_OFF__ = false));
+    await openWithPin(page);
+    await page.getByRole('button', { name: '시작하기' }).click();
+    await expect(page.locator('.tour-tip')).toContainText('1. 굿즈 담기');
+    // 밝힌 곳(굿즈 목록) 밖의 판매 합계 탭은 덮여 있다
+    await page
+      .getByRole('tab', { name: '전체' })
+      .click({ trial: true, timeout: 500 })
+      .then(
+        () => {
+          throw new Error('밝힌 곳 밖이 눌리면 안 된다');
+        },
+        () => {}
+      );
+    // 중간에 새로 고쳐도 다시 뜨지 않는다 (기기마다 한 번)
+    await page.reload();
+    await expect(page.locator('#app')).toBeVisible();
+    await page.waitForTimeout(800);
+    await expect(page.locator('.tour')).toHaveCount(0);
+
+    await page.locator('.item[data-name="마그넷"]').click();
+    await page.locator('#cartSubmit').click();
+    await expect.poll(() => sheet.sales.length).toBe(1);
+  });
+});
+
+test.describe('THE WONDER BOX 묶음으로 바꾸기', () => {
+  const ITEMS = [
+    { name: 'THE WONDER BOX 이상한 나라의 작은 수집함', price: 25000 },
+    { name: '아트 엽서', price: 3000 },
+    { name: '아트 마그넷', price: 15000 },
+    { name: '아트 책갈피', price: 8000 }
+  ];
+  const add = async (page, name, n = 1) => {
+    for (let i = 0; i < n; i++) await page.locator(`.item[data-name="${name}"]`).click();
+  };
+
+  test('엽서 2 + 마그넷 + 책갈피를 담으면 알려 주고, 누르면 WONDER BOX 하나로 바뀐다', async ({ page }) => {
+    const sheet = await fakeSheet(page, { items: ITEMS });
+    await openWithPin(page);
+    await add(page, '아트 엽서', 2);
+    await add(page, '아트 마그넷');
+    await expect(page.locator('#bundle')).toBeHidden(); // 아직 책갈피가 없다
+    await add(page, '아트 책갈피');
+    await add(page, '아트 엽서'); // 남는 엽서 하나는 그대로 둔다
+
+    await expect(page.locator('#bundle')).toBeVisible();
+    await expect(page.locator('#bundleText')).toContainText('4,000원');
+    await expect(page.locator('#cartSubmit')).toHaveText('32,000원 판매');
+    await page.getByRole('button', { name: 'THE WONDER BOX 25,000원으로 바꾸기' }).click();
+
+    await expect(page.locator('#bundle')).toBeHidden();
+    await expect(page.locator('#cartLines li')).toHaveCount(2);
+    await expect(page.locator('#cartLines')).toContainText('THE WONDER BOX');
+    await expect(page.locator('#cartSubmit')).toHaveText('28,000원 판매');
+    await page.locator('#cartSubmit').click();
+    await expect.poll(() => sheet.sales.length).toBe(1);
+    expect(sheet.sales[0].lines).toEqual([
+      { name: 'THE WONDER BOX 이상한 나라의 작은 수집함', qty: 1, price: 25000 },
+      { name: '아트 엽서', qty: 1, price: 3000 }
+    ]);
+  });
+
+  test('두 세트를 담으면 WONDER BOX 두 개로 바꾼다', async ({ page }) => {
+    await fakeSheet(page, { items: ITEMS });
+    await openWithPin(page);
+    await add(page, '아트 엽서', 4);
+    await add(page, '아트 마그넷', 2);
+    await add(page, '아트 책갈피', 2);
+    await page.getByRole('button', { name: 'THE WONDER BOX 2개 50,000원으로 바꾸기' }).click();
+    await expect(page.locator('#cartSubmit')).toHaveText('50,000원 판매');
+  });
+
+  test('WONDER BOX 재고가 없으면 알리지 않는다', async ({ page }) => {
+    await fakeSheet(page, { items: ITEMS.map((i, n) => (n === 0 ? { ...i, stock: 0 } : i)) });
+    await openWithPin(page);
+    await add(page, '아트 엽서', 2);
+    await add(page, '아트 마그넷');
+    await add(page, '아트 책갈피');
+    await expect(page.locator('#bundle')).toBeHidden();
+  });
+});

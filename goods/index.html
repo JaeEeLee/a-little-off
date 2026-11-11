@@ -65,6 +65,8 @@
         </section>
 
         <p class="foot">
+          <button type="button" class="link" id="tourAgain">사용법 다시 보기</button>
+          <a class="link" href="/goods/guide/">자세한 안내</a>
           <button type="button" class="link" id="logout">이 휴대폰에서 잠그기</button>
         </p>
       </main>
@@ -73,6 +75,17 @@
     <!-- 담은 굿즈: 손님 한 명의 결제 한 번 -->
     <div class="cart" id="cart" hidden>
       <div class="cart-in">
+        <!-- 담긴 굿즈가 묶음 구성과 같을 때: 묶음으로 바꾸기 -->
+        <div class="bundle" id="bundle" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 3 2 20h20L12 3z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" />
+            <path d="M12 10v4.5M12 17.2v.1" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" />
+          </svg>
+          <div>
+            <p class="bundle-text" id="bundleText"></p>
+            <button type="button" class="bundle-btn" id="bundleBtn"></button>
+          </div>
+        </div>
         <ul class="cart-lines" id="cartLines"></ul>
         <div class="pays" id="pays" role="radiogroup" aria-label="결제 방법"></div>
         <div class="cart-actions">
@@ -99,5 +112,6 @@
     <p class="toast" id="toast" role="status" aria-live="polite"></p>
 
     <script src="/assets/js/goods.js"></script>
+    <script src="/assets/js/goods-tour.js"></script>
   </body>
 </html>

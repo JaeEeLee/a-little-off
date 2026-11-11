@@ -467,6 +467,73 @@
         return { name: n, price: priceOf(n), qty: cart[n] };
       });
   }
+  /* 묶음 상품: 담긴 굿즈가 묶음 구성과 같으면 묶음으로 바꾸라고 알려 준다 (손님에게 더 싸다)
+     name 은 '굿즈 상품' 탭 이름 일부만 맞아도 된다 (예: 'THE WONDER BOX 이상한 나라의 작은 수집함') */
+  var BUNDLES = [
+    {
+      match: /wonder\s*box/i,
+      parts: [
+        ['아트 엽서', 2],
+        ['아트 마그넷', 1],
+        ['아트 책갈피', 1]
+      ]
+    }
+  ];
+  // 지금 장바구니에서 바꿀 수 있는 묶음 하나 (몇 세트 · 얼마 아끼는지)
+  function bundleOffer() {
+    for (var b = 0; b < BUNDLES.length; b++) {
+      var B = BUNDLES[b];
+      var box = null;
+      for (var i = 0; i < items.length; i++) if (B.match.test(items[i].name) && items[i].price != null) box = items[i];
+      if (!box) continue;
+      var sets = Infinity;
+      var partsPrice = 0;
+      B.parts.forEach(function (p) {
+        var price = priceOf(p[0]);
+        if (price == null) sets = 0;
+        else partsPrice += price * p[1];
+        sets = Math.min(sets, Math.floor((cart[p[0]] || 0) / p[1]));
+      });
+      // 묶음 재고가 모자라면 남은 만큼만
+      var left = leftOf(box.name, soldCounts());
+      if (left != null) sets = Math.min(sets, left - (cart[box.name] || 0));
+      if (sets > 0 && sets !== Infinity && box.price < partsPrice) {
+        return { box: box, parts: B.parts, sets: sets, save: (partsPrice - box.price) * sets };
+      }
+    }
+    return null;
+  }
+  function renderBundle() {
+    var el = $('bundle');
+    var o = bundleOffer();
+    el.hidden = !o;
+    if (!o) return;
+    var short = o.box.name.replace(/^(THE WONDER BOX).*/i, '$1');
+    $('bundleText').innerHTML =
+      '<b>' +
+      esc(short) +
+      ' 구성</b>이 담겼어요 (' +
+      o.parts
+        .map(function (p) {
+          return esc(p[0].replace(/^아트 /, '')) + ' ' + p[1] * o.sets;
+        })
+        .join(' · ') +
+      '). 바꾸면 손님이 <b>' +
+      won(o.save) +
+      '원</b> 아껴요.';
+    $('bundleBtn').textContent = short + (o.sets > 1 ? ' ' + o.sets + '개' : '') + ' ' + won(o.box.price * o.sets) + '원으로 바꾸기';
+    $('bundleBtn').onclick = function () {
+      o.parts.forEach(function (p) {
+        cart[p[0]] -= p[1] * o.sets;
+        if (cart[p[0]] <= 0) delete cart[p[0]];
+      });
+      cart[o.box.name] = (cart[o.box.name] || 0) + o.sets;
+      buzz();
+      render();
+      toast(short + '로 바꿨어요');
+    };
+  }
+
   function renderCart() {
     var lines = cartLines();
     $('cart').hidden = !lines.length;
@@ -474,6 +541,7 @@
       fitCart();
       return;
     }
+    renderBundle();
     var ul = $('cartLines');
     ul.innerHTML = '';
     lines.forEach(function (l) {
@@ -555,8 +623,16 @@
   $('cartSubmit').addEventListener('click', function () {
     var lines = cartLines();
     if (!lines.length) return;
-    practicePing('sale');
     var op = { type: 'sale', id: newId(), at: new Date().toISOString(), pay: pay, lines: lines };
+    if (touring) {
+      // 사용법 따라하기: 판매가 된 것처럼 보여 주기만 하고 아무 데도 적지 않는다
+      cart = {};
+      buzz();
+      render();
+      showDone(op);
+      return;
+    }
+    practicePing('sale');
     if (EARLY) op.early = true; // 시트가 전시 시작 전 판매를 받아 주도록
     queue.push(op);
     store(KEY.queue, queue);
@@ -577,7 +653,7 @@
       })
       .join(', ');
     $('doneTitle').textContent = won(amountOf(op.lines)) + '원 · ' + op.pay + ' 기록 완료';
-    $('doneSub').textContent = what;
+    $('doneSub').textContent = touring ? what + ' · 따라하기라 저장하지 않았어요' : what;
     bar.hidden = false;
     bar.classList.remove('run');
     void bar.offsetWidth;
@@ -588,10 +664,16 @@
       op.lines.forEach(function (l) {
         cart[l.name] = (cart[l.name] || 0) + l.qty;
       });
+      if (touring) {
+        render();
+        toast('되돌렸어요. 굿즈를 장바구니에 다시 담았어요');
+        return;
+      }
       cancel(op.id, '되돌렸어요. 굿즈를 장바구니에 다시 담았어요');
     };
     clearTimeout(doneTimer);
-    doneTimer = setTimeout(hideDone, 5000);
+    bar.classList.toggle('hold', touring); // 따라하기 중에는 설명을 읽도록 저절로 닫지 않는다
+    if (!touring) doneTimer = setTimeout(hideDone, 5000);
   }
   function hideDone() {
     clearTimeout(doneTimer);
@@ -811,6 +893,23 @@
     });
     if (EARLY) chip.classList.add('live'); // 배너 대신 칩 색으로 실제 기록 중임을 알린다
   }
+
+  /* ── 사용법 따라하기 (goods-tour.js 가 켜고 끈다) ── */
+  var touring = false;
+  window.goodsTour = {
+    start: function () {
+      touring = true;
+      cart = {};
+      hideDone();
+      render();
+    },
+    end: function () {
+      touring = false;
+      cart = {};
+      hideDone();
+      render();
+    }
+  };
 
   /* ── 시작 ── */
   if (DEMO) {

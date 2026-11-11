@@ -370,8 +370,13 @@ h2.first {
   color: var(--warn);
 }
 .foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 18px;
   margin: 32px 0 0;
   text-align: center;
+  font-size: 0.85rem;
 }
 
 /* ── 담은 굿즈 (아래 고정) ── */
@@ -652,4 +657,144 @@ h2.first {
 .table .left.out {
   color: #c8401b;
   font-weight: 600;
+}
+
+/* ── 사용법 따라하기 (goods-tour.js) ── */
+.done.hold .done-bar {
+  visibility: hidden;
+}
+.tour {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none; /* 막는 건 둘레 네 조각과 말풍선만. 밝힌 곳은 그대로 눌린다 */
+}
+.tour-block,
+.tour-tip,
+.tour.center {
+  pointer-events: auto;
+}
+.tour[hidden] {
+  display: none;
+}
+.tour-block {
+  position: fixed;
+  background: rgba(30, 20, 12, 0.62);
+}
+.tour-hole {
+  position: fixed;
+  border-radius: 14px;
+  box-shadow: 0 0 0 3px #fff;
+  pointer-events: none; /* 밝힌 곳은 그대로 눌린다 */
+}
+.tour-hole.pulse {
+  animation: tourPulse 1.4s ease-out infinite;
+}
+@keyframes tourPulse {
+  0% {
+    box-shadow: 0 0 0 3px #fff, 0 0 0 3px rgba(255, 255, 255, 0.6);
+  }
+  100% {
+    box-shadow: 0 0 0 3px #fff, 0 0 0 14px rgba(255, 255, 255, 0);
+  }
+}
+.tour-tip {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 16px 18px 12px;
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+}
+.tour-count {
+  margin: 0 0 2px;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+}
+.tour-tip h3 {
+  margin: 0 0 6px;
+  font-size: 1.02rem;
+}
+.tour-text {
+  margin: 0;
+  font-size: 0.9rem;
+  word-break: keep-all;
+}
+.tour-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+}
+.tour-actions .link {
+  font-size: 0.82rem;
+}
+.tour-next {
+  margin-left: auto;
+  padding: 9px 18px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 600;
+}
+.tour.center {
+  background: rgba(30, 20, 12, 0.62);
+}
+.tour.center .tour-block,
+.tour.center .tour-hole {
+  display: none;
+}
+.tour.center .tour-tip {
+  top: 50% !important;
+  transform: translateY(-50%);
+}
+@media (prefers-reduced-motion: reduce) {
+  .tour-hole.pulse {
+    animation: none;
+  }
+}
+
+/* 묶음으로 바꾸기 (담긴 굿즈가 THE WONDER BOX 구성과 같을 때) */
+.bundle {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin: 0 0 10px;
+  padding: 10px 12px;
+  border: 1px solid #f0c48a;
+  border-radius: var(--radius);
+  background: #fff6e8;
+}
+.bundle[hidden] {
+  display: none;
+}
+.bundle > svg {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  margin-top: 1px;
+  color: #c86a12;
+}
+.bundle-text {
+  margin: 0 0 8px;
+  font-size: 0.84rem;
+  word-break: keep-all;
+}
+.bundle-btn {
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 10px;
+  background: #c86a12;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.bundle-btn:active {
+  background: #a85710;
 }

@@ -26,6 +26,10 @@ export const test = base.extend({
   page: async ({ page }, use) => {
     await page.route(/^https:\/\/fonts\.(googleapis|gstatic)\.com\//, (r) => r.abort());
     await page.route('**/after-docent**', (r) => r.fulfill({ json: { ok: false } }));
+    // 굿즈 장부의 사용법 따라하기는 따로 시험한다 (다른 시험을 가리지 않게 꺼 둔다)
+    await page.addInitScript(() => {
+      if (!('__GOODS_TOUR_OFF__' in window)) window.__GOODS_TOUR_OFF__ = true;
+    });
     await use(page);
   },
 
