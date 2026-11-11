@@ -127,12 +127,16 @@ function buildSummary() {
   sum.getRange('D5:D').setNumberFormat('#,##0');
 
   // 날짜별 (판매가 없으면 안내 문구)
+  // 날짜는 TEXT 로 글자로 만든다. 칸 서식에 맡기면 서식이 바뀌거나 빠질 때 46337, ₩46,337 처럼 숫자로 보인다
   sum.getRange('G4').setFormula(
-    '=IFERROR(QUERY(' + S + "!A:H,\"select toDate(A), sum(E), sum(F) where H = '정상' group by toDate(A) label toDate(A) '날짜', sum(E) '판매 개수', sum(F) '금액'\",1), \"아직 판매 기록이 없어요\")"
+    '=IFERROR(LET(q, QUERY(' + S + "!A:H, \"select toDate(A), sum(E), sum(F) where H = '정상' group by toDate(A) label toDate(A) '', sum(E) '', sum(F) ''\", 0), " +
+      '{"날짜", "판매 개수", "금액"; ARRAYFORMULA(TEXT(CHOOSECOLS(q, 1), "yyyy-mm-dd (ddd)")), CHOOSECOLS(q, 2), CHOOSECOLS(q, 3)}), ' +
+      '"아직 판매 기록이 없어요")'
   );
   sum.getRange('G4:I4').setFontWeight('bold');
-  sum.getRange('G5:G').setNumberFormat('yyyy-mm-dd (ddd)'); // 날짜가 숫자로 보이지 않게
-  sum.getRange('H5:I').setNumberFormat('#,##0');
+  sum.getRange('G5:G').setNumberFormat('@').setHorizontalAlignment('left');
+  sum.getRange('H5:H').setNumberFormat('#,##0"개"');
+  sum.getRange('I5:I').setNumberFormat('#,##0"원"');
 
   sum.setFrozenRows(4);
   sum.setColumnWidth(1, 170);
