@@ -1,7 +1,7 @@
 /**
  * 굿즈 판매 장부 (/goods) — 전시장 굿즈 담당 스태프용
  *
- *  - 굿즈를 눌러 담고 결제 방법을 고른 뒤 '판매 기록'을 누르면 한 건으로 쌓인다
+ *  - 굿즈를 눌러 담고 결제 방법을 고른 뒤 'xx원 판매'를 누르면 한 건으로 쌓인다
  *  - 상품별 판매 개수 · 총 판매금액을 오늘 / 전체로 본다. 잘못 누른 건 '취소'로 지운다 (시트에는 '취소'로 남는다)
  *  - 기록은 구글 시트(Apps Script 웹앱, docs/apps-script/goods.gs)에 저장된다. 여러 휴대폰이 같은 장부를 본다
  *  - 지하라 신호가 끊겨도 기록은 휴대폰에 먼저 쌓였다가, 연결되면 자동으로 보낸다 (판매번호로 중복 방지)
@@ -471,7 +471,6 @@
     var lines = cartLines();
     $('cart').hidden = !lines.length;
     if (!lines.length) {
-      received = 0;
       fitCart();
       return;
     }
@@ -529,45 +528,8 @@
       });
       pays.appendChild(b);
     });
-    renderChange(amountOf(lines));
-    $('cartSubmit').textContent = won(amountOf(lines)) + '원 판매 기록';
+    $('cartSubmit').textContent = won(amountOf(lines)) + '원 판매';
     fitCart();
-  }
-
-  /* 현금일 때: 받은 돈 빠른 버튼 → 거스름돈 (스태프 계산용, 시트에는 남기지 않는다) */
-  var received = 0;
-  function renderChange(total) {
-    var box = $('change');
-    box.hidden = pay !== '현금';
-    if (box.hidden) return;
-    if (received && received < total) received = 0;
-    var opts = [total];
-    [10000, 20000, 30000, 50000, 100000].forEach(function (u) {
-      var v = Math.ceil(total / u) * u;
-      if (v > total && opts.indexOf(v) < 0) opts.push(v);
-    });
-    opts = opts
-      .sort(function (a, b) {
-        return a - b;
-      })
-      .slice(0, 4);
-    var row = $('changeOpts');
-    row.innerHTML = '';
-    opts.forEach(function (v) {
-      var b = document.createElement('button');
-      b.type = 'button';
-      b.textContent = v === total ? '딱 맞게' : won(v);
-      b.setAttribute('aria-pressed', String(received === v));
-      b.addEventListener('click', function () {
-        received = received === v ? 0 : v;
-        renderChange(total);
-      });
-      row.appendChild(b);
-    });
-    $('changeOut').textContent = received
-      ? '거스름돈 ' + won(received - total) + '원'
-      : '받은 돈을 고르면 거스름돈이 나와요';
-    $('changeOut').classList.toggle('on', !!received);
   }
 
   // 장바구니가 아래 굿즈를 가리지 않게, 그 높이만큼 페이지 아래에 여백을 둔다
@@ -596,20 +558,18 @@
     practicePing('sale');
     var op = { type: 'sale', id: newId(), at: new Date().toISOString(), pay: pay, lines: lines };
     if (EARLY) op.early = true; // 시트가 전시 시작 전 판매를 받아 주도록
-    var change = pay === '현금' && received > amountOf(lines) ? received - amountOf(lines) : 0;
     queue.push(op);
     store(KEY.queue, queue);
     cart = {};
-    received = 0;
     buzz();
     render();
-    showDone(op, change);
+    showDone(op);
     flush();
   });
 
   /* 기록 직후 5초 동안: 무엇을 얼마에 기록했는지 + 되돌리기 (담았던 굿즈는 장바구니로 돌아온다) */
   var doneTimer;
-  function showDone(op, change) {
+  function showDone(op) {
     var bar = $('done');
     var what = op.lines
       .map(function (l) {
@@ -617,7 +577,7 @@
       })
       .join(', ');
     $('doneTitle').textContent = won(amountOf(op.lines)) + '원 · ' + op.pay + ' 기록 완료';
-    $('doneSub').textContent = what + (change ? ' · 거스름돈 ' + won(change) + '원' : '');
+    $('doneSub').textContent = what;
     bar.hidden = false;
     bar.classList.remove('run');
     void bar.offsetWidth;

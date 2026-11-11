@@ -554,40 +554,6 @@ h2.first {
   opacity: 0.35;
 }
 
-/* ── 현금 거스름돈 ── */
-.change {
-  margin: 0 0 10px;
-}
-.change-opts {
-  display: flex;
-  gap: 6px;
-}
-.change-opts button {
-  flex: 1;
-  padding: 7px 0;
-  border: 1px dashed var(--line);
-  border-radius: 8px;
-  background: var(--surface);
-  font-size: 0.82rem;
-  font-variant-numeric: tabular-nums;
-}
-.change-opts button[aria-pressed='true'] {
-  border-style: solid;
-  border-color: var(--ink);
-  font-weight: 600;
-}
-.change-out {
-  margin: 6px 0 0;
-  text-align: right;
-  font-size: 0.82rem;
-  color: var(--ink-soft);
-}
-.change-out.on {
-  color: var(--ink);
-  font-size: 1rem;
-  font-weight: 700;
-}
-
 /* ── 기록 직후 결과 + 되돌리기 (5초) ── */
 .done {
   position: fixed;

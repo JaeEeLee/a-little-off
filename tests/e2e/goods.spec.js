@@ -138,7 +138,7 @@ test('굿즈를 담아 기록하면 판매 개수와 총 판매금액이 쌓인�
   await page.locator('.item[data-name="마그넷"]').click();
   await expect(page.locator('.item[data-name="엽서"] .badge')).toHaveText('2');
   await page.getByRole('radio', { name: '계좌이체' }).click();
-  await expect(page.locator('#cartSubmit')).toHaveText('9,000원 판매 기록');
+  await expect(page.locator('#cartSubmit')).toHaveText('9,000원 판매');
   await page.locator('#cartSubmit').click();
 
   await expect(page.locator('#cart')).toBeHidden();
@@ -256,16 +256,13 @@ test('기록 알림은 X로 바로 닫히고, 다음 굿즈를 담아도 닫힌�
   await expect(page.locator('#cartSubmit')).toBeVisible();
 });
 
-test('현금이면 받은 돈을 골라 거스름돈을 본다', async ({ page }) => {
+test('현금을 골라도 받은 돈 · 거스름돈 칸은 없다', async ({ page }) => {
   await fakeSheet(page);
   await openWithPin(page);
-  await page.locator('.item[data-name="마그넷"]').click(); // 5,000원
+  await page.locator('.item[data-name="마그넷"]').click();
   await page.getByRole('radio', { name: '현금' }).click();
-  await expect(page.locator('#change')).toBeVisible();
-  await page.locator('#changeOpts button', { hasText: '10,000' }).click();
-  await expect(page.locator('#changeOut')).toHaveText('거스름돈 5,000원');
-  await page.getByRole('radio', { name: '계좌이체' }).click();
-  await expect(page.locator('#change')).toBeHidden();
+  await expect(page.locator('#change')).toHaveCount(0);
+  await expect(page.getByText('딱 맞게')).toHaveCount(0);
 });
 
 test('재고를 적으면 남은 개수가 보이고, 다 팔리면 버튼이 꺼진다', async ({ page }) => {
@@ -298,7 +295,7 @@ test('휴지통을 누르면 수량과 상관없이 그 굿즈를 한 번에 뺀
   await page.locator('.item[data-name="마그넷"]').click();
   await page.getByRole('button', { name: '엽서 모두 빼기' }).click();
   await expect(page.locator('.item[data-name="엽서"] .badge')).toHaveCount(0);
-  await expect(page.locator('#cartSubmit')).toHaveText('5,000원 판매 기록');
+  await expect(page.locator('#cartSubmit')).toHaveText('5,000원 판매');
   await page.getByRole('button', { name: '마그넷 모두 빼기' }).click();
   await expect(page.locator('#cart')).toBeHidden();
 });
