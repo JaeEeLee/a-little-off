@@ -415,7 +415,8 @@ test.describe('시작 전 실제 판매로 바꾸기 (연습 모드 칩)', () =>
     await expect(page.locator('#sync')).toHaveText('실제 기록 중 ⇄');
     await page.locator('#pin').fill('1234');
     await page.getByRole('button', { name: '열기' }).click();
-    await expect(page.locator('#demoNote')).toContainText('실제 판매 기록 중');
+    await expect(page.locator('#demoNote')).toBeHidden(); // 배너 없이 칩 색으로만 알린다
+    await expect(page.locator('#sync')).toHaveClass(/live/);
 
     await page.locator('.item[data-name="엽서"]').click();
     await page.locator('.item[data-name="엽서"]').click();

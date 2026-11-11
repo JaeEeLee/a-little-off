@@ -111,12 +111,19 @@ h2.first {
 .sync.switch:active {
   background: var(--wall);
 }
-.demo-note.early {
-  background: #e8f0fc;
-}
 .sync.wait {
   color: var(--warn);
   border-color: currentColor;
+}
+.sync.switch.live {
+  /* 전시 전 실제 장부로 바꾼 휴대폰: 연습과 헷갈리지 않게 칩을 빨갛게 채운다 */
+  background: #d6342c;
+  border-color: #d6342c;
+  color: #fff;
+  font-weight: 600;
+}
+.sync.switch.live:active {
+  background: #b02a23;
 }
 .demo-note {
   margin: 0 0 14px;

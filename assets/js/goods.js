@@ -849,13 +849,7 @@
         flip();
       }
     });
-    if (EARLY) {
-      $('demoNote').hidden = false;
-      $('demoNote').classList.add('early');
-      $('demoText').innerHTML =
-        '<b>실제 판매 기록 중</b> · 전시 시작 전이지만 이 휴대폰의 기록은 실제 장부에 남아요. 연습하려면 위쪽 칩을 눌러 연습 모드로 돌아가세요.';
-      $('demoReset').hidden = true;
-    }
+    if (EARLY) chip.classList.add('live'); // 배너 대신 칩 색으로 실제 기록 중임을 알린다
   }
 
   /* ── 시작 ── */
