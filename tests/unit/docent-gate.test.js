@@ -189,3 +189,33 @@ describe('운영진 입장', () => {
     assert.match(body.gate, /^open: 운영진/);
   });
 });
+
+describe('개관 전 운영진 입장 칸 (도슨트 안내 화면)', () => {
+  const STAFF_ENV = { ...ENV, DOCENT_STAFF_KEY: 'staff-pass' };
+
+  test('첫 개관 전에는 안내 화면에 운영진 비밀번호 칸이 있다', async () => {
+    at(Date.parse('2026-11-12T12:10:00+09:00'));
+    for (const path of ['/docent/', '/docent/?k=wrong']) {
+      const html = await (await call(path, { env: STAFF_ENV })).res.text();
+      assert.match(html, /운영진 비밀번호/);
+      assert.match(html, /\/docent\/__staff/);
+      assert.doesNotMatch(html, /staff-pass/);
+    }
+  });
+
+  test('비밀번호가 설정되지 않았으면 칸을 띄우지 않는다', async () => {
+    at(Date.parse('2026-11-12T12:10:00+09:00'));
+    const html = await (await call('/docent/')).res.text();
+    assert.doesNotMatch(html, /운영진 비밀번호/);
+  });
+
+  test('개관(11/12 13:00) 뒤에는 칸이 사라진다', async () => {
+    at(Date.parse('2026-11-12T13:00:00+09:00'));
+    const html = await (await call('/docent/', { env: STAFF_ENV })).res.text();
+    assert.match(html, /전시장에서 들어 주세요/);
+    assert.doesNotMatch(html, /운영진 비밀번호/);
+    mock.timers.reset();
+    at(CLOSED_TIME);
+    assert.doesNotMatch(await (await call('/docent/', { env: STAFF_ENV })).res.text(), /운영진 비밀번호/);
+  });
+});

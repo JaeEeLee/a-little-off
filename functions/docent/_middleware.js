@@ -27,6 +27,9 @@ const COOKIE = 'docent_pass';
 const PASS_SECONDS = 3 * 60 * 60; // 입장권 유효 시간 3시간
 const STAFF_COOKIE = 'docent_staff';
 const STAFF_SECONDS = 12 * 60 * 60; // 운영진 입장 유효 시간 12시간
+// 전시가 처음 열리기 전까지는 /docent 안내 화면에 '운영진 입장' 칸을 띄운다 (스태프 연습용).
+// 열린 뒤에는 QR로 들어오면 되므로 칸을 없앤다 (운영진 입장은 /docent/debug 에서 계속 쓸 수 있다)
+const FIRST_OPEN = new Date('2026-11-12T13:00:00+09:00');
 
 // 리허설 모드는 전시 첫날 0시(한국 시간)에 저절로 꺼진다
 const REHEARSAL_UNTIL = new Date('2026-11-12T00:00:00+09:00');
@@ -64,15 +67,16 @@ export async function onRequest(context) {
     return serve(context);
   }
 
+  const staffForm = !!env.DOCENT_STAFF_KEY && !!env.DOCENT_SECRET && new Date() < FIRST_OPEN;
   if (!env.DOCENT_KEY || !env.DOCENT_SECRET) return notice('closed', 503);
-  if (!rehearsal(env, new Date()) && !isOpen(new Date())) return notice('hours', 403);
+  if (!rehearsal(env, new Date()) && !isOpen(new Date())) return notice('hours', 403, staffForm);
 
   const now = Math.floor(Date.now() / 1000);
 
   // QR로 들어왔다: 열쇠를 확인하고 입장권을 준다
   const key = url.searchParams.get('k');
   if (key !== null) {
-    if (!sameText(key, env.DOCENT_KEY)) return notice('qr', 403);
+    if (!sameText(key, env.DOCENT_KEY)) return notice('qr', 403, staffForm);
     const exp = now + PASS_SECONDS;
     const pass = exp + '.' + (await sign(String(exp), env.DOCENT_SECRET));
     url.searchParams.delete('k');
@@ -88,7 +92,7 @@ export async function onRequest(context) {
 
   // 입장권 확인
   if ((await checkPass(request, env, now)).valid) return serve(context);
-  return notice('qr', 403);
+  return notice('qr', 403, staffForm);
 }
 
 async function serve(context) {
@@ -281,7 +285,16 @@ const MESSAGES = {
   closed: ['도슨트 준비 중', '곧 들으실 수 있도록 준비하고 있어요.']
 };
 
-function notice(kind, status) {
+// 개관 전 운영진 입장 칸: 비밀번호가 맞으면 운영진 입장권을 받고 같은 주소(#작가 포함)를 다시 연다
+const STAFF_FORM = `<form id="staff" class="staff"><p class="staff-t">운영진이신가요?</p>
+<input id="staffKey" type="password" placeholder="운영진 비밀번호" autocomplete="current-password" required>
+<button type="submit">들어가기</button><p class="staff-m" id="staffMsg">전시가 열리기 전(11. 12 13:00)까지 연습용으로 열 수 있어요.</p></form>
+<script>document.getElementById('staff').addEventListener('submit',function(e){e.preventDefault();var m=document.getElementById('staffMsg');m.textContent='확인하는 중…';
+fetch('/docent/__staff',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:document.getElementById('staffKey').value})})
+.then(function(r){return r.json()}).then(function(r){if(r.ok){location.reload()}else{m.textContent=r.error==='unset'?'운영진 비밀번호가 아직 설정되지 않았어요.':'비밀번호가 맞지 않아요.'}})
+.catch(function(){m.textContent='연결이 안 돼요. 다시 시도해 주세요.'})});</script>`;
+
+function notice(kind, status, staffForm) {
   const [title, body] = MESSAGES[kind];
   const html = `<!doctype html><html lang="ko"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
@@ -291,7 +304,11 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#FAFAF
 font:15px/1.7 -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo",sans-serif;text-align:center;padding:24px;box-sizing:border-box}
 h1{margin:0 0 10px;font-size:1.3rem;letter-spacing:-.02em}p{margin:0;color:#6E6254;font-size:.9rem}
 a{display:inline-block;margin-top:26px;padding:12px 20px;border:1px solid #E2DFD8;border-radius:10px;color:#332519;text-decoration:none;font-size:.85rem;background:#fff}
-</style></head><body><main><h1>${title}</h1><p>${body}</p><a href="/">전시 안내 보기</a></main></body></html>`;
+.staff{margin:34px auto 0;max-width:300px;padding:18px;border:1px solid #E2DFD8;border-radius:14px;background:#fff;display:grid;gap:8px}
+.staff-t{margin:0;color:#332519;font-weight:600}.staff-m{font-size:.78rem}
+.staff input{padding:11px;border:1px solid #E2DFD8;border-radius:8px;font-size:16px;width:100%;box-sizing:border-box}
+.staff button{padding:11px;border:0;border-radius:8px;background:#1E56B8;color:#FCFAF6;font-size:.9rem;font-weight:600}
+</style></head><body><main><h1>${title}</h1><p>${body}</p>${staffForm ? STAFF_FORM : ''}<a href="/">전시 안내 보기</a></main></body></html>`;
   return new Response(html, {
     status,
     headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex' }
