@@ -588,3 +588,13 @@ test.describe('THE WONDER BOX 묶음으로 바꾸기', () => {
     await expect(page.locator('#bundle')).toBeHidden();
   });
 });
+
+test('연습 모드는 기본 바탕, 실제 장부일 때만 포스터 색 바탕', async ({ page }) => {
+  await page.addInitScript(() => (window.__GOODS_ENDPOINT__ = '')); // 연습 모드
+  await page.goto('/goods');
+  await expect(page.locator('.backdrop')).toBeHidden();
+  await page.addInitScript(() => (window.__GOODS_ENDPOINT__ = 'https://script.google.com/macros/s/GOODS/exec'));
+  await page.addInitScript(() => (window.__GOODS_OPEN_AT__ = '2000-01-01T00:00:00Z'));
+  await page.goto('/goods');
+  await expect(page.locator('.backdrop')).toBeVisible();
+});

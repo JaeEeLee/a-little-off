@@ -32,6 +32,8 @@
   } catch (e) {}
   var PREOPEN = BEFORE_OPEN && !EARLY;
   var DEMO = !ENDPOINT || PREOPEN;
+  // 연습 모드는 기본 바탕, 실제 장부일 때만 포스터 색 바탕 (지금 어느 쪽인지 한눈에 알 수 있게)
+  document.documentElement.classList.toggle('practice', DEMO);
 
   var PAYS = ['현금', '계좌이체'];
   var DEMO_ITEMS = [
@@ -521,7 +523,8 @@
       '). 바꾸면 손님이 <b>' +
       won(o.save) +
       '원</b> 아껴요.';
-    $('bundleBtn').textContent = short + (o.sets > 1 ? ' ' + o.sets + '개' : '') + ' ' + won(o.box.price * o.sets) + '원으로 바꾸기';
+    $('bundleBtn').textContent =
+      short + (o.sets > 1 ? ' ' + o.sets + '개' : '') + ' ' + won(o.box.price * o.sets) + '원으로 바꾸기';
     $('bundleBtn').onclick = function () {
       o.parts.forEach(function (p) {
         cart[p[0]] -= p[1] * o.sets;

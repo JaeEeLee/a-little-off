@@ -15,7 +15,10 @@
   --poster-blur: url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwgHBgoICAgLCgoLDhgQDg0NDh0VFhEYIx8lJCIfIiEmKzcvJik0KSEiMEExNDk7Pj4+JS5ESUM8SDc9Pjv/2wBDAQoLCw4NDhwQEBw7KCIoOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozv/wAARCAAUAA4DASIAAhEBAxEB/8QAGAAAAgMAAAAAAAAAAAAAAAAAAAUBAwT/xAAeEAACAgICAwAAAAAAAAAAAAABAgADBAURMRNBcf/EABYBAQEBAAAAAAAAAAAAAAAAAAYBBf/EABwRAAICAgMAAAAAAAAAAAAAAAABAgQDIQUSMf/aAAwDAQACEQMRAD8AX1a45IIXqYsjV+Kwho31tz0qfcpzb1e3lpMd5wrpR0aWXj+9xue0ThMTUfkU7Gxhd3CEPISy8Z//2Q==');
 }
 
-/* ── 바탕: 포스터의 빨갛고 푸른 색이 화면에 고정돼 번진다 ── */
+/* ── 바탕: 실제 장부일 때만 포스터의 빨갛고 푸른 색이 화면에 고정돼 번진다 (연습 모드는 기본 바탕) ── */
+.practice .backdrop {
+  display: none;
+}
 .backdrop {
   position: fixed;
   inset: 0;
