@@ -593,8 +593,10 @@ test('연습 모드는 기본 바탕, 실제 장부일 때만 포스터 색 바�
   await page.addInitScript(() => (window.__GOODS_ENDPOINT__ = '')); // 연습 모드
   await page.goto('/goods');
   await expect(page.locator('.backdrop')).toBeHidden();
+  await expect(page.locator('h1')).toHaveText('굿즈 판매 장부(연습모드)');
   await page.addInitScript(() => (window.__GOODS_ENDPOINT__ = 'https://script.google.com/macros/s/GOODS/exec'));
   await page.addInitScript(() => (window.__GOODS_OPEN_AT__ = '2000-01-01T00:00:00Z'));
   await page.goto('/goods');
   await expect(page.locator('.backdrop')).toBeVisible();
+  await expect(page.locator('.mode-tag')).toBeHidden();
 });

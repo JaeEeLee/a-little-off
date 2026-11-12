@@ -96,6 +96,19 @@ h1 {
   font-size: 1.55rem;
   letter-spacing: -0.03em;
 }
+/* 연습 모드일 때만 제목 옆에 (연습모드) */
+.mode-tag {
+  display: none;
+  margin-left: 6px;
+  font-family: 'IBM Plex Sans KR', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--ink-soft);
+}
+.practice .mode-tag {
+  display: inline;
+}
 h2 {
   margin: 28px 0 4px;
   font-size: 1rem;
