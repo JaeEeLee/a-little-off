@@ -7,6 +7,8 @@
  * Cloudflare Pages > 설정 > 변수 및 비밀(Production)에 넣는 값
  *  - DOCENT_KEY     QR 주소에 붙는 열쇠. 바꾸면 이전 QR은 더 이상 열리지 않는다
  *  - DOCENT_SECRET  입장권 서명용 비밀값. 밖으로 알려지지 않게 둔다
+ *  - DOCENT_STAFF_KEY    운영진 비밀번호. /docent/debug 에서 넣으면 이 휴대폰은 12시간 동안
+ *                        QR · 운영 시간과 상관없이 바로 들어간다 (개관 전 점검 · 마감 후 확인용). 없으면 이 기능은 꺼진다
  *  - DOCENT_ALWAYS_OPEN  "true"면 운영 시간과 상관없이 연다 (전시 전 리허설용)
  *                        REHEARSAL_UNTIL 이 지나면 값이 남아 있어도 자동으로 무시한다
  * 두 값이 없으면 아무도 들어오지 못한다.
@@ -14,7 +16,8 @@
  * 점검용 (잠금 없이 열린다. 열쇠·비밀값은 절대 보여 주지 않는다)
  *  - /docent/debug        점검 페이지
  *  - /docent/__status     지금 상태를 JSON으로. ?at=2026-11-14T15:00 이면 그 시각의 운영 여부도 알려 준다
- *                         ?logout=1 이면 이 휴대폰의 입장권을 지운다
+ *                         ?logout=1 이면 이 휴대폰의 입장권(운영진 입장 포함)을 지운다
+ *  - POST /docent/__staff {key}  운영진 비밀번호가 맞으면 운영진 입장권을 준다
  *
  * 도슨트 페이지의 CSS · JS · 순서표는 /assets 아래에 있어 이 잠금을 거치지 않는다
  * (작가·작품 이름뿐이라 공개돼도 괜찮다). 잠기는 것은 /docent 아래 HTML 과 음성 파일뿐이다.
@@ -22,6 +25,8 @@
 
 const COOKIE = 'docent_pass';
 const PASS_SECONDS = 3 * 60 * 60; // 입장권 유효 시간 3시간
+const STAFF_COOKIE = 'docent_staff';
+const STAFF_SECONDS = 12 * 60 * 60; // 운영진 입장 유효 시간 12시간
 
 // 리허설 모드는 전시 첫날 0시(한국 시간)에 저절로 꺼진다
 const REHEARSAL_UNTIL = new Date('2026-11-12T00:00:00+09:00');
@@ -52,6 +57,13 @@ export async function onRequest(context) {
     return out;
   }
 
+  if (url.pathname === '/docent/__staff') return staffLogin(request, env);
+
+  // 운영진: QR · 운영 시간과 상관없이 바로 들어간다
+  if (env.DOCENT_SECRET && (await checkStaff(request, env, Math.floor(Date.now() / 1000))).valid) {
+    return serve(context);
+  }
+
   if (!env.DOCENT_KEY || !env.DOCENT_SECRET) return notice('closed', 503);
   if (!rehearsal(env, new Date()) && !isOpen(new Date())) return notice('hours', 403);
 
@@ -75,14 +87,56 @@ export async function onRequest(context) {
   }
 
   // 입장권 확인
-  if ((await checkPass(request, env, now)).valid) {
-    const res = await context.next();
-    const out = new Response(res.body, res);
-    out.headers.set('Cache-Control', 'private, no-store');
-    out.headers.set('X-Robots-Tag', 'noindex, nofollow');
-    return out;
-  }
+  if ((await checkPass(request, env, now)).valid) return serve(context);
   return notice('qr', 403);
+}
+
+async function serve(context) {
+  const res = await context.next();
+  const out = new Response(res.body, res);
+  out.headers.set('Cache-Control', 'private, no-store');
+  out.headers.set('X-Robots-Tag', 'noindex, nofollow');
+  return out;
+}
+
+/* ── 운영진 입장 ─────────────────────────── */
+
+async function staffLogin(request, env) {
+  const headers = { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' };
+  const reply = (body, status) => new Response(JSON.stringify(body), { status, headers });
+  if (request.method !== 'POST') return reply({ ok: false, error: 'method' }, 405);
+  if (!env.DOCENT_STAFF_KEY || !env.DOCENT_SECRET) return reply({ ok: false, error: 'unset' }, 503);
+  let key = '';
+  try {
+    key = String((await request.json()).key || '');
+  } catch (e) {}
+  if (!sameText(key, env.DOCENT_STAFF_KEY)) {
+    await new Promise((r) => setTimeout(r, 400)); // 마구 넣어 보는 걸 조금이라도 늦춘다
+    return reply({ ok: false, error: 'key' }, 403);
+  }
+  const exp = Math.floor(Date.now() / 1000) + STAFF_SECONDS;
+  const value = exp + '.' + (await sign('staff.' + exp, env.DOCENT_SECRET));
+  const res = reply({ ok: true, expiresKst: kstText(new Date(exp * 1000)) }, 200);
+  res.headers.append(
+    'Set-Cookie',
+    `${STAFF_COOKIE}=${value}; Path=/docent; Max-Age=${STAFF_SECONDS}; HttpOnly; Secure; SameSite=Lax`
+  );
+  return res;
+}
+
+async function checkStaff(request, env, now) {
+  const v = readCookie(request.headers.get('Cookie') || '', STAFF_COOKIE);
+  if (!v) return { present: false, valid: false };
+  const [exp, sig] = v.split('.');
+  if (!sig || !sameText(sig, await sign('staff.' + exp, env.DOCENT_SECRET))) return { present: true, valid: false };
+  const left = Number(exp) - now;
+  if (!(left > 0)) return { present: true, valid: false };
+  return {
+    present: true,
+    valid: true,
+    expiresKst: kstText(new Date(Number(exp) * 1000)),
+    remainingMin: Math.floor(left / 60)
+  };
 }
 
 /* ── 입장권 · 점검 ───────────────────────── */
@@ -120,10 +174,12 @@ async function status(request, env, url) {
         : '설정은 남아 있지만 ' + kstText(REHEARSAL_UNTIL) + '이 지나 무시됨';
   const openNow = isOpen(nowDate);
   const pass = await checkPass(request, env, now);
+  const staff = secretSet ? await checkStaff(request, env, now) : { present: false, valid: false };
 
   // 지금 /docent 를 열면 무엇이 보일지
   let gate;
-  if (!keySet || !secretSet) gate = 'closed: 설정값이 없어 "도슨트 준비 중"';
+  if (staff.valid) gate = 'open: 운영진 입장 (QR · 운영 시간과 상관없이 열림)';
+  else if (!keySet || !secretSet) gate = 'closed: 설정값이 없어 "도슨트 준비 중"';
   else if (!alwaysOpen && !openNow) gate = 'hours: 운영 시간이 아니라 막힘';
   else if (pass.valid) gate = 'open: 도슨트를 들을 수 있음';
   else gate = 'need_qr: 전시장 QR로 들어와야 함';
@@ -134,10 +190,12 @@ async function status(request, env, url) {
     settings: {
       DOCENT_KEY: keySet ? '설정됨' : '없음',
       DOCENT_SECRET: secretSet ? '설정됨' : '없음',
-      DOCENT_ALWAYS_OPEN: rehearsalNote
+      DOCENT_ALWAYS_OPEN: rehearsalNote,
+      DOCENT_STAFF_KEY: env.DOCENT_STAFF_KEY ? '설정됨' : '없음'
     },
     hours: { openNow, today: HOURS[kstText(nowDate).slice(0, 10)] || null, all: HOURS },
     pass,
+    staff,
     passSeconds: PASS_SECONDS
   };
 
@@ -152,11 +210,14 @@ async function status(request, env, url) {
     'Cache-Control': 'no-store',
     'X-Robots-Tag': 'noindex'
   };
+  const res = new Response(JSON.stringify(body, null, 2), { status: 200, headers });
   if (url.searchParams.get('logout') === '1') {
-    headers['Set-Cookie'] = `${COOKIE}=; Path=/docent; Max-Age=0; HttpOnly; Secure; SameSite=Lax`;
+    res.headers.append('Set-Cookie', `${COOKIE}=; Path=/docent; Max-Age=0; HttpOnly; Secure; SameSite=Lax`);
+    res.headers.append('Set-Cookie', `${STAFF_COOKIE}=; Path=/docent; Max-Age=0; HttpOnly; Secure; SameSite=Lax`);
     body.loggedOut = true;
+    return new Response(JSON.stringify(body, null, 2), { status: 200, headers: res.headers });
   }
-  return new Response(JSON.stringify(body, null, 2), { status: 200, headers });
+  return res;
 }
 
 function kstText(date) {

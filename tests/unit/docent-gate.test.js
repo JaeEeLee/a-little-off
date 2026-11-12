@@ -128,3 +128,64 @@ describe('점검용 주소', () => {
     assert.equal(JSON.stringify(body).includes('test-key'), false);
   });
 });
+
+describe('운영진 입장', () => {
+  const STAFF_ENV = { ...ENV, DOCENT_STAFF_KEY: 'staff-pass' };
+  function post(key, env = STAFF_ENV) {
+    const request = new Request('https://a-little-off.pages.dev/docent/__staff', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key })
+    });
+    return onRequest({ request, env, next: async () => new Response('x') });
+  }
+
+  test('비밀번호가 맞으면 운영 시간 전에도 QR 없이 페이지와 음성을 내준다', async () => {
+    at(Date.parse('2026-11-12T11:00:00+09:00')); // 첫날 개관 전
+    const res = await post('staff-pass');
+    assert.equal(res.status, 200);
+    assert.equal((await res.json()).ok, true);
+    const cookie = res.headers.get('Set-Cookie').split(';')[0];
+    assert.match(cookie, /^docent_staff=/);
+    for (const path of ['/docent/', '/docent/audio/%EC%84%9C%EB%AC%B8.mp3']) {
+      const { res: r, passed } = await call(path, { env: STAFF_ENV, cookie });
+      assert.equal(r.status, 200);
+      assert.equal(passed, true);
+      assert.equal(r.headers.get('Cache-Control'), 'private, no-store');
+    }
+    // 운영진 입장이 없으면 그대로 막힌다
+    assert.equal((await call('/docent/', { env: STAFF_ENV })).res.status, 403);
+  });
+
+  test('틀린 비밀번호 · 설정 없음 · GET 은 막는다', async () => {
+    at(OPEN_TIME);
+    assert.equal((await post('nope')).status, 403);
+    assert.equal((await post('staff-pass', ENV)).status, 503);
+    const { res } = await call('/docent/__staff', { env: STAFF_ENV });
+    assert.equal(res.status, 405);
+  });
+
+  test('12시간이 지나거나 위조된 운영진 입장권은 무효', async () => {
+    at(OPEN_TIME);
+    const cookie = (await post('staff-pass')).headers.get('Set-Cookie').split(';')[0];
+    mock.timers.reset();
+    at(OPEN_TIME + 12 * 3600 * 1000 + 1000);
+    assert.equal((await call('/docent/', { env: STAFF_ENV, cookie })).res.status, 403);
+    mock.timers.reset();
+    at(CLOSED_TIME);
+    const forged = cookie.replace(/\.[^.]+$/, '.forged');
+    assert.equal((await call('/docent/', { env: STAFF_ENV, cookie: forged })).res.status, 403);
+  });
+
+  test('상태에 운영진 입장을 보여 주고, 비밀번호 값은 보여 주지 않는다', async () => {
+    at(Date.parse('2026-11-12T11:00:00+09:00'));
+    const cookie = (await post('staff-pass')).headers.get('Set-Cookie').split(';')[0];
+    const { res } = await call('/docent/__status', { env: STAFF_ENV, cookie });
+    const text = await res.text();
+    assert.doesNotMatch(text, /staff-pass/);
+    const body = JSON.parse(text);
+    assert.equal(body.staff.valid, true);
+    assert.equal(body.settings.DOCENT_STAFF_KEY, '설정됨');
+    assert.match(body.gate, /^open: 운영진/);
+  });
+});

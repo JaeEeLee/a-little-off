@@ -21,6 +21,7 @@
       .then(function (s) {
         var gateKind = /^open/.test(s.gate) ? 'ok' : /^need_qr/.test(s.gate) ? 'warn' : 'bad';
         var p = s.pass;
+        var st = s.staff || {};
         var rows = [
           ['한국 시간', esc(s.nowKst)],
           ['/docent 결과', badge(esc(s.gate), gateKind)],
@@ -45,6 +46,12 @@
                 (s.hours.today ? ' 오늘 ' + s.hours.today.join('–') : ' 오늘은 전시일 아님')
           ],
           [
+            '운영진 입장',
+            st.valid
+              ? badge('들어옴', 'ok') + ' ' + esc(st.expiresKst) + '까지 · ' + st.remainingMin + '분 남음'
+              : badge(s.settings.DOCENT_STAFF_KEY === '설정됨' ? '아님' : '비밀번호 설정 없음', 'warn')
+          ],
+          [
             '입장권',
             badge(p.valid ? '유효' : p.present ? '무효' : '없음', p.valid ? 'ok' : 'warn') +
               ' ' +
@@ -58,9 +65,12 @@
           })
           .join('');
         $('raw').textContent = JSON.stringify(s, null, 2);
-        $('fileNote').textContent = p.valid
-          ? '입장권이 있어서 실제 파일을 확인했습니다.'
-          : '입장권이 없어 파일 요청이 잠금에 막힙니다. 위 2번에서 QR로 들어간 뒤 다시 확인하세요.';
+        $('staffOpen').hidden = !st.valid;
+        $('fileNote').textContent = st.valid
+          ? '운영진으로 들어와서 실제 파일을 확인했습니다.'
+          : p.valid
+            ? '입장권이 있어서 실제 파일을 확인했습니다.'
+            : '입장권이 없어 파일 요청이 잠금에 막힙니다. 위 2번에서 QR로 들어간 뒤 다시 확인하세요.';
         return s;
       })
       .catch(function (e) {
@@ -155,6 +165,38 @@
       loadStatus();
       checkFiles();
     });
+  });
+
+  $('staffForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var key = $('staffKey').value;
+    if (!key) return $('staffKey').focus();
+    $('staffNote').textContent = '확인하는 중…';
+    fetch('/docent/__staff', {
+      method: 'POST',
+      cache: 'no-store',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key: key })
+    })
+      .then(function (r) {
+        return r.json();
+      })
+      .then(function (r) {
+        if (r.ok) {
+          $('staffKey').value = '';
+          $('staffNote').textContent = '들어왔어요. ' + r.expiresKst + '까지 바로 열 수 있어요.';
+          loadStatus().then(checkFiles);
+        } else {
+          $('staffNote').textContent =
+            r.error === 'unset'
+              ? '운영진 비밀번호(DOCENT_STAFF_KEY)가 Cloudflare에 아직 설정되지 않았어요.'
+              : '비밀번호가 맞지 않아요.';
+        }
+      })
+      .catch(function () {
+        $('staffNote').textContent = '연결이 안 돼요. 다시 시도해 주세요.';
+      });
   });
 
   $('checkAt').addEventListener('click', function () {

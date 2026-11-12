@@ -13,6 +13,16 @@
       <h1>도슨트 점검</h1>
       <p class="sub">잠금 상태 · 입장권 · 운영 시간 · 음성 파일을 확인합니다. 열쇠와 비밀값은 이 페이지에 나오지 않습니다.</p>
 
+      <section id="staff">
+        <h2>운영진 입장</h2>
+        <form class="row" id="staffForm">
+          <input id="staffKey" type="password" placeholder="운영진 비밀번호" autocomplete="current-password" style="flex: 1 1 180px" />
+          <button type="submit" class="primary">들어가기</button>
+        </form>
+        <p class="note" id="staffNote">비밀번호가 맞으면 이 휴대폰은 12시간 동안 QR · 운영 시간과 상관없이 도슨트를 바로 열 수 있어요.</p>
+        <div class="row" id="staffOpen" hidden><a class="btn primary" href="/docent/">도슨트 열기</a></div>
+      </section>
+
       <section>
         <h2>
           1. 지금 상태 <button type="button" id="refresh" style="float: right; padding: 4px 10px; font-size: 0.78rem">새로고침</button>
@@ -35,7 +45,7 @@
           <button type="button" class="primary" id="enter">QR로 들어가기</button>
         </div>
         <div class="row">
-          <button type="button" id="logout">이 휴대폰 입장권 지우기</button>
+          <button type="button" id="logout">이 휴대폰 입장권 지우기 (운영진 입장 포함)</button>
           <a class="btn" href="/docent/" id="open">도슨트 열기</a>
         </div>
         <p class="note">QR로 들어가기 = 전시장 QR을 찍은 것과 같습니다. 성공하면 3시간짜리 입장권이 생기고 도슨트로 넘어갑니다.</p>
