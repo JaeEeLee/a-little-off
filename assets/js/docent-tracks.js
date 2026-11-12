@@ -49,8 +49,8 @@ var CHAPTERS = [
       { no: 15, name: '이경도', work: '바다' },
       { no: 16, name: '편해연', work: '마이 룸 인 원더랜드' },
       { no: 17, name: '이서현', work: '점화' },
-      { no: 18, name: '김지현', work: 'What We Left on the Table' },
-      { no: 19, name: '조수연', work: 'Vase' },
+      { no: 18, name: '조수연', work: 'Vase' },
+      { no: 19, name: '김지현', work: 'What We Left on the Table' },
       { no: 20, name: '홍림', work: '1+1+1=1' }
     ]
   },
