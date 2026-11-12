@@ -96,11 +96,13 @@ h1 {
   border: 0;
   border-radius: 999px;
   cursor: pointer;
-  background: var(--accent);
-  color: var(--on-accent);
-  font-weight: 500;
+  /* 메인 페이지 예약하기 버튼과 같은 빨강 → 분홍 → 파랑 대각선 그라데이션 */
+  background: linear-gradient(135deg, #c8401b 0%, #d9708a 45%, var(--accent) 100%);
+  color: #fff;
+  font-weight: 600;
   font-size: 0.9rem;
-  box-shadow: 0 8px 22px rgba(30, 86, 184, 0.25);
+  text-shadow: 0 1px 2px rgba(40, 20, 40, 0.25);
+  box-shadow: 0 8px 22px rgba(160, 60, 90, 0.25);
 }
 .play-all svg {
   width: 14px;
