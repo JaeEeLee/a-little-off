@@ -33,6 +33,7 @@
       </header>
 
       <main id="list"></main>
+      <button class="note-all" type="button" id="noteAll">✉ 참여 작가들에게 한마디 남기기</button>
       <p class="foot">조금 이상한 우리들 · Everyone Is a Little off<br />2026. 11. 12 – 11. 17 · 홍대 피시스 아카이브</p>
     </div>
 
@@ -43,7 +44,10 @@
             <span class="now-label" id="nowLabel">들을 작품을 골라 주세요</span>
             <span class="now-name" id="nowName">—</span>
           </div>
-          <button class="speed" type="button" id="speed" aria-label="재생 속도">1×</button>
+          <div class="now-actions">
+            <button class="note-btn" type="button" id="noteBtn" hidden>✉ 한마디</button>
+            <button class="speed" type="button" id="speed" aria-label="재생 속도">1×</button>
+          </div>
         </div>
         <div class="seek">
           <span id="cur">0:00</span>
@@ -70,7 +74,32 @@
 
     <audio id="audio" preload="metadata"></audio>
 
+    <!-- 작가에게 한마디: 듣던 작품의 작가에게 바로 남긴다 (메인 페이지의 '작가에게 한마디'와 같은 시트로 간다) -->
+    <div class="note-sheet" id="noteSheet" hidden>
+      <div class="note-panel" role="dialog" aria-modal="true" aria-labelledby="noteTitle">
+        <button class="note-close" type="button" id="noteClose" aria-label="닫기">×</button>
+        <h2 class="note-title" id="noteTitle"></h2>
+        <form id="noteForm" novalidate>
+          <textarea id="noteMsg" maxlength="300" rows="5" placeholder="작품을 보고 느낀 점, 응원 한마디를 남겨 주세요."></textarea>
+          <div class="note-row">
+            <input id="noteFrom" type="text" maxlength="20" placeholder="보내는 사람 (비워도 돼요)" autocomplete="nickname" />
+            <span class="note-count" id="noteCount">0 / 300</span>
+          </div>
+          <input class="note-trap" id="noteTrap" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />
+          <p class="note-privacy" id="notePrivacy"></p>
+          <p class="note-status" id="noteStatus" role="status"></p>
+          <button class="note-send" type="submit" id="noteSend">전하기</button>
+        </form>
+        <div class="note-done" id="noteDone" hidden>
+          <p class="note-done-t">전해졌어요. 고마워요!</p>
+          <p class="note-done-s" id="noteDoneSub"></p>
+          <button class="note-send" type="button" id="noteDoneClose">닫기</button>
+        </div>
+      </div>
+    </div>
+
     <script src="/assets/js/docent-tracks.js"></script>
     <script src="/assets/js/docent.js"></script>
+    <script src="/assets/js/docent-note.js"></script>
   </body>
 </html>

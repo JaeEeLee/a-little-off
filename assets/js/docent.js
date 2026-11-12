@@ -179,6 +179,11 @@
     hint.textContent = '';
     audio.src = queue[i].src;
     mark();
+    // 작가에게 한마디 버튼이 지금 작품의 작가를 알 수 있게
+    window.docentNow = queue[i]; // #이름으로 바로 열려 이벤트보다 늦게 붙는 쪽도 읽을 수 있게
+    try {
+      window.dispatchEvent(new CustomEvent('docent-track', { detail: queue[i] }));
+    } catch (e) {}
     queue[i].el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     if (play) start();
   }
