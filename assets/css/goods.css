@@ -11,6 +11,22 @@
   --shadow: rgba(53, 37, 24, 0.13);
   --radius: 12px;
   color-scheme: light;
+  /* 메인 · 도슨트와 같은 바탕: 포스터를 흐리게 번지게 한 색 (site.css 의 --poster-blur 와 같은 값) */
+  --poster-blur: url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwgHBgoICAgLCgoLDhgQDg0NDh0VFhEYIx8lJCIfIiEmKzcvJik0KSEiMEExNDk7Pj4+JS5ESUM8SDc9Pjv/2wBDAQoLCw4NDhwQEBw7KCIoOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozv/wAARCAAUAA4DASIAAhEBAxEB/8QAGAAAAgMAAAAAAAAAAAAAAAAAAAUBAwT/xAAeEAACAgICAwAAAAAAAAAAAAABAgADBAURMRNBcf/EABYBAQEBAAAAAAAAAAAAAAAAAAYBBf/EABwRAAICAgMAAAAAAAAAAAAAAAABAgQDIQUSMf/aAAwDAQACEQMRAD8AX1a45IIXqYsjV+Kwho31tz0qfcpzb1e3lpMd5wrpR0aWXj+9xue0ThMTUfkU7Gxhd3CEPISy8Z//2Q==');
+}
+
+/* ── 바탕: 포스터의 빨갛고 푸른 색이 화면에 고정돼 번진다 ── */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: var(--poster-blur);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  filter: blur(80px) saturate(1.34);
+  opacity: 0.82;
+  transform: scale(1.25);
 }
 * {
   box-sizing: border-box;
@@ -69,7 +85,7 @@ button {
   margin: 0 0 4px;
   font-size: 0.68rem;
   letter-spacing: 0.2em;
-  color: var(--ink-soft);
+  color: var(--ink);
 }
 h1 {
   margin: 0;
@@ -87,7 +103,7 @@ h2.first {
 .hint {
   margin: 0 0 12px;
   font-size: 0.85rem;
-  color: var(--ink-soft);
+  color: var(--ink);
 }
 .sync {
   flex: none;
@@ -317,7 +333,13 @@ h2.first {
 .recent {
   list-style: none;
   margin: 8px 0 0;
-  padding: 0;
+  padding: 2px 14px;
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.92); /* 색 바탕 위에서 기록이 잘 읽히게 흰 카드에 */
+  box-shadow: 0 2px 10px var(--shadow);
+}
+.recent li:first-child {
+  border-top: 0;
 }
 .recent li {
   display: grid;
@@ -692,10 +714,14 @@ h2.first {
 }
 @keyframes tourPulse {
   0% {
-    box-shadow: 0 0 0 3px #fff, 0 0 0 3px rgba(255, 255, 255, 0.6);
+    box-shadow:
+      0 0 0 3px #fff,
+      0 0 0 3px rgba(255, 255, 255, 0.6);
   }
   100% {
-    box-shadow: 0 0 0 3px #fff, 0 0 0 14px rgba(255, 255, 255, 0);
+    box-shadow:
+      0 0 0 3px #fff,
+      0 0 0 14px rgba(255, 255, 255, 0);
   }
 }
 .tour-tip {
