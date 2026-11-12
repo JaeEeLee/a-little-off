@@ -142,3 +142,7 @@ pre {
   color: var(--soft);
   font-size: 0.78rem;
 }
+
+[hidden] {
+  display: none !important;
+}

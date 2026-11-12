@@ -65,7 +65,11 @@
           })
           .join('');
         $('raw').textContent = JSON.stringify(s, null, 2);
+        // 이미 들어와 있으면 비밀번호 칸 대신 '도슨트 열기'만, 아니면 비밀번호 칸만 (버튼은 늘 하나)
         $('staffOpen').hidden = !st.valid;
+        $('staffForm').hidden = !!st.valid;
+        if (st.valid)
+          $('staffNote').textContent = '운영진으로 들어와 있어요. ' + st.expiresKst + '까지 바로 열 수 있어요.';
         $('fileNote').textContent = st.valid
           ? '운영진으로 들어와서 실제 파일을 확인했습니다.'
           : p.valid
@@ -185,8 +189,8 @@
       .then(function (r) {
         if (r.ok) {
           $('staffKey').value = '';
-          $('staffNote').textContent = '들어왔어요. ' + r.expiresKst + '까지 바로 열 수 있어요.';
-          loadStatus().then(checkFiles);
+          $('staffNote').textContent = '들어왔어요. 도슨트로 넘어갑니다…';
+          location.href = '/docent/'; // 비밀번호가 맞으면 바로 도슨트로
         } else {
           $('staffNote').textContent =
             r.error === 'unset'
