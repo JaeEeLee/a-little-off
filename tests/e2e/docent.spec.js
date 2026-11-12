@@ -56,12 +56,12 @@ test.describe('재생 횟수를 시트에 남긴다', () => {
     expect(Object.keys(posts[0]).sort()).toEqual(['device', 'how', 'name', 'order', 'type', 'work']);
   });
 
-  test('작품 옆 QR(#이름)로 들어오면 qr, 다음으로 넘어가면 next', async ({ page }) => {
+  test('#이름 링크로 바로 들어와도 tap, 다음으로 넘어가면 next', async ({ page }) => {
     const posts = await setup(page);
     await page.goto('/docent/#이재이');
     await playing(page);
     await expect.poll(() => posts.length).toBe(1);
-    expect(posts[0]).toMatchObject({ name: '재이', how: 'qr' });
+    expect(posts[0]).toMatchObject({ name: '재이', how: 'tap' });
     await page.locator('#next').click();
     await playing(page);
     await expect.poll(() => posts.length).toBe(2);
