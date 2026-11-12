@@ -25,6 +25,8 @@
  *       전시 시작 전에는 early:true (스태프가 '실제 판매 기록'으로 바꾼 휴대폰) 판매만 받는다
  *  POST {type:'cancel', pin, id}                              → { ok }   그 판매의 상태를 '취소'로
  *  POST {type:'practice', device, event:'open'|'sale'}         → { ok }   전시 전 연습 현황 (비밀번호 없음, 익명)
+ *  POST {type:'docent_play', order, name, work, how, device}  → { ok }   도슨트 재생 1회 (비밀번호 없음, 익명)
+ *       how: 'tap' 이름을 눌러서 · 'qr' 작품 옆 QR로 · 'next' 이어 듣기/처음부터/이전·다음
  *  비밀번호(같은 숫자 4개, 0000 제외)가 아니면 { ok:false, error:'pin' }
  */
 
@@ -156,6 +158,17 @@ function doPost(e) {
     b = JSON.parse(e.postData.contents);
   } catch (x) {
     return out({ ok: false, error: 'body' });
+  }
+
+  // 도슨트 재생 횟수도 비밀번호 없이 받는다 (관람객 휴대폰에서 온다). 매출 시트와는 상관없다
+  if (b.type === 'docent_play') {
+    const dl = LockService.getScriptLock();
+    if (!dl.tryLock(10000)) return out({ ok: false, error: 'busy' });
+    try {
+      return out(logDocentPlay(b));
+    } finally {
+      dl.releaseLock();
+    }
   }
 
   // 연습 현황은 비밀번호 없이 받는다 (연습 모드는 비밀번호 없이 열리므로). 매출 시트와는 상관없다
@@ -312,6 +325,78 @@ function logPractice(b) {
     else sh.getRange(r, 5).setValue((Number(v[1]) || 0) + 1);
   }
   return { ok: true };
+}
+
+/* ── 도슨트 재생 횟수 ──
+   '도슨트 재생 기록': 한 번 들을 때마다 한 줄 (시각 · 순서 · 이름 · 작품 · 어떻게 · 휴대폰(익명))
+   '도슨트 재생 요약': 작품마다 한 줄, 어떻게 들었는지별 횟수와 합계 + 막대 차트 (처음 기록이 들어올 때 만든다) */
+const PLAY_LOG = '도슨트 재생 기록';
+const PLAY_SUM = '도슨트 재생 요약';
+const PLAY_HOW = { tap: '이름 눌러서', qr: 'QR로', next: '이어 듣기' };
+const PLAY_SUM_HEAD = ['순서', '이름', '작품', '이름 눌러서', 'QR로', '이어 듣기', '합계'];
+
+function logDocentPlay(b) {
+  const now = new Date();
+  if (now < OPEN_AT) return { ok: false, error: 'not_open' }; // 개관 전 점검 · 리허설 재생은 세지 않는다
+  const name = String(b.name || '').trim().slice(0, 20);
+  const work = String(b.work || '').trim().slice(0, 60);
+  const order = Math.floor(Number(b.order));
+  const how = PLAY_HOW[b.how] ? b.how : 'next';
+  const device = /^[a-z0-9]{6,24}$/.test(String(b.device || '')) ? String(b.device) : '';
+  if (!name || !(order >= 0 && order < 100)) return { ok: false, error: 'track' };
+
+  const ss = book();
+  let log = ss.getSheetByName(PLAY_LOG);
+  if (!log) {
+    log = ss.insertSheet(PLAY_LOG);
+    log.appendRow(['시각', '순서', '이름', '작품', '어떻게', '휴대폰(익명)']);
+    log.setFrozenRows(1);
+    log.getRange('A:A').setNumberFormat('yyyy-mm-dd hh:mm');
+  }
+  log.appendRow([now, order + 1, name, work, PLAY_HOW[how], device]);
+
+  const sum = playSummary(ss);
+  const col = { tap: 4, qr: 5, next: 6 }[how];
+  const hit = sum.getLastRow() > 1 && sum.getRange('B2:B').createTextFinder(name).matchEntireCell(true).findNext();
+  if (hit) {
+    const r = hit.getRow();
+    const cell = sum.getRange(r, col);
+    cell.setValue((Number(cell.getValue()) || 0) + 1);
+  } else {
+    const row = [order + 1, name, work, 0, 0, 0];
+    row[col - 1] = 1;
+    sum.appendRow(row);
+    const r = sum.getLastRow();
+    sum.getRange(r, 7).setFormula('=SUM(D' + r + ':F' + r + ')');
+    sum.getRange(2, 1, r - 1, PLAY_SUM_HEAD.length).sort(1); // 도슨트 순서대로
+  }
+  return { ok: true };
+}
+
+function playSummary(ss) {
+  let sum = ss.getSheetByName(PLAY_SUM);
+  if (sum) return sum;
+  sum = ss.insertSheet(PLAY_SUM);
+  sum.appendRow(PLAY_SUM_HEAD);
+  sum.setFrozenRows(1);
+  sum.getRange('A1:G1').setFontWeight('bold').setBackground('#F0EFEC');
+  // 작품별 재생 횟수 막대 차트 (이름 눌러서 · QR로 · 이어 듣기를 쌓아서). 26줄까지 넉넉히 잡는다
+  const chart = sum
+    .newChart()
+    .setChartType(Charts.ChartType.BAR)
+    .addRange(sum.getRange('B1:B27'))
+    .addRange(sum.getRange('D1:F27'))
+    .setNumHeaders(1)
+    .setOption('title', '도슨트 작품별 재생 횟수')
+    .setOption('isStacked', true)
+    .setOption('legend', { position: 'top' })
+    .setOption('colors', ['#1e56b8', '#c8553d', '#b9b3a8'])
+    .setOption('height', 620)
+    .setOption('width', 560)
+    .setPosition(1, 9, 0, 0)
+    .build();
+  sum.insertChart(chart);
+  return sum;
 }
 
 function out(o) {

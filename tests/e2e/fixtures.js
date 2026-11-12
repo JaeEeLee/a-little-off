@@ -26,6 +26,8 @@ export const test = base.extend({
   page: async ({ page }, use) => {
     await page.route(/^https:\/\/fonts\.(googleapis|gstatic)\.com\//, (r) => r.abort());
     await page.route('**/after-docent**', (r) => r.fulfill({ json: { ok: false } }));
+    // 시험이 실제 시트(방명록 · 굿즈 · 도슨트 재생 수)에 쓰지 않게 기본으로 막는다. 필요한 시험은 따로 가짜 응답을 단다
+    await page.route(/^https:\/\/script\.google\.com\//, (r) => r.abort());
     // 굿즈 장부의 사용법 따라하기는 따로 시험한다 (다른 시험을 가리지 않게 꺼 둔다)
     await page.addInitScript(() => {
       if (!('__GOODS_TOUR_OFF__' in window)) window.__GOODS_TOUR_OFF__ = true;

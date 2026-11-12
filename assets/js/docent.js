@@ -30,6 +30,59 @@
   var index = -1;
   var continuous = true; // 한 작품이 끝나면 다음 작품으로 이어 간다
 
+  /* ── 재생 횟수: 어떤 작품을 어떻게(이름을 눌러서 · QR로 · 이어 듣기) 들었는지 시트에 한 번씩 남긴다 ──
+     실제로 소리가 나기 시작할 때 한 번만 센다. 같은 휴대폰이 같은 작품을 10분 안에 다시 들으면 세지 않는다.
+     이름 · 연락처는 보내지 않고, 휴대폰마다 임의로 만든 번호만 보낸다 */
+  var PLAY_LOG_ENDPOINT =
+    'https://script.google.com/macros/s/AKfycbzj5BtE_6bPV7ZN26QfzlRUNrIlCU3K7v6ZprFwpvweLlVhILfYnwCj6d1cjej7JTJhGg/exec';
+  if ('__DOCENT_LOG__' in window) PLAY_LOG_ENDPOINT = window.__DOCENT_LOG__; // 테스트용
+  var REPLAY_MS = 10 * 60 * 1000;
+  var pendingHow = null; // 지금 불러온 작품을 어떻게 골랐는지. 소리가 나면 보내고 비운다
+  function store(k, v) {
+    try {
+      localStorage.setItem(k, JSON.stringify(v));
+    } catch (e) {}
+  }
+  function read(k, d) {
+    try {
+      var v = localStorage.getItem(k);
+      return v == null ? d : JSON.parse(v);
+    } catch (e) {
+      return d;
+    }
+  }
+  function deviceId() {
+    var id = read('alo.docent.device', '');
+    if (!/^[a-z0-9]{6,24}$/.test(id)) {
+      id = (Date.now().toString(36) + Math.random().toString(36).slice(2, 8)).slice(0, 16);
+      store('alo.docent.device', id);
+    }
+    return id;
+  }
+  function countPlay(t, how) {
+    if (!PLAY_LOG_ENDPOINT) return;
+    var key = t.name || t.file || t.label;
+    var seen = read('alo.docent.played', {});
+    if (seen[key] && Date.now() - seen[key] < REPLAY_MS) return;
+    seen[key] = Date.now();
+    store('alo.docent.played', seen);
+    try {
+      fetch(PLAY_LOG_ENDPOINT, {
+        method: 'POST',
+        keepalive: true, // 듣다가 페이지를 닫아도 보내지게
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({
+          type: 'docent_play',
+          order: queue.indexOf(t),
+          name: t.label,
+          work: t.work || t.sub || '',
+          how: how,
+          device: deviceId()
+        })
+      }).catch(function () {});
+    } catch (e) {}
+  }
+
   function fmt(s) {
     if (!isFinite(s) || s < 0) s = 0;
     s = Math.floor(s);
@@ -64,7 +117,7 @@
       if (!t.no) b.classList.add('is-extra');
       b.setAttribute('aria-label', t.label + (t.work ? ', ' + t.work : '') + ' 듣기');
       b.addEventListener('click', function () {
-        load(i, true);
+        load(i, true, 'tap');
       });
       t.el = b;
       li.appendChild(b);
@@ -119,9 +172,10 @@
     }
   }
 
-  function load(i, play) {
+  function load(i, play, how) {
     if (i < 0 || i >= queue.length) return;
     index = i;
+    pendingHow = how || 'next';
     hint.textContent = '';
     audio.src = queue[i].src;
     mark();
@@ -154,6 +208,11 @@
   }
   ['play', 'playing', 'pause'].forEach(function (ev) {
     audio.addEventListener(ev, sync);
+  });
+  audio.addEventListener('playing', function () {
+    if (!pendingHow || index < 0) return;
+    countPlay(queue[index], pendingHow);
+    pendingHow = null;
   });
   audio.addEventListener('loadedmetadata', function () {
     bar.max = audio.duration || 0;
@@ -232,7 +291,7 @@
     for (var i = 0; i < queue.length; i++) {
       // 본명(#이재이)으로도, 작가명(#재이)으로도 찾는다. 현장 QR에는 본명이 들어 있다
       if (queue[i].name && (queue[i].name === name || queue[i].label === name)) {
-        load(i, true);
+        load(i, true, 'qr');
         return;
       }
     }
