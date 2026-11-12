@@ -276,13 +276,18 @@ function readCookie(header, name) {
 const MESSAGES = {
   qr: [
     '전시장에서 들어 주세요',
-    '도슨트는 전시장 안의 QR 코드로만 열 수 있어요.<br>입장 후 3시간 동안 들을 수 있습니다.'
+    '도슨트는 전시장 안의 QR 코드로만 열 수 있어요.<br>입장 후 3시간 동안 들을 수 있습니다.' +
+      '<span class="en">The audio guide opens only from the QR codes at the venue,<br>for 3 hours after you scan.</span>'
   ],
   hours: [
     '지금은 운영 시간이 아니에요',
-    '도슨트는 전시 운영 시간에만 들을 수 있어요.<br>11. 12 (목) 13:00 – 11. 17 (화) 20:00<br>매일 11:00 – 21:00'
+    '도슨트는 전시 운영 시간에만 들을 수 있어요.<br>11. 12 (목) 13:00 – 11. 17 (화) 20:00<br>매일 11:00 – 21:00' +
+      '<span class="en">The audio guide is available during opening hours only:<br>Nov 12 (13:00) – Nov 17 (20:00), daily 11:00 – 21:00.</span>'
   ],
-  closed: ['도슨트 준비 중', '곧 들으실 수 있도록 준비하고 있어요.']
+  closed: [
+    '도슨트 준비 중',
+    '곧 들으실 수 있도록 준비하고 있어요.<span class="en">The audio guide is being prepared.</span>'
+  ]
 };
 
 // 개관 전 운영진 입장 칸: 비밀번호가 맞으면 운영진 입장권을 받고 같은 주소(#작가 포함)를 다시 연다
@@ -304,6 +309,7 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#FAFAF
 font:15px/1.7 -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo",sans-serif;text-align:center;padding:24px;box-sizing:border-box}
 h1{margin:0 0 10px;font-size:1.3rem;letter-spacing:-.02em}p{margin:0;color:#6E6254;font-size:.9rem}
 a{display:inline-block;margin-top:26px;padding:12px 20px;border:1px solid #E2DFD8;border-radius:10px;color:#332519;text-decoration:none;font-size:.85rem;background:#fff}
+.en{display:block;margin-top:12px;font-size:.8rem;color:#8a7f72}
 .staff{margin:34px auto 0;max-width:300px;padding:18px;border:1px solid #E2DFD8;border-radius:14px;background:#fff;display:grid;gap:8px}
 .staff-t{margin:0;color:#332519;font-weight:600}.staff-m{font-size:.78rem}
 .staff input{padding:11px;border:1px solid #E2DFD8;border-radius:8px;font-size:16px;width:100%;box-sizing:border-box}

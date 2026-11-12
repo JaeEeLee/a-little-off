@@ -2898,3 +2898,30 @@ html:not(.artist-page) #questSection {
 .artist-page .studio-top {
   display: none;
 }
+
+/* ── 한국어 ⇄ English 버튼 (i18n.js 가 붙인다) ── */
+.lang-toggle {
+  position: fixed;
+  top: calc(10px + env(safe-area-inset-top, 0px));
+  right: 10px;
+  z-index: 45;
+  padding: 5px 12px;
+  border: 1px solid rgba(51, 37, 25, 0.18);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.86);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  color: #332519;
+  font:
+    600 12px/1.4 'IBM Plex Sans KR',
+    system-ui,
+    sans-serif;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+}
+.en-note {
+  margin: 10px auto 0;
+  max-width: 320px;
+  font-size: 0.78rem;
+  color: var(--ink);
+}
