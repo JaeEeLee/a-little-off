@@ -96,7 +96,7 @@
     '나를 따르다': 'Following Myself',
     '꿈과 현실 사이': 'Between Dreams and Reality',
     '그림자 너머': 'Beyond the Shadow',
-    '경계선 위의 발걸음': 'Steps on the Borderline',
+    '경계선 위의 발걸음': 'Footsteps on the Borderline', // 작가가 붙인 영어 제목
     바다: 'The Sea',
     '마이 룸 인 원더랜드': 'My Room in Wonderland',
     점화: 'Ignition',
@@ -592,7 +592,7 @@
       if (lead) {
         var p = document.createElement('p');
         p.className = 'en-note';
-        p.textContent = 'The audio is in Korean. English text for each work will be added here soon.';
+        p.textContent = 'The audio is in Korean. Tap an artist to read about the work in English.';
         lead.after(p);
       }
     }

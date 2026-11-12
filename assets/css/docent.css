@@ -554,3 +554,32 @@ h1 {
   font-size: 0.78rem;
   color: var(--ink);
 }
+
+/* 영어 모드: 고른 작품 아래 펼쳐지는 영어 설명 (docent-en.js) */
+.en-text {
+  margin: 0 6px 14px;
+  padding: 14px 14px 12px;
+  border-radius: 12px;
+  background: rgba(30, 86, 184, 0.06);
+  font-size: 0.86rem;
+  line-height: 1.6;
+}
+.en-text p {
+  margin: 0 0 10px;
+}
+.en-text .en-meta {
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  color: var(--ink-soft);
+}
+.en-read {
+  margin-top: 2px;
+  padding: 7px 14px;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+}

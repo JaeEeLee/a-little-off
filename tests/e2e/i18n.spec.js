@@ -49,3 +49,24 @@ test('도슨트: 화면 문구 · 작가 이름 · 작품 제목이 영어로', 
   await page.locator('#noteBtn').click();
   await expect(page.locator('#noteTitle')).toHaveText('A note for Jaei');
 });
+
+test('도슨트 영어: 작품을 고르면 그 아래 영어 설명이 펼쳐지고, 다른 작품을 고르면 바뀐다', async ({ page }) => {
+  await page.addInitScript(() => {
+    window.__DOCENT_LOG__ = '';
+  });
+  await page.goto('/docent/?lang=en#이재이');
+  const box = page.locator('.en-text');
+  await expect(box).toHaveCount(1);
+  await expect(box).toContainText('Oil on panel');
+  await expect(box).toContainText('chess piece');
+  await page.locator('#list button.track', { hasText: 'Heeji Lee' }).click();
+  await expect(box).toHaveCount(1);
+  await expect(box).toContainText('I am strange, and so are you.');
+  await page.locator('#list button.track', { hasText: 'Introduction' }).click();
+  await expect(box).toHaveCount(0);
+});
+
+test('도슨트 한국어에서는 영어 설명이 없다', async ({ page }) => {
+  await page.goto('/docent/?lang=ko#이재이');
+  await expect(page.locator('.en-text')).toHaveCount(0);
+});
