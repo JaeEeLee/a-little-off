@@ -31,8 +31,8 @@
       meta: 'Oil on canvas · 65.1 × 80.3 cm',
       text: [
         'When I was little, a pumpkin doll I saw was so creepy that I stopped eating pumpkin. But when I grow up, I really want to try pumpkin.',
-        'If I could go to the “Wonderland” I imagine, I would go with Jaeeun and my big brother.',
-        'In the painting, Jaeeun is a “mushroom” sending a distress signal asking for sausages, and my brother is a “turtle” who runs fast but thinks deeply and takes things slowly. And I have turned into a “sunflower” because I want to bring happiness to people.',
+        'If I could go to the “Wonderland” I imagine, I would go with JaeEun and my big brother.',
+        'In the painting, JaeEun is a “mushroom” sending a distress signal asking for sausages, and my brother is a “turtle” who runs fast but thinks deeply and takes things slowly. And I have turned into a “sunflower” because I want to bring happiness to people.',
         'If you went to Wonderland, what would you want to become?'
       ]
     },
