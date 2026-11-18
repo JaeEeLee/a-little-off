@@ -194,7 +194,7 @@
       instaHead.appendChild(instaLink);
     }
 
-    var ARTIST_COVER = { 이재이: '/works/jessie/01-s.jpg' };
+    var ARTIST_COVER = { 이재이: '/works/jessie/final-01-s.jpg' };
     var posterFrame = document.querySelector('.hero .frame');
     if (posterFrame && ARTIST_COVER[PAGE_ARTIST]) {
       var cover = document.createElement('span');
