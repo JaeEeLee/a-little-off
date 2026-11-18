@@ -88,3 +88,16 @@ test('관람객 쪽지가 없는 작가에게는 운영진 이름으로 그 작�
   await page.locator('#names button', { hasText: '김지현' }).click();
   await expect(page.locator('#mine .note-msg')).toContainText('테이블');
 });
+
+test('한 번 연 편지는 휴대폰에 보관돼, 다음에는 서버가 느리거나 안 돼도 바로 보인다', async ({ page }) => {
+  await fake(page);
+  await page.goto('/letters/');
+  await page.locator('#names button', { hasText: '재이' }).click();
+  await expect(page.locator('#mine .note-card')).toHaveCount(2);
+  await page.unroute(EP + '**');
+  await page.route(EP + '**', (r) => r.abort()); // 서버가 안 되는 상황
+  await page.reload();
+  await expect(page.locator('#letter')).toBeVisible();
+  await expect(page.locator('#mine .note-card')).toHaveCount(2);
+  await expect(page.locator('#state')).toBeEmpty();
+});

@@ -8,8 +8,8 @@
 (function () {
   'use strict';
 
-  var ENDPOINT =
-    'https://script.google.com/macros/s/AKfycbz9oZZXBoCEBRYiXmML2QEUPuuK5gb1a4UqKDBBFDMhnSH3ud0gHYFVxLN8EM4yfnGEXg/exec';
+  // 사이트 서버(functions/letters-data.js)가 구글에서 받아 온 편지를 보관해 두었다가 바로 내준다
+  var ENDPOINT = '/letters-data';
   if ('__LETTERS_ENDPOINT__' in window) ENDPOINT = window.__LETTERS_ENDPOINT__; // 테스트용
   var CLOSING =
     '조금 이상한 우리들을 함께 만들어 주셔서 고맙습니다.\n관람객들이 남긴 마음을 모아 전해 드려요.\n— 조금 이상한 우리들 운영진';
@@ -126,17 +126,47 @@
       $('names').appendChild(b);
     });
 
+  // 한 번 연 편지는 이 휴대폰에도 보관해 두고, 다음에는 기다림 없이 먼저 보여 준 뒤 뒤에서 새로 받아 온다
+  var CACHE_KEY = 'alo.letters.cache.';
+  function readCache(name) {
+    try {
+      return JSON.parse(localStorage.getItem(CACHE_KEY + name) || 'null');
+    } catch (e) {
+      return null;
+    }
+  }
+  function writeCache(name, r) {
+    try {
+      localStorage.setItem(CACHE_KEY + name, JSON.stringify(r));
+    } catch (e) {}
+  }
+  function apply(a, raw) {
+    var r = JSON.parse(JSON.stringify(raw));
+    if (!r.notes || !r.notes.length) {
+      r.notes = [];
+      if (STAFF_NOTES[a[0]]) r.staffNote = { message: STAFF_NOTES[a[0]], sender: STAFF_FROM, at: '' };
+    }
+    save({ artist: a[0] });
+    data = r;
+    chosen = a;
+    render();
+    if ($('letter').hidden) {
+      show('letter');
+      window.scrollTo(0, 0);
+    }
+  }
   function open(a, fromTap) {
-    $('state').textContent = '편지를 여는 중…';
-    fetch(ENDPOINT + '?type=letters&artist=' + encodeURIComponent(a[0]), {
-      cache: 'no-store'
-    })
+    var cached = readCache(a[0]);
+    if (cached) apply(a, cached);
+    else $('state').textContent = '편지를 여는 중…';
+    fetch(ENDPOINT + '?type=letters&artist=' + encodeURIComponent(a[0]))
       .then(function (r) {
         return r.json();
       })
       .then(function (r) {
         $('state').textContent = '';
         if (!r || !r.ok) {
+          if (cached && (!r || r.error !== 'closed')) return; // 보관해 둔 편지를 그대로 둔다
           var why =
             {
               closed: '편지함이 닫혔어요. 운영진에게 문의해 주세요.',
@@ -147,18 +177,12 @@
           $('state').textContent = why;
           return;
         }
-        save({ artist: a[0] });
-        if (!r.notes || !r.notes.length) {
-          r.notes = [];
-          if (STAFF_NOTES[a[0]]) r.staffNote = { message: STAFF_NOTES[a[0]], sender: STAFF_FROM, at: '' };
-        }
-        data = r;
-        chosen = a;
-        render();
-        show('letter');
-        window.scrollTo(0, 0);
+        var changed = !cached || JSON.stringify(cached) !== JSON.stringify(r);
+        writeCache(a[0], r);
+        if (changed && (!cached || !$('letter').hidden)) apply(a, r); // 뒤로 간 뒤라면 다시 열지 않는다
       })
       .catch(function () {
+        if (cached) return;
         $('state').textContent = '연결이 안 돼요. 잠시 뒤에 다시 시도해 주세요.';
         if (!fromTap) show('pick');
       });
