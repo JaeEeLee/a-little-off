@@ -1,7 +1,7 @@
 /* 작가님께 온 편지 (/letters)
  *
- * 1. 이름을 고른다  2. 운영진에게 받은 열쇠(6자리)를 넣는다  3. 그 작가에게 온 글 + 모두에게 남긴 글을 편지처럼 본다
- * - 글은 저장소에 두지 않는다. Apps Script(docs/apps-script/goods.gs 의 readLetters)가 열쇠를 확인한 뒤 그 작가 글만 내려 준다
+ * 이름을 고르면 그 작가에게 온 글 + 모두에게 남긴 글을 편지처럼 본다
+ * - 글은 저장소에 두지 않는다. Apps Script(docs/apps-script/goods.gs 의 readLetters)가 그 작가 글만 내려 준다
  * - 한 번 연 휴대폰은 다음에 바로 열린다 ('이 휴대폰에서 닫기'로 지운다)
  * - '이미지로 저장하기': 편지를 몇 장의 이미지로 나눠 만들어 사진첩에 저장하거나 공유한다
  */
@@ -47,7 +47,7 @@
   var data = null;
 
   function show(which) {
-    ['pick', 'key', 'letter'].forEach(function (id) {
+    ['pick', 'letter'].forEach(function (id) {
       $(id).hidden = id !== which;
     });
   }
@@ -79,35 +79,14 @@
       b.textContent = labelOf(a);
       b.addEventListener('click', function () {
         chosen = a;
-        $('keyName').textContent = labelOf(a);
-        $('keyMsg').textContent = '';
-        $('code').value = '';
-        show('key');
-        $('code').focus();
+        open(a, true);
       });
       $('names').appendChild(b);
     });
 
-  /* 2. 열쇠 */
-  $('keyBack').addEventListener('click', function () {
-    show('pick');
-  });
-  $('key').addEventListener('submit', function (e) {
-    e.preventDefault();
-    var code = $('code').value.trim().toUpperCase();
-    if (code.length < 6) {
-      $('keyMsg').textContent = '열쇠 6자리를 모두 넣어 주세요.';
-      return;
-    }
-    open(chosen, code, true);
-  });
-
-  function open(a, code, fromForm) {
-    var btn = $('keyOpen');
-    btn.disabled = true;
-    btn.textContent = '여는 중…';
-    $('state').textContent = fromForm ? '' : '편지를 여는 중…';
-    fetch(ENDPOINT + '?type=letters&artist=' + encodeURIComponent(a[0]) + '&code=' + encodeURIComponent(code), {
+  function open(a, fromTap) {
+    $('state').textContent = '편지를 여는 중…';
+    fetch(ENDPOINT + '?type=letters&artist=' + encodeURIComponent(a[0]), {
       cache: 'no-store'
     })
       .then(function (r) {
@@ -118,18 +97,15 @@
         if (!r || !r.ok) {
           var why =
             {
-              code: '열쇠가 맞지 않아요. 운영진에게 받은 열쇠를 다시 확인해 주세요.',
               closed: '편지함이 닫혔어요. 운영진에게 문의해 주세요.',
               unset: '편지함이 아직 준비되지 않았어요.'
             }[r && r.error] || '편지를 불러오지 못했어요. 잠시 뒤에 다시 시도해 주세요.';
-          if (!fromForm) {
-            save(null);
-            show('pick');
-            $('state').textContent = why;
-          } else $('keyMsg').textContent = why;
+          save(null);
+          show('pick');
+          $('state').textContent = why;
           return;
         }
-        save({ artist: a[0], code: code });
+        save({ artist: a[0] });
         data = r;
         chosen = a;
         render();
@@ -137,13 +113,8 @@
         window.scrollTo(0, 0);
       })
       .catch(function () {
-        var why = '연결이 안 돼요. 잠시 뒤에 다시 시도해 주세요.';
-        if (fromForm) $('keyMsg').textContent = why;
-        else $('state').textContent = why;
-      })
-      .then(function () {
-        btn.disabled = false;
-        btn.textContent = '편지 열기';
+        $('state').textContent = '연결이 안 돼요. 잠시 뒤에 다시 시도해 주세요.';
+        if (!fromTap) show('pick');
       });
   }
 
@@ -346,9 +317,9 @@
     ARTISTS.filter(function (a) {
       return a[0] === s.artist;
     })[0];
-  if (a0 && s.code) {
+  if (a0) {
     chosen = a0;
     show('');
-    open(a0, s.code, false);
+    open(a0, false);
   } else show('pick');
 })();

@@ -10,8 +10,8 @@ async function fake(page) {
     const p = new URL(route.request().url()).searchParams;
     calls.push({ artist: p.get('artist'), code: p.get('code') });
     if (p.get('type') !== 'letters') return route.fulfill({ json: { ok: false } });
-    if (p.get('artist') !== '이재이' || p.get('code') !== 'AB3K7Q')
-      return route.fulfill({ json: { ok: false, error: 'code' } });
+    if (p.get('artist') !== '이재이')
+      return route.fulfill({ json: { ok: true, artist: p.get('artist'), label: p.get('artist'), notes: [], all: [] } });
     return route.fulfill({
       json: {
         ok: true,
@@ -29,20 +29,12 @@ async function fake(page) {
   return calls;
 }
 
-test('이름을 고르고 열쇠를 넣으면 그 작가의 편지가 열린다', async ({ page }) => {
+test('이름을 고르면 바로 그 작가의 편지가 열린다', async ({ page }) => {
   const calls = await fake(page);
   await page.goto('/letters/');
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
   await expect(page.locator('#names button')).toHaveCount(20);
   await page.locator('#names button', { hasText: '재이' }).click();
-  await expect(page.locator('#keyName')).toHaveText('재이');
-
-  await page.locator('#code').fill('zzzzzz');
-  await page.locator('#keyOpen').click();
-  await expect(page.locator('#keyMsg')).toContainText('열쇠가 맞지 않아요');
-
-  await page.locator('#code').fill('ab3k7q'); // 소문자로 넣어도 된다
-  await page.locator('#keyOpen').click();
   await expect(page.locator('#letter')).toBeVisible();
   await expect(page.locator('#toName')).toHaveText('재이');
   await expect(page.locator('#count')).toHaveText('받은 글 2통 · 모두에게 남긴 글 1통');
@@ -51,15 +43,13 @@ test('이름을 고르고 열쇠를 넣으면 그 작가의 편지가 열린다'
   await expect(page.locator('#mine .note-card').first()).toContainText('From. 관람객');
   await expect(page.locator('#all .note-card')).toHaveCount(1);
   await expect(page.locator('#until')).toContainText('12월 31일');
-  expect(calls.at(-1)).toEqual({ artist: '이재이', code: 'AB3K7Q' });
+  expect(calls.at(-1)).toEqual({ artist: '이재이', code: null }); // 열쇠 없이 이름만
 });
 
 test('한 번 연 휴대폰은 다음에 바로 열리고, 닫으면 다시 이름을 고른다', async ({ page }) => {
   await fake(page);
   await page.goto('/letters/');
   await page.locator('#names button', { hasText: '재이' }).click();
-  await page.locator('#code').fill('AB3K7Q');
-  await page.locator('#keyOpen').click();
   await expect(page.locator('#letter')).toBeVisible();
   await page.reload();
   await expect(page.locator('#letter')).toBeVisible();
@@ -80,8 +70,6 @@ test('이미지로 저장: 편지를 이미지로 만들어 내려받는다', as
   );
   await page.goto('/letters/');
   await page.locator('#names button', { hasText: '재이' }).click();
-  await page.locator('#code').fill('AB3K7Q');
-  await page.locator('#keyOpen').click();
   const download = page.waitForEvent('download');
   await page.locator('#saveImg').click();
   await download; // 파일 이름은 이 시험용 브라우저가 무시해서 따로 보지 않는다
