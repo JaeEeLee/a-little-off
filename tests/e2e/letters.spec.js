@@ -83,7 +83,6 @@ test('이미지로 저장: 편지 전체를 이미지로 만들어 모아 보여
   expect(drawn[0]).toContain('분홍색이 계속 생각나요');
   expect(drawn[0]).toContain('From. 관람객');
   expect(drawn[0]).toContain('참여 작가 모두에게 남긴 글');
-  expect(drawn[0]).not.toContain('이 쪽지 저장'); // 이미지에는 버튼이 들어가지 않는다
   const download = page.waitForEvent('download');
   await page.locator('#galleryAll').click();
   await download;
@@ -91,25 +90,15 @@ test('이미지로 저장: 편지 전체를 이미지로 만들어 모아 보여
   await expect(page.locator('#gallery')).toBeHidden();
 });
 
-test('쪽지마다 그 쪽지 한 장만 이미지로 저장할 수 있다', async ({ page }) => {
-  await fake(page);
-  await fakeH2C(page);
-  await page.goto('/letters/');
-  await page.locator('#names button', { hasText: '재이' }).click();
-  await page.locator('#mine .note-card').nth(1).getByRole('button', { name: '이 쪽지 저장' }).click();
-  await expect(page.locator('#galleryList img')).toHaveCount(1);
-  const drawn = await page.evaluate(() => window.__drawn);
-  expect(drawn[0]).toContain('응원해요!');
-  expect(drawn[0]).not.toContain('분홍색이 계속 생각나요');
-  expect(drawn[0]).toContain('재이 작가님께');
-});
-
-test('받은 쪽지가 없는 작가에게는 익명 응원 쪽지 한 통이 들어 있다', async ({ page }) => {
+test('관람객 쪽지가 없는 작가에게는 운영진 이름으로 그 작가만을 위한 글이 들어간다', async ({ page }) => {
   await fake(page);
   await page.goto('/letters/');
   await page.locator('#names button', { hasText: '홍림' }).click();
-  await expect(page.locator('#count')).toHaveText('받은 글 1통');
-  await expect(page.locator('#mine .note-card')).toHaveCount(1);
-  await expect(page.locator('#mine .note-from')).toHaveText('From. 익명');
-  await expect(page.locator('#mine .note-msg')).toContainText('수고 많으셨어요');
+  await expect(page.locator('#count')).toHaveText('운영진이 전하는 글');
+  await expect(page.locator('#mine .note-card.staff')).toHaveCount(1);
+  await expect(page.locator('#mine .note-from')).toHaveText('From. 조금 이상한 우리들 운영진');
+  await expect(page.locator('#mine .note-msg')).toContainText('강물');
+  await page.locator('#logout').click();
+  await page.locator('#names button', { hasText: '김지현' }).click();
+  await expect(page.locator('#mine .note-msg')).toContainText('테이블');
 });
