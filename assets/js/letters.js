@@ -1,7 +1,7 @@
 /* 작가님께 온 편지 (/letters)
  *
  * 이름을 고르면 그 작가에게 온 글 + 모두에게 남긴 글을 편지처럼 본다
- * - 글은 저장소에 두지 않는다. Apps Script(docs/apps-script/goods.gs 의 readLetters)가 그 작가 글만 내려 준다
+ * - 글은 저장소에 두지 않는다. 방명록 Apps Script(Code.gs 에 붙인 docs/apps-script/letters-addon.gs)가 그 작가 글만 내려 준다
  * - 한 번 연 휴대폰은 다음에 바로 열린다 ('이 휴대폰에서 닫기'로 지운다)
  * - '이미지로 저장하기': 편지를 몇 장의 이미지로 나눠 만들어 사진첩에 저장하거나 공유한다
  */
@@ -9,7 +9,7 @@
   'use strict';
 
   var ENDPOINT =
-    'https://script.google.com/macros/s/AKfycbzj5BtE_6bPV7ZN26QfzlRUNrIlCU3K7v6ZprFwpvweLlVhILfYnwCj6d1cjej7JTJhGg/exec';
+    'https://script.google.com/macros/s/AKfycbz9oZZXBoCEBRYiXmML2QEUPuuK5gb1a4UqKDBBFDMhnSH3ud0gHYFVxLN8EM4yfnGEXg/exec';
   if ('__LETTERS_ENDPOINT__' in window) ENDPOINT = window.__LETTERS_ENDPOINT__; // 테스트용
   var H2C = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
   var PER_IMAGE = 8; // 이미지 한 장에 담을 글 수
