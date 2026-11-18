@@ -160,8 +160,8 @@
       return r.json();
     });
   }
-  /* 편지 열기: 휴대폰에 보관본이 있으면 바로 보여 주고, 없으면 사이트 서버 보관본(빠름)으로 먼저 연다.
-     그런 다음 늘 구글에서 최신본을 한 번 더 받아(refresh=1) 달라졌으면 바꿔 끼운다 → 새 쪽지가 바로 반영된다 */
+  /* 편지 열기: 휴대폰에 보관본이 있으면 바로 보여 주고, 사이트 서버(10초 보관)에서 받아 달라졌으면 바꿔 끼운다.
+     쪽지를 보냈을 때는 아래 보내기에서 구글 최신본(refresh=1)을 곧바로 받는다 */
   function open(a, fromTap) {
     var cached = readCache(a[0]);
     if (cached) apply(a, cached);
@@ -191,10 +191,7 @@
       $('state').textContent = '연결이 안 돼요. 잠시 뒤에 다시 시도해 주세요.';
       if (!fromTap) show('pick');
     }
-    var first = cached ? Promise.resolve() : get(a[0], false).then(got, function () {});
-    first.then(function () {
-      return get(a[0], true).then(got, failed);
-    });
+    get(a[0], false).then(got, failed);
   }
 
   /* 3. 편지 */
@@ -369,22 +366,30 @@
           })[0]
         );
         $('sendDone').hidden = false;
-        // 받는 작가가 열면 새 쪽지가 바로 보이게 한다
-        try {
-          localStorage.removeItem(CACHE_KEY + to);
-        } catch (x) {}
-        // 시트에 줄이 쌓이는 데 잠깐 걸려서, 조금 뒤 두 번 최신본을 받아 둔다
-        [3000, 10000].forEach(function (ms) {
+        // 바로 갱신: 보고 있는 편지면 보낸 쪽지를 곧장 붙이고, 구글 최신본(refresh=1)을 바로 받아 바꿔 끼운다.
+        // 서버 보관본도 이때 새것이 되어 다른 휴대폰에서도 바로 보인다. 시트에 아직 안 보이면 잠깐 뒤 두 번 더 확인한다
+        if (chosen && chosen[0] === to && !$('letter').hidden && data) {
+          data.notes = (data.notes || []).concat([JSON.parse(body)]);
+          render();
+        }
+        var tries = [0, 2000, 5000];
+        (function check(k) {
           setTimeout(function () {
             get(to, true)
               .then(function (r) {
-                if (!r || !r.ok) return;
+                if (!r || !r.ok) throw 0;
+                var has = (r.notes || []).some(function (n) {
+                  return n.message === message;
+                });
+                if (!has && k + 1 < tries.length) return check(k + 1);
                 writeCache(to, r);
                 if (chosen && chosen[0] === to && !$('letter').hidden) apply(chosen, r);
               })
-              .catch(function () {});
-          }, ms);
-        });
+              .catch(function () {
+                if (k + 1 < tries.length) check(k + 1);
+              });
+          }, tries[k]);
+        })(0);
       })
       .catch(function () {
         sendState('전하지 못했어요. 잠시 뒤에 다시 시도해 주세요.');

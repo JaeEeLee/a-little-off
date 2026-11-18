@@ -8,7 +8,7 @@ async function fake(page) {
   await page.addInitScript((u) => (window.__LETTERS_ENDPOINT__ = u), EP);
   await page.route(EP + '**', async (route) => {
     const p = new URL(route.request().url()).searchParams;
-    calls.push({ artist: p.get('artist'), code: p.get('code') });
+    calls.push({ artist: p.get('artist'), code: p.get('code'), refresh: p.get('refresh') });
     if (p.get('type') !== 'letters') return route.fulfill({ json: { ok: false } });
     if (p.get('artist') !== '이재이')
       return route.fulfill({ json: { ok: true, artist: p.get('artist'), label: p.get('artist'), notes: [], all: [] } });
@@ -44,7 +44,7 @@ test('이름을 고르면 바로 그 작가의 편지가 열린다', async ({ pa
   await expect(page.locator('#mine .note-card .note-from').nth(1)).toHaveText('From. 익명'); // 보낸 사람이 비면 익명
   await expect(page.locator('#all .note-card')).toHaveCount(1);
   await expect(page.locator('#until')).toContainText('12월 31일');
-  expect(calls.at(-1)).toEqual({ artist: '이재이', code: null }); // 열쇠 없이 이름만
+  expect(calls.at(-1)).toEqual({ artist: '이재이', code: null, refresh: null }); // 열쇠 없이 이름만, 평소엔 10초 보관본
 });
 
 test('한 번 연 휴대폰은 다음에 바로 열리고, 닫으면 다시 이름을 고른다', async ({ page }) => {
@@ -112,7 +112,7 @@ test('운영진 글은 관람객 쪽지가 있는 작가에게도 맨 끝에 들
 });
 
 test('오른쪽 위 뱃지로 지금 보는 작가에게 쪽지를 보낸다', async ({ page }) => {
-  await fake(page);
+  const calls = await fake(page);
   const SEND = 'https://script.google.com/macros/s/SEND/exec';
   await page.addInitScript((u) => (window.__LETTERS_SEND__ = u), SEND);
   const sent = [];
@@ -134,6 +134,9 @@ test('오른쪽 위 뱃지로 지금 보는 작가에게 쪽지를 보낸다', a
   await expect(page.locator('#sendDone')).toContainText('재이 작가님께 쪽지를 전했어요');
   expect(sent).toHaveLength(1);
   expect(sent[0]).toMatchObject({ artist: '이재이', message: '수고 많으셨어요', sender: '홍림' });
+  // 보고 있던 편지에 곧장 붙고, 구글 최신본을 바로 다시 받는다
+  await expect(page.locator('#mine .note-msg', { hasText: '수고 많으셨어요' })).toHaveCount(1);
+  await expect.poll(() => calls.filter((c) => c.refresh === '1').length).toBeGreaterThan(0);
   await page.locator('#sendDone [data-close]').click();
   await expect(page.locator('#sendDlg')).toBeHidden();
 });
