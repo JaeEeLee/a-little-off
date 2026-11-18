@@ -61,15 +61,26 @@ function doPost(e) {
 /* ── 쪽지 ── */
 
 function addNote(b) {
-  const message = String(b.message || '').trim().slice(0, MAX_LEN);
-  const sender = String(b.sender || '').trim().slice(0, 20);
-  const artist = String(b.artist || '').trim().slice(0, 20) || '전체';
+  const message = String(b.message || '')
+    .trim()
+    .slice(0, MAX_LEN);
+  const sender = String(b.sender || '')
+    .trim()
+    .slice(0, 20);
+  const artist =
+    String(b.artist || '')
+      .trim()
+      .slice(0, 20) || '전체';
   if (!message) return { ok: false, reason: 'empty' };
   if (BLOCKED.some((re) => re.test(message) || re.test(sender))) return { ok: false, reason: 'blocked' };
 
   // 같은 글을 짧은 사이에 두 번 받으면 (사이트가 응답을 못 읽고 한 번 더 보낸 경우) 한 번만 적는다
   const cache = CacheService.getScriptCache();
-  const key = 'n:' + Utilities.base64Encode(Utilities.computeDigest(Utilities.DigestAlgorithm.MD5, artist + '|' + sender + '|' + message));
+  const key =
+    'n:' +
+    Utilities.base64Encode(
+      Utilities.computeDigest(Utilities.DigestAlgorithm.MD5, artist + '|' + sender + '|' + message)
+    );
   if (cache.get(key)) return { ok: true, dup: true };
   cache.put(key, '1', 120);
 
@@ -122,7 +133,14 @@ function notesTab(create) {
     const col = {
       artist: find(['artist', '작가', '받는']),
       message: find(['message', '메시지', '내용', '쪽지', '한마디']),
-      sender: find(['sender', '보낸', '닉네임', 'from']),
+      // '보낸 사람' · '보내는 사람' · '작성자' · '닉네임' · '이름'(받는 작가 열이 아닌 것)
+      sender: (function () {
+        const i = find(['sender', '보낸', '보내', '작성자', '닉네임', '닉', 'from']);
+        if (i >= 0) return i;
+        return head.findIndex(function (h, k) {
+          return h.indexOf('이름') >= 0 && h.indexOf('작가') < 0 && h.indexOf('받는') < 0;
+        });
+      })(),
       at: head.indexOf('at') >= 0 ? head.indexOf('at') : find(['시각', '시간', '날짜', 'time', 'date']),
       send: head.indexOf('전달')
     };
@@ -141,7 +159,14 @@ function notesTab(create) {
 function check() {
   const t = notesTab(false);
   if (!t) return Logger.log('쪽지 탭을 찾지 못했어요. 맨 위 NOTES_TAB 에 탭 이름을 적어 주세요.');
-  Logger.log('쪽지 탭: ' + t.sheet.getName() + ' / 열 위치(0부터): ' + JSON.stringify(t.col) + ' / 줄 수: ' + (t.sheet.getLastRow() - 1));
+  Logger.log(
+    '쪽지 탭: ' +
+      t.sheet.getName() +
+      ' / 열 위치(0부터): ' +
+      JSON.stringify(t.col) +
+      ' / 줄 수: ' +
+      (t.sheet.getLastRow() - 1)
+  );
   Logger.log('재이 게시판 쪽지 수: ' + readBoard('이재이').notes.length);
 }
 

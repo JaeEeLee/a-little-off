@@ -494,7 +494,14 @@ function findNotes(ss) {
     const col = {
       artist: find(['artist', '작가', '받는']),
       message: find(['message', '메시지', '내용', '쪽지', '한마디']),
-      sender: find(['sender', '보낸', '닉네임', 'from']),
+      // '보낸 사람' · '보내는 사람' · '작성자' · '닉네임' · '이름'(받는 작가 열이 아닌 것)
+      sender: (function () {
+        const i = find(['sender', '보낸', '보내', '작성자', '닉네임', '닉', 'from']);
+        if (i >= 0) return i;
+        return head.findIndex(function (h, k) {
+          return h.indexOf('이름') >= 0 && h.indexOf('작가') < 0 && h.indexOf('받는') < 0;
+        });
+      })(),
       at: head.indexOf('at') >= 0 ? head.indexOf('at') : find(['시각', '시간', '날짜', 'time', 'date']),
       send: head.indexOf('전달')
     };

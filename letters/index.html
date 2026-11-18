@@ -10,10 +10,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Hahmlet:wght@500;700&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap"
-    />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" />
     <link rel="stylesheet" href="/assets/css/letters.css" />
   </head>
   <body>
@@ -53,6 +50,22 @@
       </section>
 
       <p class="msg center" id="state" role="status"></p>
+
+      <!-- 만든 이미지 모아 보기 -->
+      <div class="gallery" id="gallery" hidden>
+        <div class="gallery-in" role="dialog" aria-modal="true" aria-labelledby="galleryCount">
+          <div class="gallery-top">
+            <b id="galleryCount"></b>
+            <button type="button" class="gallery-x" id="galleryClose" aria-label="닫기">×</button>
+          </div>
+          <p class="gallery-tip">휴대폰: 이미지를 <b>길게 눌러 '사진에 저장'</b>하거나, 아래 <b>모두 저장</b>을 눌러 주세요.</p>
+          <div class="gallery-list" id="galleryList"></div>
+          <div class="gallery-bottom">
+            <button type="button" class="primary" id="galleryAll">모두 저장</button>
+            <p class="msg" id="galleryMsg" role="status"></p>
+          </div>
+        </div>
+      </div>
     </main>
     <script src="/assets/js/letters.js"></script>
   </body>

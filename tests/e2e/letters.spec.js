@@ -40,7 +40,8 @@ test('이름을 고르면 바로 그 작가의 편지가 열린다', async ({ pa
   await expect(page.locator('#count')).toHaveText('받은 글 2통 · 모두에게 남긴 글 1통');
   await expect(page.locator('#mine .note-card')).toHaveCount(2);
   await expect(page.locator('#mine .note-card').first()).toContainText('분홍색이 계속 생각나요');
-  await expect(page.locator('#mine .note-card').first()).toContainText('From. 관람객');
+  await expect(page.locator('#mine .note-card .note-from').first()).toHaveText('From. 관람객');
+  await expect(page.locator('#mine .note-card .note-from').nth(1)).toHaveText('From. 익명'); // 보낸 사람이 비면 익명
   await expect(page.locator('#all .note-card')).toHaveCount(1);
   await expect(page.locator('#until')).toContainText('12월 31일');
   expect(calls.at(-1)).toEqual({ artist: '이재이', code: null }); // 열쇠 없이 이름만
@@ -59,8 +60,7 @@ test('한 번 연 휴대폰은 다음에 바로 열리고, 닫으면 다시 이�
   await expect(page.locator('#pick')).toBeVisible();
 });
 
-test('이미지로 저장: 편지를 이미지로 만들어 내려받는다', async ({ page }) => {
-  await fake(page);
+async function fakeH2C(page) {
   // 그림 그리는 라이브러리는 가짜로 (실제 사이트는 cdnjs 에서 받는다)
   await page.route('https://cdnjs.cloudflare.com/**', (r) =>
     r.fulfill({
@@ -68,15 +68,48 @@ test('이미지로 저장: 편지를 이미지로 만들어 내려받는다', as
       body: 'window.html2canvas = function (el) { var c = document.createElement("canvas"); c.width = 10; c.height = 10; window.__drawn = (window.__drawn || []).concat(el.textContent); return Promise.resolve(c); };'
     })
   );
+}
+
+test('이미지로 저장: 편지 전체를 이미지로 만들어 모아 보여 주고, 모두 저장으로 내려받는다', async ({ page }) => {
+  await fake(page);
+  await fakeH2C(page);
   await page.goto('/letters/');
   await page.locator('#names button', { hasText: '재이' }).click();
-  const download = page.waitForEvent('download');
   await page.locator('#saveImg').click();
-  await download; // 파일 이름은 이 시험용 브라우저가 무시해서 따로 보지 않는다
-  await expect(page.locator('#saveMsg')).toHaveText('이미지 1장을 내려받았어요.');
+  await expect(page.locator('#gallery')).toBeVisible();
+  await expect(page.locator('#galleryList img')).toHaveCount(1);
+  await expect(page.locator('#galleryCount')).toHaveText('이미지 1장');
   const drawn = await page.evaluate(() => window.__drawn);
-  expect(drawn).toHaveLength(1);
   expect(drawn[0]).toContain('분홍색이 계속 생각나요');
+  expect(drawn[0]).toContain('From. 관람객');
   expect(drawn[0]).toContain('참여 작가 모두에게 남긴 글');
-  expect(drawn[0]).toContain('운영진');
+  expect(drawn[0]).not.toContain('이 쪽지 저장'); // 이미지에는 버튼이 들어가지 않는다
+  const download = page.waitForEvent('download');
+  await page.locator('#galleryAll').click();
+  await download;
+  await page.locator('#galleryClose').click();
+  await expect(page.locator('#gallery')).toBeHidden();
+});
+
+test('쪽지마다 그 쪽지 한 장만 이미지로 저장할 수 있다', async ({ page }) => {
+  await fake(page);
+  await fakeH2C(page);
+  await page.goto('/letters/');
+  await page.locator('#names button', { hasText: '재이' }).click();
+  await page.locator('#mine .note-card').nth(1).getByRole('button', { name: '이 쪽지 저장' }).click();
+  await expect(page.locator('#galleryList img')).toHaveCount(1);
+  const drawn = await page.evaluate(() => window.__drawn);
+  expect(drawn[0]).toContain('응원해요!');
+  expect(drawn[0]).not.toContain('분홍색이 계속 생각나요');
+  expect(drawn[0]).toContain('재이 작가님께');
+});
+
+test('받은 쪽지가 없는 작가에게는 익명 응원 쪽지 한 통이 들어 있다', async ({ page }) => {
+  await fake(page);
+  await page.goto('/letters/');
+  await page.locator('#names button', { hasText: '홍림' }).click();
+  await expect(page.locator('#count')).toHaveText('받은 글 1통');
+  await expect(page.locator('#mine .note-card')).toHaveCount(1);
+  await expect(page.locator('#mine .note-from')).toHaveText('From. 익명');
+  await expect(page.locator('#mine .note-msg')).toContainText('수고 많으셨어요');
 });
