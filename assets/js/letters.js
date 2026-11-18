@@ -153,37 +153,48 @@
       window.scrollTo(0, 0);
     }
   }
+  function get(name, fresh) {
+    return fetch(ENDPOINT + '?type=letters&artist=' + encodeURIComponent(name) + (fresh ? '&refresh=1' : ''), {
+      cache: 'no-store'
+    }).then(function (r) {
+      return r.json();
+    });
+  }
+  /* 편지 열기: 휴대폰에 보관본이 있으면 바로 보여 주고, 없으면 사이트 서버 보관본(빠름)으로 먼저 연다.
+     그런 다음 늘 구글에서 최신본을 한 번 더 받아(refresh=1) 달라졌으면 바꿔 끼운다 → 새 쪽지가 바로 반영된다 */
   function open(a, fromTap) {
     var cached = readCache(a[0]);
     if (cached) apply(a, cached);
     else $('state').textContent = '편지를 여는 중…';
-    fetch(ENDPOINT + '?type=letters&artist=' + encodeURIComponent(a[0]))
-      .then(function (r) {
-        return r.json();
-      })
-      .then(function (r) {
-        $('state').textContent = '';
-        if (!r || !r.ok) {
-          if (cached && (!r || r.error !== 'closed')) return; // 보관해 둔 편지를 그대로 둔다
-          var why =
-            {
-              closed: '편지함이 닫혔어요. 운영진에게 문의해 주세요.',
-              unset: '편지함이 아직 준비되지 않았어요.'
-            }[r && r.error] || '편지를 불러오지 못했어요. 잠시 뒤에 다시 시도해 주세요.';
-          save(null);
-          show('pick');
-          $('state').textContent = why;
-          return;
-        }
-        var changed = !cached || JSON.stringify(cached) !== JSON.stringify(r);
-        writeCache(a[0], r);
-        if (changed && (!cached || !$('letter').hidden)) apply(a, r); // 뒤로 간 뒤라면 다시 열지 않는다
-      })
-      .catch(function () {
-        if (cached) return;
-        $('state').textContent = '연결이 안 돼요. 잠시 뒤에 다시 시도해 주세요.';
-        if (!fromTap) show('pick');
-      });
+    var shown = cached;
+    function got(r) {
+      $('state').textContent = '';
+      if (!r || !r.ok) {
+        if (shown && (!r || r.error !== 'closed')) return; // 보여 준 편지를 그대로 둔다
+        var why =
+          {
+            closed: '편지함이 닫혔어요. 운영진에게 문의해 주세요.',
+            unset: '편지함이 아직 준비되지 않았어요.'
+          }[r && r.error] || '편지를 불러오지 못했어요. 잠시 뒤에 다시 시도해 주세요.';
+        save(null);
+        show('pick');
+        $('state').textContent = why;
+        return;
+      }
+      var changed = !shown || JSON.stringify(shown) !== JSON.stringify(r);
+      writeCache(a[0], r);
+      if (changed && (!shown || (!$('letter').hidden && chosen && chosen[0] === a[0]))) apply(a, r); // 뒤로 간 뒤라면 다시 열지 않는다
+      shown = r;
+    }
+    function failed() {
+      if (shown) return;
+      $('state').textContent = '연결이 안 돼요. 잠시 뒤에 다시 시도해 주세요.';
+      if (!fromTap) show('pick');
+    }
+    var first = cached ? Promise.resolve() : get(a[0], false).then(got, function () {});
+    first.then(function () {
+      return get(a[0], true).then(got, failed);
+    });
   }
 
   /* 3. 편지 */
@@ -358,22 +369,22 @@
           })[0]
         );
         $('sendDone').hidden = false;
-        // 서버 보관본을 새로 받아 두어, 받는 작가가 열면 바로 보이게 한다
+        // 받는 작가가 열면 새 쪽지가 바로 보이게 한다
         try {
           localStorage.removeItem(CACHE_KEY + to);
         } catch (x) {}
-        setTimeout(function () {
-          fetch(ENDPOINT + '?type=letters&artist=' + encodeURIComponent(to) + '&refresh=1')
-            .then(function (r) {
-              return r.json();
-            })
-            .then(function (r) {
-              if (!r || !r.ok) return;
-              writeCache(to, r);
-              if (chosen && chosen[0] === to && !$('letter').hidden) apply(chosen, r);
-            })
-            .catch(function () {});
-        }, 1500);
+        // 시트에 줄이 쌓이는 데 잠깐 걸려서, 조금 뒤 두 번 최신본을 받아 둔다
+        [3000, 10000].forEach(function (ms) {
+          setTimeout(function () {
+            get(to, true)
+              .then(function (r) {
+                if (!r || !r.ok) return;
+                writeCache(to, r);
+                if (chosen && chosen[0] === to && !$('letter').hidden) apply(chosen, r);
+              })
+              .catch(function () {});
+          }, ms);
+        });
       })
       .catch(function () {
         sendState('전하지 못했어요. 잠시 뒤에 다시 시도해 주세요.');

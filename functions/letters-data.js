@@ -1,8 +1,10 @@
 /**
  * 작가님께 온 편지 데이터 (/letters-data?artist=<본명>)
  *
- * 편지 페이지가 구글 Apps Script 를 직접 부르면 매번 몇 초씩 걸린다. 이제 쪽지가 더 쌓이지 않으므로
- * 여기서 한 번 받아 온 결과를 Cloudflare 캐시에 하루 보관하고, 그다음부터는 바로 내준다.
+ * 편지 페이지가 구글 Apps Script 를 직접 부르면 매번 몇 초씩 걸린다. 그래서 받아 온 결과를 Cloudflare 캐시에
+ * 보관해 두고 처음 여는 휴대폰에 바로 내준다. 편지 페이지는 그 뒤 늘 ?refresh=1 로 최신본을 한 번 더 받아
+ * 바꿔 끼우고, 그때 보관본도 새것으로 바뀐다 (새 쪽지가 바로 반영된다).
+ * 휴대폰 브라우저에는 저장하지 말라고(no-store) 알린다. 저장해 두면 새 쪽지가 하루 동안 안 보인다.
  * 글은 저장소에 두지 않는다 (공개 레포).
  *
  *  - ?refresh=1 을 붙이면 캐시를 건너뛰고 새로 받아 온다 (시트를 고친 뒤 바로 보고 싶을 때)
@@ -11,7 +13,7 @@
 const UPSTREAM =
   'https://script.google.com/macros/s/AKfycbz9oZZXBoCEBRYiXmML2QEUPuuK5gb1a4UqKDBBFDMhnSH3ud0gHYFVxLN8EM4yfnGEXg/exec';
 const TTL = 24 * 60 * 60; // 하루
-const VERSION = '1'; // 캐시를 한꺼번에 비우고 싶으면 숫자를 올린다
+const VERSION = '2'; // 캐시를 한꺼번에 비우고 싶으면 숫자를 올린다
 
 function json(body, status, extra) {
   return new Response(JSON.stringify(body), {
@@ -47,7 +49,7 @@ export async function onRequest(context) {
   }
   if (!data || !data.ok) return json(data || { ok: false }, 200, { 'Cache-Control': 'no-store' });
 
-  const res = json(data, 200, { 'Cache-Control': 'public, max-age=' + TTL });
-  if (cache) context.waitUntil(cache.put(key, res.clone()));
-  return res;
+  // 서버 보관용 사본에만 보관 기간을 적고, 휴대폰에 보내는 응답은 저장하지 않게 한다
+  if (cache) context.waitUntil(cache.put(key, json(data, 200, { 'Cache-Control': 'public, max-age=' + TTL })));
+  return json(data, 200, { 'Cache-Control': 'no-store' });
 }

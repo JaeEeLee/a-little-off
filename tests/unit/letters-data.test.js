@@ -28,7 +28,8 @@ test('처음엔 구글에서 받아 오고, 두 번째는 보관해 둔 것을 �
   );
   const r1 = await call('https://x.dev/letters-data?type=letters&artist=%EC%9D%B4%EC%9E%AC%EC%9D%B4', cache);
   assert.equal((await r1.json()).notes.length, 1);
-  assert.match(r1.headers.get('Cache-Control'), /max-age=86400/);
+  assert.equal(r1.headers.get('Cache-Control'), 'no-store'); // 휴대폰 브라우저는 저장하지 않는다
+  assert.match([...cache.store.values()][0].headers.get('Cache-Control'), /max-age=86400/); // 서버 보관본만 하루
   const r2 = await call('https://x.dev/letters-data?type=letters&artist=%EC%9D%B4%EC%9E%AC%EC%9D%B4', cache);
   assert.equal((await r2.json()).ok, true);
   assert.equal(fetchMock.mock.callCount(), 1);
