@@ -90,6 +90,9 @@
     if (robots) robots.setAttribute('content', 'noindex, follow');
     var workSec = document.getElementById('workSection');
     if (workSec) workSec.hidden = IS_VISIT; // 예약 페이지에서는 그림 카드를 빼 둔다
+    // 전시장 풍경 사진은 재이 페이지에만 있다
+    var sceneSec = document.getElementById('sceneSection');
+    if (sceneSec) sceneSec.hidden = IS_VISIT || PAGE_ARTIST !== '이재이';
     document.documentElement.classList.add('artist-page');
     if (IS_VISIT) document.documentElement.classList.add('visit-page');
 
@@ -214,7 +217,16 @@
     var footer = document.querySelector('footer');
     var ORDER = IS_VISIT
       ? ['infoSection', 'visitSection', 'helloSection', 'boardSection', 'questSection', 'thanksSection']
-      : ['workSection', 'afterDocent', 'boardSection', 'questSection', 'infoSection', 'ondutySection', 'visitSection'];
+      : [
+          'workSection',
+          'sceneSection',
+          'afterDocent',
+          'boardSection',
+          'questSection',
+          'infoSection',
+          'ondutySection',
+          'visitSection'
+        ];
     ORDER.forEach(function (id) {
       var el = document.getElementById(id);
       if (el && footer) footer.parentNode.insertBefore(el, footer);
@@ -835,20 +847,42 @@
     var nextBtn = document.getElementById('viewerNext');
     var buttons = Array.prototype.slice.call(document.querySelectorAll('.work-zoom'));
 
-    // 페이지에 있는 작품 사진을 차례대로 한 줄로 늘어놓는다 (같은 사진은 한 번만)
-    var srcs = [];
+    /* 사진 묶음마다 따로 넘긴다: 작품 사진(그림 · 가까이 보기)과 전시장 풍경은 섞이지 않는다.
+       묶음은 가장 가까운 [data-viewer] 값, 없으면 'work' */
+    var groups = {};
+    function groupOf(b) {
+      var g = b.closest('[data-viewer]');
+      return g ? g.getAttribute('data-viewer') : 'work';
+    }
     buttons.forEach(function (b) {
+      var g = groupOf(b);
       var src = b.getAttribute('data-src');
-      if (srcs.indexOf(src) !== -1) return;
-      srcs.push(src);
-      var slide = document.createElement('div');
-      slide.className = 'viewer-slide';
-      var im = document.createElement('img');
-      im.alt = (b.querySelector('img') || {}).alt || '';
-      im.dataset.src = src; // 열 때 불러온다
-      slide.appendChild(im);
-      track.appendChild(slide);
+      groups[g] = groups[g] || [];
+      if (
+        groups[g].some(function (x) {
+          return x.src === src;
+        })
+      )
+        return; // 같은 사진은 한 번만
+      groups[g].push({ src: src, alt: (b.querySelector('img') || {}).alt || '' });
     });
+    var srcs = [];
+    var shown = null;
+    function fill(g) {
+      if (shown === g) return;
+      shown = g;
+      track.textContent = '';
+      srcs = groups[g].map(function (it) {
+        var slide = document.createElement('div');
+        slide.className = 'viewer-slide';
+        var im = document.createElement('img');
+        im.alt = it.alt;
+        im.dataset.src = it.src; // 열 때 불러온다
+        slide.appendChild(im);
+        track.appendChild(slide);
+        return it.src;
+      });
+    }
     var slides = track.children;
 
     function current() {
@@ -873,7 +907,8 @@
       track.scrollTo({ left: i * track.clientWidth, behavior: smooth ? 'smooth' : 'auto' });
       update();
     }
-    function open(src) {
+    function open(src, g) {
+      fill(g);
       loadAround(srcs.indexOf(src));
       viewer.hidden = false;
       document.body.style.overflow = 'hidden';
@@ -886,7 +921,7 @@
 
     buttons.forEach(function (b) {
       b.addEventListener('click', function () {
-        open(b.getAttribute('data-src'));
+        open(b.getAttribute('data-src'), groupOf(b));
       });
     });
     var t = null;

@@ -2935,3 +2935,37 @@ html:not(.artist-page) #questSection {
 .sticky-meta > * {
   white-space: nowrap;
 }
+
+/* 전시장 풍경 (재이 페이지): 정사각 사진을 바둑판처럼, 누르면 크게 */
+.scene-label {
+  margin: 22px 0 10px;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+}
+.scene-label:first-of-type {
+  margin-top: 8px;
+}
+.scene-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+}
+.scene-grid .work-zoom {
+  aspect-ratio: 1;
+  border-radius: 3px;
+  background: var(--line);
+}
+.scene-grid .work-zoom img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+.scene-grid .work-zoom:hover img {
+  transform: scale(1.03);
+}
+.scene-grid .work-zoom:focus-visible {
+  outline: 2px solid var(--spark);
+  outline-offset: 2px;
+}
