@@ -1886,7 +1886,11 @@ button.cal-day:focus-visible b {
     0 1px 2px rgba(70, 50, 30, 0.12);
   rotate: var(--r, -2deg);
   translate: 0 var(--y, 0);
-  font-family: 'Gaegu', 'Hahmlet', sans-serif;
+  font-family:
+    'IBM Plex Sans KR',
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif; /* 손글씨체 대신 본문 글꼴 */
   color: #3b2e22;
   transition:
     rotate 0.25s ease,
@@ -1912,17 +1916,19 @@ button.cal-day:focus-visible b {
 }
 .sticky-msg {
   margin: 0;
-  font-size: 1.08rem;
-  line-height: 1.45;
+  font-size: 0.92rem;
+  line-height: 1.55;
   white-space: pre-line;
-  word-break: break-word;
+  word-break: keep-all; /* 한글 낱말 중간에서 줄이 끊기지 않게 */
+  overflow-wrap: anywhere;
 }
 .sticky-meta {
   display: flex;
+  flex-wrap: wrap; /* 좁은 쪽지에서는 보낸 사람 · 날짜를 줄을 나눠 놓고, 글자 단위로 끊지 않는다 */
   justify-content: space-between;
-  gap: 8px;
+  gap: 2px 8px;
   margin-top: 10px;
-  font-size: 0.92rem;
+  font-size: 0.74rem;
   opacity: 0.75;
 }
 .sticky.is-new {
@@ -2924,4 +2930,8 @@ html:not(.artist-page) #questSection {
   max-width: 320px;
   font-size: 0.78rem;
   color: var(--ink);
+}
+
+.sticky-meta > * {
+  white-space: nowrap;
 }

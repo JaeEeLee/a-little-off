@@ -1429,12 +1429,6 @@
     sec.hidden = false;
     if (IS_VISIT) return; // 예약 페이지: 쪽지 보드는 빼고 쓰는 칸만 둔다
 
-    // 손글씨 느낌 글꼴은 이 페이지에서만 불러온다
-    var font = document.createElement('link');
-    font.rel = 'stylesheet';
-    font.href = 'https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap';
-    document.head.appendChild(font);
-
     var board = document.getElementById('board');
     var empty = document.getElementById('boardEmpty');
     var PAPERS = ['#FFF4A8', '#FFD9E4', '#D7F0FF', '#DDF5D2', '#FFE3C2', '#EADCFF'];

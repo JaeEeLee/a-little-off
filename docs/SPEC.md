@@ -16,17 +16,17 @@
 
 ## 2. 사용 기술
 
-| 영역              | 사용한 것                                                                                | 비고                                                        |
-| ----------------- | ---------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
-| 마크업            | HTML5                                                                                    | 페이지당 HTML 한 장                                         |
-| 스타일            | CSS (사용자 정의 속성, `clamp`/`min`/`max`, `aspect-ratio`, `mask`, `svh`)               | 전처리기 없음                                               |
-| 브라우저 스크립트 | 바닐라 JavaScript (ES5 문법)                                                             | 프레임워크 · 번들러 없음. 오래된 휴대폰에서도 그대로 돌도록 |
-| 서버 함수         | JavaScript ES 모듈 (Workers 런타임)                                                      | `fetch` 표준 `Request`/`Response`, Web Crypto               |
-| 글꼴              | Google Fonts: Hahmlet(제목), IBM Plex Sans KR(본문), Gaegu(쪽지 손글씨, `/jessie`에서만) |                                                             |
-| 외부 서비스       | Google Apps Script 웹앱, Google 시트                                                     | 쪽지 · 예약 · 게시판                                        |
-| 지도              | 네이버 지도, 카카오맵, 구글 지도 링크                                                    | 링크만, 지도 SDK 없음                                       |
-| 테스트            | Playwright Test 1.56 (브라우저), Node.js 내장 `node:test` (서버 함수)                    | `tests/`                                                    |
-| 코드 스타일       | Prettier 3.3.3, EditorConfig                                                             | 설정은 루트의 `.prettierrc.json`, `.editorconfig`           |
+| 영역              | 사용한 것                                                                  | 비고                                                        |
+| ----------------- | -------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| 마크업            | HTML5                                                                      | 페이지당 HTML 한 장                                         |
+| 스타일            | CSS (사용자 정의 속성, `clamp`/`min`/`max`, `aspect-ratio`, `mask`, `svh`) | 전처리기 없음                                               |
+| 브라우저 스크립트 | 바닐라 JavaScript (ES5 문법)                                               | 프레임워크 · 번들러 없음. 오래된 휴대폰에서도 그대로 돌도록 |
+| 서버 함수         | JavaScript ES 모듈 (Workers 런타임)                                        | `fetch` 표준 `Request`/`Response`, Web Crypto               |
+| 글꼴              | Google Fonts: Hahmlet(제목), IBM Plex Sans KR(본문 · 쪽지)                 |                                                             |
+| 외부 서비스       | Google Apps Script 웹앱, Google 시트                                       | 쪽지 · 예약 · 게시판                                        |
+| 지도              | 네이버 지도, 카카오맵, 구글 지도 링크                                      | 링크만, 지도 SDK 없음                                       |
+| 테스트            | Playwright Test 1.56 (브라우저), Node.js 내장 `node:test` (서버 함수)      | `tests/`                                                    |
+| 코드 스타일       | Prettier 3.3.3, EditorConfig                                               | 설정은 루트의 `.prettierrc.json`, `.editorconfig`           |
 
 브라우저 API: `fetch`, `localStorage`, `IntersectionObserver`, `requestAnimationFrame`, `matchMedia`(동작 줄이기), `document.fonts`, `Image.decode`, Media Session(도슨트 잠금 화면 조작), Clipboard(주소 · 링크 복사).
 
