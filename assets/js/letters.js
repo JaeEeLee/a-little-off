@@ -37,7 +37,7 @@
     ['홍림', '']
   ];
   var KEY = 'alo.letters';
-  // 앞으로 온 관람객 쪽지가 없는 작가에게는, 운영진이 그 작가에게 쓴 글 한 통을 '운영진' 이름으로 넣는다
+  // 모든 작가 편지 끝에, 운영진이 그 작가에게 쓴 글 한 통을 '운영진' 이름으로 넣는다
   // (관람객인 척하지 않는다. 작가마다 작품 이야기를 담아 겹치지 않게)
   var STAFF_FROM = '조금 이상한 우리들 운영진';
   var STAFF_NOTES = {
@@ -142,10 +142,8 @@
   }
   function apply(a, raw) {
     var r = JSON.parse(JSON.stringify(raw));
-    if (!r.notes || !r.notes.length) {
-      r.notes = [];
-      if (STAFF_NOTES[a[0]]) r.staffNote = { message: STAFF_NOTES[a[0]], sender: STAFF_FROM, at: '' };
-    }
+    r.notes = r.notes || [];
+    if (STAFF_NOTES[a[0]]) r.staffNote = { message: STAFF_NOTES[a[0]], sender: STAFF_FROM, at: '' };
     save({ artist: a[0] });
     data = r;
     chosen = a;
@@ -230,7 +228,7 @@
     mine.forEach(function (n) {
       ol.appendChild(card(n));
     });
-    if (!mine.length && data.staffNote) ol.appendChild(card(data.staffNote, true));
+    if (data.staffNote) ol.appendChild(card(data.staffNote, true));
     $('all').innerHTML = '';
     all.forEach(function (n) {
       $('all').appendChild(card(n));
@@ -267,6 +265,123 @@
     setTimeout(function () {
       document.title = old;
     }, 1000);
+  });
+
+  /* ── 쪽지 보내기: 오른쪽 위 뱃지 → 작은 창. 방명록 시트에 한 줄로 쌓이고, 받는 작가 편지에 들어간다 ── */
+  var SEND_TO =
+    'https://script.google.com/macros/s/AKfycbz9oZZXBoCEBRYiXmML2QEUPuuK5gb1a4UqKDBBFDMhnSH3ud0gHYFVxLN8EM4yfnGEXg/exec';
+  if ('__LETTERS_SEND__' in window) SEND_TO = window.__LETTERS_SEND__; // 테스트용
+  var MAX = 300;
+  var BLOCKED = [
+    [/[\w.+-]+@[\w-]+\.[\w.]{2,}/, '이메일 주소는 적지 않으셔도 돼요.'],
+    [/01[016-9][-.\s]?\d{3,4}[-.\s]?\d{4}/, '전화번호는 적지 않으셔도 돼요.'],
+    [/\d{9,}/, '긴 숫자는 적지 않으셔도 돼요.'],
+    [/(https?:\/\/|www\.)|\.(com|net|org|kr|io|me|shop|link|xyz|top|biz)\b/i, '링크는 넣을 수 없어요.']
+  ];
+  var dlg = $('sendDlg');
+  var form = $('sendForm');
+  ARTISTS.slice()
+    .sort(function (a, b) {
+      return labelOf(a).localeCompare(labelOf(b), 'ko');
+    })
+    .forEach(function (a) {
+      var o = document.createElement('option');
+      o.value = a[0];
+      o.textContent = labelOf(a);
+      form.to.appendChild(o);
+    });
+  function sendState(t) {
+    $('sendState').textContent = t || '';
+  }
+  function openSend() {
+    // 편지를 보고 있으면 그 작가에게, 아니면 직접 고른다
+    form.to.value = !$('letter').hidden && chosen ? chosen[0] : '';
+    sendState('');
+    $('sendDone').hidden = true;
+    form.hidden = false;
+    dlg.hidden = false;
+    document.body.style.overflow = 'hidden';
+    (form.to.value ? form.message : form.to).focus();
+  }
+  function closeSend() {
+    dlg.hidden = true;
+    document.body.style.overflow = '';
+    $('sendBadge').focus();
+  }
+  $('sendBadge').addEventListener('click', openSend);
+  Array.prototype.forEach.call(dlg.querySelectorAll('[data-close]'), function (b) {
+    b.addEventListener('click', closeSend);
+  });
+  dlg.addEventListener('click', function (e) {
+    if (e.target === dlg) closeSend();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && !dlg.hidden) closeSend();
+  });
+  form.message.addEventListener('input', function () {
+    $('sendLen').textContent = form.message.value.length + ' / ' + MAX;
+  });
+  var lastSent = 0;
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var to = form.to.value;
+    var message = form.message.value.trim();
+    var sender = form.sender.value.trim();
+    if (!to) return (sendState('받는 작가를 골라 주세요.'), form.to.focus());
+    if (!message) return (sendState('전할 말을 적어 주세요.'), form.message.focus());
+    for (var i = 0; i < BLOCKED.length; i++) {
+      if (BLOCKED[i][0].test(message) || BLOCKED[i][0].test(sender)) return sendState(BLOCKED[i][1]);
+    }
+    if (Date.now() - lastSent < 20000) return sendState('방금 하나를 보냈어요. 잠시 뒤에 다시 보내 주세요.');
+    var btn = $('sendBtn');
+    btn.disabled = true;
+    btn.textContent = '전하는 중…';
+    var body = JSON.stringify({ artist: to, message: message, sender: sender, at: new Date().toISOString() });
+    // text/plain 으로 보내면 사전 확인 요청 없이 바로 간다. 응답을 못 읽어도 전달은 되는 경우가 많아 한 번 더 시도한다
+    fetch(SEND_TO, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: body })
+      .catch(function () {
+        return fetch(SEND_TO, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: body
+        });
+      })
+      .then(function () {
+        lastSent = Date.now();
+        form.message.value = '';
+        $('sendLen').textContent = '0 / ' + MAX;
+        form.hidden = true;
+        $('sendDoneTo').textContent = labelOf(
+          ARTISTS.filter(function (a) {
+            return a[0] === to;
+          })[0]
+        );
+        $('sendDone').hidden = false;
+        // 서버 보관본을 새로 받아 두어, 받는 작가가 열면 바로 보이게 한다
+        try {
+          localStorage.removeItem(CACHE_KEY + to);
+        } catch (x) {}
+        setTimeout(function () {
+          fetch(ENDPOINT + '?type=letters&artist=' + encodeURIComponent(to) + '&refresh=1')
+            .then(function (r) {
+              return r.json();
+            })
+            .then(function (r) {
+              if (!r || !r.ok) return;
+              writeCache(to, r);
+              if (chosen && chosen[0] === to && !$('letter').hidden) apply(chosen, r);
+            })
+            .catch(function () {});
+        }, 1500);
+      })
+      .catch(function () {
+        sendState('전하지 못했어요. 잠시 뒤에 다시 시도해 주세요.');
+      })
+      .then(function () {
+        btn.disabled = false;
+        btn.textContent = '전하기';
+      });
   });
 
   /* 시작: 한 번 연 휴대폰이면 바로 연다 */

@@ -264,6 +264,8 @@ h1 {
   body {
     background: #fff;
   }
+  .send-badge,
+  .send-dlg,
   .backdrop,
   .head,
   #pick,
@@ -290,4 +292,119 @@ h1 {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
+}
+
+/* 쪽지 보내기: 오른쪽 위 작은 뱃지 → 가운데 작은 창 */
+.send-badge {
+  position: fixed;
+  top: max(12px, env(safe-area-inset-top));
+  right: 12px;
+  z-index: 20;
+  padding: 7px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 999px;
+  background: rgba(255, 253, 248, 0.86);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 14px var(--shadow);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.send-badge:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.send-dlg {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(40, 28, 20, 0.45);
+  overscroll-behavior: contain;
+}
+.send-box {
+  position: relative;
+  width: min(100%, 400px);
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  padding: 22px 20px 20px;
+  border-radius: 16px;
+  background: var(--paper);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+}
+.send-box h2 {
+  margin: 0 0 14px;
+  font-size: 1.05rem;
+}
+.send-x {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--ink-soft);
+  font-size: 1rem;
+  cursor: pointer;
+}
+#sendForm {
+  display: grid;
+  gap: 12px;
+}
+#sendForm label {
+  display: grid;
+  gap: 5px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+#sendForm small {
+  font-weight: 400;
+}
+#sendForm select,
+#sendForm textarea,
+#sendForm input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  font-size: 16px; /* 아이폰에서 확대되지 않게 */
+  font-weight: 400;
+}
+#sendForm textarea {
+  resize: vertical;
+}
+.send-len {
+  justify-self: end;
+  font-size: 0.75rem;
+  font-weight: 400;
+}
+.send-state {
+  margin: 0;
+  min-height: 1.2em;
+  font-size: 0.85rem;
+  color: var(--ember);
+}
+.send-done {
+  display: grid;
+  gap: 12px;
+  justify-items: center;
+  text-align: center;
+}
+.send-done p {
+  margin: 8px 0 0;
+}
+/* 뱃지가 맨 위 날짜 줄과 겹치지 않게 머리 위를 조금 띄운다 */
+.head {
+  padding-top: 26px;
 }

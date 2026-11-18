@@ -38,7 +38,7 @@ test('이름을 고르면 바로 그 작가의 편지가 열린다', async ({ pa
   await expect(page.locator('#letter')).toBeVisible();
   await expect(page.locator('#toName')).toHaveText('재이');
   await expect(page.locator('#count')).toHaveText('받은 글 2통 · 모두에게 남긴 글 1통');
-  await expect(page.locator('#mine .note-card')).toHaveCount(2);
+  await expect(page.locator('#mine .note-card')).toHaveCount(3); // 관람객 2 + 운영진 1
   await expect(page.locator('#mine .note-card').first()).toContainText('분홍색이 계속 생각나요');
   await expect(page.locator('#mine .note-card .note-from').first()).toHaveText('From. 관람객');
   await expect(page.locator('#mine .note-card .note-from').nth(1)).toHaveText('From. 익명'); // 보낸 사람이 비면 익명
@@ -76,7 +76,7 @@ test('PDF로 저장: 인쇄 창을 열고, 인쇄에는 편지 종이만 나온�
   await expect(page.locator('.head')).toBeHidden();
 });
 
-test('관람객 쪽지가 없는 작가에게는 운영진 이름으로 그 작가만을 위한 글이 들어간다', async ({ page }) => {
+test('관람객 쪽지가 없는 작가에게는 운영진 글만 들어간다', async ({ page }) => {
   await fake(page);
   await page.goto('/letters/');
   await page.locator('#names button', { hasText: '홍림' }).click();
@@ -93,11 +93,59 @@ test('한 번 연 편지는 휴대폰에 보관돼, 다음에는 서버가 느�
   await fake(page);
   await page.goto('/letters/');
   await page.locator('#names button', { hasText: '재이' }).click();
-  await expect(page.locator('#mine .note-card')).toHaveCount(2);
+  await expect(page.locator('#mine .note-card')).toHaveCount(3); // 관람객 2 + 운영진 1
   await page.unroute(EP + '**');
   await page.route(EP + '**', (r) => r.abort()); // 서버가 안 되는 상황
   await page.reload();
   await expect(page.locator('#letter')).toBeVisible();
-  await expect(page.locator('#mine .note-card')).toHaveCount(2);
+  await expect(page.locator('#mine .note-card')).toHaveCount(3); // 관람객 2 + 운영진 1
   await expect(page.locator('#state')).toBeEmpty();
+});
+
+test('운영진 글은 관람객 쪽지가 있는 작가에게도 맨 끝에 들어간다', async ({ page }) => {
+  await fake(page);
+  await page.goto('/letters/');
+  await page.locator('#names button', { hasText: '재이' }).click();
+  await expect(page.locator('#mine .note-card')).toHaveCount(3);
+  await expect(page.locator('#mine .note-card').last()).toHaveClass(/staff/);
+  await expect(page.locator('#count')).toHaveText('받은 글 2통 · 모두에게 남긴 글 1통');
+});
+
+test('오른쪽 위 뱃지로 지금 보는 작가에게 쪽지를 보낸다', async ({ page }) => {
+  await fake(page);
+  const SEND = 'https://script.google.com/macros/s/SEND/exec';
+  await page.addInitScript((u) => (window.__LETTERS_SEND__ = u), SEND);
+  const sent = [];
+  await page.route(SEND, async (route) => {
+    sent.push(JSON.parse(route.request().postData()));
+    return route.fulfill({ json: { ok: true } });
+  });
+  await page.goto('/letters/');
+  await expect(page.locator('#sendBadge')).toBeVisible();
+  await page.locator('#names button', { hasText: '재이' }).click();
+  await page.locator('#sendBadge').click();
+  await expect(page.locator('#sendDlg')).toBeVisible();
+  await expect(page.locator('#sendForm [name=to]')).toHaveValue('이재이');
+  await page.locator('#sendBtn').click();
+  await expect(page.locator('#sendState')).toHaveText('전할 말을 적어 주세요.');
+  await page.locator('#sendForm [name=message]').fill('수고 많으셨어요');
+  await page.locator('#sendForm [name=sender]').fill('홍림');
+  await page.locator('#sendBtn').click();
+  await expect(page.locator('#sendDone')).toContainText('재이 작가님께 쪽지를 전했어요');
+  expect(sent).toHaveLength(1);
+  expect(sent[0]).toMatchObject({ artist: '이재이', message: '수고 많으셨어요', sender: '홍림' });
+  await page.locator('#sendDone [data-close]').click();
+  await expect(page.locator('#sendDlg')).toBeHidden();
+});
+
+test('이름 고르는 화면에서는 받는 작가를 직접 골라야 한다', async ({ page }) => {
+  await fake(page);
+  await page.goto('/letters/');
+  await page.locator('#sendBadge').click();
+  await expect(page.locator('#sendForm [name=to]')).toHaveValue('');
+  await page.locator('#sendForm [name=message]').fill('안녕하세요');
+  await page.locator('#sendBtn').click();
+  await expect(page.locator('#sendState')).toHaveText('받는 작가를 골라 주세요.');
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#sendDlg')).toBeHidden();
 });

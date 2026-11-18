@@ -15,6 +15,36 @@
   </head>
   <body>
     <div class="backdrop" aria-hidden="true"></div>
+    <button type="button" class="send-badge" id="sendBadge" aria-haspopup="dialog">✉ 쪽지 보내기</button>
+    <div class="send-dlg" id="sendDlg" hidden role="dialog" aria-modal="true" aria-labelledby="sendTitle">
+      <div class="send-box">
+        <button type="button" class="send-x" data-close aria-label="닫기">✕</button>
+        <h2 id="sendTitle">작가에게 쪽지 보내기</h2>
+        <form id="sendForm" novalidate>
+          <label
+            >받는 작가
+            <select name="to">
+              <option value="">작가를 골라 주세요</option>
+            </select>
+          </label>
+          <label
+            >전할 말
+            <textarea name="message" rows="5" maxlength="300" placeholder="작가님께 전하고 싶은 말을 적어 주세요"></textarea>
+            <span class="send-len" id="sendLen">0 / 300</span>
+          </label>
+          <label
+            >보내는 사람 <small>(비워 두면 익명)</small>
+            <input name="sender" maxlength="20" autocomplete="nickname" />
+          </label>
+          <p class="send-state" id="sendState" role="status"></p>
+          <button type="submit" class="primary" id="sendBtn">전하기</button>
+        </form>
+        <div class="send-done" id="sendDone" hidden>
+          <p><b id="sendDoneTo"></b> 작가님께 쪽지를 전했어요.<br />곧 그 작가님 편지에 들어가요.</p>
+          <button type="button" class="link" data-close>닫기</button>
+        </div>
+      </div>
+    </div>
     <main class="wrap">
       <header class="head">
         <p class="eyebrow">조금 이상한 우리들 · 2026. 11. 12 – 17</p>
