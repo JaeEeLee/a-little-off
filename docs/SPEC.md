@@ -98,7 +98,7 @@ Cloudflare Pages는 `404.html`이 없으면 없는 주소에 `index.html`을 내
 
 ### 4.1 Google Apps Script 웹앱
 
-`site.js`의 `SHEET_ENDPOINT`(배포된 웹앱 주소). 스크립트 코드는 Google Apps Script 편집기에 있고 이 저장소에는 없습니다.
+`site.js`의 `SHEET_ENDPOINT`(배포된 웹앱 주소). 스크립트 코드는 `docs/apps-script/guestbook.gs`(2026-11-18 다시 짬, 예약은 마감되어 `reason: 'closed'`). 굿즈 · 도슨트 재생 수 · 편지는 별도 프로젝트인 `goods.gs`.
 
 | 용도        | 요청   | 본문 · 쿼리                                               | 응답                                       |
 | ----------- | ------ | --------------------------------------------------------- | ------------------------------------------ |
