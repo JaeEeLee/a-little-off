@@ -3,7 +3,7 @@
  * 이름을 고르면 그 작가에게 온 글 + 모두에게 남긴 글을 편지처럼 본다
  * - 글은 저장소에 두지 않는다. 방명록 Apps Script(Code.gs 에 붙인 docs/apps-script/letters-addon.gs)가 그 작가 글만 내려 준다
  * - 한 번 연 휴대폰은 다음에 바로 열린다 ('이 휴대폰에서 닫기'로 지운다)
- * - '이미지로 저장하기': 편지를 몇 장의 이미지로 나눠 만들어 사진첩에 저장하거나 공유한다
+ * - 'PDF로 저장하기': 브라우저 인쇄로 편지 종이만 PDF 로 남긴다 (캡처를 먼저 권한다)
  */
 (function () {
   'use strict';
@@ -11,8 +11,6 @@
   var ENDPOINT =
     'https://script.google.com/macros/s/AKfycbz9oZZXBoCEBRYiXmML2QEUPuuK5gb1a4UqKDBBFDMhnSH3ud0gHYFVxLN8EM4yfnGEXg/exec';
   if ('__LETTERS_ENDPOINT__' in window) ENDPOINT = window.__LETTERS_ENDPOINT__; // 테스트용
-  var H2C = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-  var PER_IMAGE = 6; // 이미지 한 장에 담을 글 수
   var CLOSING =
     '조금 이상한 우리들을 함께 만들어 주셔서 고맙습니다.\n관람객들이 남긴 마음을 모아 전해 드려요.\n— 조금 이상한 우리들 운영진';
 
@@ -218,11 +216,7 @@
     if (data.until) {
       var u = new Date(data.until);
       $('until').textContent =
-        '이 편지함은 ' +
-        (u.getMonth() + 1) +
-        '월 ' +
-        u.getDate() +
-        '일까지 열려 있어요. 그 전에 캡처해 두세요.';
+        '이 편지함은 ' + (u.getMonth() + 1) + '월 ' + u.getDate() + '일까지 열려 있어요. 그 전에 캡처해 두세요.';
     }
   }
 
@@ -232,204 +226,23 @@
     show('pick');
   });
 
-  /* ── 이미지로 저장 ──
-     - '이미지로 저장하기': 편지 전체를 글 PER_IMAGE 개씩 나눠 1080px 폭 이미지로 만든다
-     - 만든 이미지는 화면에 모아 보여 준다: 길게 눌러 사진에 저장(휴대폰) · '모두 저장'(공유 창 또는 내려받기) */
-  var EXPORT_W = 540; // CSS 폭. 2배로 그려 1080px
-  function loadH2C() {
-    if (window.html2canvas) return Promise.resolve(window.html2canvas);
-    return new Promise(function (resolve, reject) {
-      var s = document.createElement('script');
-      s.src = H2C;
-      s.onload = function () {
-        resolve(window.html2canvas);
-      };
-      s.onerror = reject;
-      document.head.appendChild(s);
-    });
-  }
-  function sheetHead(label) {
-    var head = document.createElement('div');
-    head.className = 'sheet-head';
-    head.innerHTML = '<p class="to"><b></b> 작가님께</p><p class="count"></p>';
-    head.querySelector('b').textContent = label;
-    head.querySelector('.count').textContent = '조금 이상한 우리들 · 2026. 11. 12 – 17';
-    return head;
-  }
-  function pages() {
-    var label = data.label || labelOf(chosen);
-    var mineList = (data.notes || []).length ? data.notes : data.staffNote ? [data.staffNote] : [];
-    var items = mineList
-      .map(function (n) {
-        return { n: n, all: false, staff: !(data.notes || []).length };
-      })
-      .concat(
-        (data.all || []).map(function (n) {
-          return { n: n, all: true };
-        })
-      );
-    var out = [];
-    for (var i = 0; i < Math.max(items.length, 1); i += PER_IMAGE) out.push(items.slice(i, i + PER_IMAGE));
-    return out.map(function (chunk, idx) {
-      var sheet = document.createElement('div');
-      sheet.className = 'sheet';
-      sheet.appendChild(sheetHead(label));
-      var lastAll = null;
-      var ol = null;
-      chunk.forEach(function (it) {
-        if (it.all !== lastAll) {
-          if (it.all) {
-            var h = document.createElement('h2');
-            h.className = 'sub';
-            h.textContent = '참여 작가 모두에게 남긴 글';
-            sheet.appendChild(h);
-          }
-          ol = document.createElement('ol');
-          ol.className = 'notes';
-          sheet.appendChild(ol);
-          lastAll = it.all;
-        }
-        ol.appendChild(card(it.n, it.staff));
-      });
-      if (idx === out.length - 1) {
-        var c = document.createElement('p');
-        c.className = 'closing';
-        c.textContent = CLOSING;
-        sheet.appendChild(c);
-      }
-      if (out.length > 1) {
-        var no = document.createElement('p');
-        no.className = 'page-no';
-        no.textContent = idx + 1 + ' / ' + out.length;
-        sheet.appendChild(no);
-      }
-      return sheet;
-    });
-  }
-
-  // 종이(sheet)들을 차례로 이미지 파일로
-  function draw(sheets, baseName) {
-    var box = document.createElement('div');
-    box.className = 'export';
-    box.style.width = EXPORT_W + 'px';
-    document.body.appendChild(box);
-    return loadH2C()
-      .then(function (h2c) {
-        var files = [];
-        var chain = (document.fonts && document.fonts.ready) || Promise.resolve();
-        sheets.forEach(function (sh, i) {
-          chain = chain.then(function () {
-            box.innerHTML = '';
-            box.appendChild(sh);
-            return h2c(sh, {
-              scale: 1080 / EXPORT_W,
-              backgroundColor: '#fffdf8',
-              useCORS: true,
-              logging: false
-            }).then(function (cv) {
-              return new Promise(function (res) {
-                cv.toBlob(function (blob) {
-                  var name = baseName + (sheets.length > 1 ? '_' + (i + 1) : '') + '.png';
-                  files.push(new File([blob], name, { type: 'image/png' }));
-                  res();
-                }, 'image/png');
-              });
-            });
-          });
-        });
-        return chain.then(function () {
-          return files;
-        });
-      })
-      .then(
-        function (files) {
-          box.remove();
-          return files;
-        },
-        function (e) {
-          box.remove();
-          throw e;
-        }
-      );
-  }
-
-  /* 만든 이미지 모아 보기 */
-  var shown = [];
-  function gallery(files) {
-    shown.forEach(function (u) {
-      URL.revokeObjectURL(u);
-    });
-    shown = [];
-    var list = $('galleryList');
-    list.innerHTML = '';
-    files.forEach(function (f) {
-      var url = URL.createObjectURL(f);
-      shown.push(url);
-      var img = document.createElement('img');
-      img.src = url;
-      img.alt = f.name;
-      list.appendChild(img);
-    });
-    $('galleryCount').textContent = '이미지 ' + files.length + '장';
-    $('galleryAll').onclick = function () {
-      saveAll(files);
-    };
-    $('gallery').hidden = false;
-    document.documentElement.classList.add('gallery-open');
-  }
-  function closeGallery() {
-    $('gallery').hidden = true;
-    document.documentElement.classList.remove('gallery-open');
-  }
-  $('galleryClose').addEventListener('click', closeGallery);
-  function saveAll(files) {
-    var msg = $('galleryMsg');
-    if (navigator.canShare && navigator.canShare({ files: files })) {
-      return navigator
-        .share({ files: files, title: '조금 이상한 우리들 · 작가님께 온 편지' })
-        .then(function () {
-          msg.textContent = '';
-        })
-        .catch(function () {});
-    }
-    files.forEach(function (f, i) {
-      setTimeout(function () {
-        var a = document.createElement('a');
-        a.href = URL.createObjectURL(f);
-        a.download = f.name;
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(function () {
-          a.remove();
-        }, 1000);
-      }, i * 300); // 여러 장을 한꺼번에 내려받으면 브라우저가 막을 수 있어 조금씩 띄운다
-    });
-    msg.textContent = '이미지 ' + files.length + '장을 내려받았어요.';
-  }
-
-  function make(sheets, baseName, btn) {
-    var msg = $('saveMsg');
-    var label0 = btn ? btn.textContent : '';
-    if (btn) {
-      btn.disabled = true;
-      btn.textContent = '만드는 중…';
-    }
-    msg.textContent = '';
-    return draw(sheets, baseName)
-      .then(gallery)
-      .catch(function () {
-        msg.textContent = '이미지를 만들지 못했어요. 화면을 캡처해 주세요.';
-      })
-      .then(function () {
-        if (btn) {
-          btn.disabled = false;
-          btn.textContent = label0;
-        }
-      });
-  }
-  $('saveImg').addEventListener('click', function () {
+  /* ── PDF로 저장: 휴대폰 브라우저의 인쇄 → PDF 저장을 쓴다 (편지 종이만 찍히게 letters.css 의 @media print) ── */
+  var ua = navigator.userAgent || '';
+  var IOS = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && 'ontouchend' in document);
+  $('pdfTip').textContent = IOS
+    ? '아이폰: 뜨는 화면에서 공유(⬆) → 프린트 → 오른쪽 위 공유(⬆) → "파일에 저장"'
+    : /Android/.test(ua)
+      ? '안드로이드: 뜨는 화면 위쪽 프린터를 "PDF로 저장"으로 고른 뒤 저장(⬇)'
+      : '인쇄 창에서 대상(프린터)을 "PDF로 저장"으로 고른 뒤 저장';
+  $('savePdf').addEventListener('click', function () {
     if (!data) return;
-    make(pages(), '조금이상한우리들_' + (data.label || labelOf(chosen)) + '_편지', $('saveImg'));
+    var old = document.title;
+    // 저장될 파일 이름 (브라우저가 제목을 파일 이름으로 쓴다)
+    document.title = '조금이상한우리들_' + (data.label || labelOf(chosen)) + '_편지';
+    window.print();
+    setTimeout(function () {
+      document.title = old;
+    }, 1000);
   });
 
   /* 시작: 한 번 연 휴대폰이면 바로 연다 */

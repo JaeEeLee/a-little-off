@@ -60,34 +60,20 @@ test('한 번 연 휴대폰은 다음에 바로 열리고, 닫으면 다시 이�
   await expect(page.locator('#pick')).toBeVisible();
 });
 
-async function fakeH2C(page) {
-  // 그림 그리는 라이브러리는 가짜로 (실제 사이트는 cdnjs 에서 받는다)
-  await page.route('https://cdnjs.cloudflare.com/**', (r) =>
-    r.fulfill({
-      contentType: 'application/javascript',
-      body: 'window.html2canvas = function (el) { var c = document.createElement("canvas"); c.width = 10; c.height = 10; window.__drawn = (window.__drawn || []).concat(el.textContent); return Promise.resolve(c); };'
-    })
-  );
-}
-
-test('이미지로 저장: 편지 전체를 이미지로 만들어 모아 보여 주고, 모두 저장으로 내려받는다', async ({ page }) => {
+test('PDF로 저장: 인쇄 창을 열고, 인쇄에는 편지 종이만 나온다', async ({ page }) => {
   await fake(page);
-  await fakeH2C(page);
+  await page.addInitScript(() => {
+    window.print = () => (window.__printed = document.title);
+  });
   await page.goto('/letters/');
   await page.locator('#names button', { hasText: '재이' }).click();
-  await page.locator('#saveImg').click();
-  await expect(page.locator('#gallery')).toBeVisible();
-  await expect(page.locator('#galleryList img')).toHaveCount(1);
-  await expect(page.locator('#galleryCount')).toHaveText('이미지 1장');
-  const drawn = await page.evaluate(() => window.__drawn);
-  expect(drawn[0]).toContain('분홍색이 계속 생각나요');
-  expect(drawn[0]).toContain('From. 관람객');
-  expect(drawn[0]).toContain('참여 작가 모두에게 남긴 글');
-  const download = page.waitForEvent('download');
-  await page.locator('#galleryAll').click();
-  await download;
-  await page.locator('#galleryClose').click();
-  await expect(page.locator('#gallery')).toBeHidden();
+  await expect(page.locator('#pdfTip')).not.toBeEmpty();
+  await page.locator('#savePdf').click();
+  expect(await page.evaluate(() => window.__printed)).toBe('조금이상한우리들_재이_편지');
+  await page.emulateMedia({ media: 'print' });
+  await expect(page.locator('#sheet')).toBeVisible();
+  await expect(page.locator('.actions')).toBeHidden();
+  await expect(page.locator('.head')).toBeHidden();
 });
 
 test('관람객 쪽지가 없는 작가에게는 운영진 이름으로 그 작가만을 위한 글이 들어간다', async ({ page }) => {

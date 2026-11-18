@@ -204,67 +204,6 @@ h1 {
   color: var(--ink-soft);
 }
 
-/* ── 만든 이미지 모아 보기 ── */
-.gallery-open body {
-  overflow: hidden;
-}
-.gallery {
-  position: fixed;
-  inset: 0;
-  z-index: 20;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  background: rgba(30, 24, 18, 0.5);
-}
-.gallery-in {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  max-width: 560px;
-  max-height: 92vh;
-  border-radius: 18px 18px 0 0;
-  background: #fff;
-  padding: 16px 16px calc(14px + env(safe-area-inset-bottom, 0px));
-}
-.gallery-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.gallery-x {
-  width: 34px;
-  height: 34px;
-  border: 0;
-  background: none;
-  font-size: 1.5rem;
-  color: var(--ink-soft);
-  cursor: pointer;
-}
-.gallery-tip {
-  margin: 4px 0 10px;
-  font-size: 0.82rem;
-  color: var(--ink-soft);
-}
-.gallery-list {
-  flex: 1;
-  overflow-y: auto;
-  display: grid;
-  gap: 12px;
-  padding: 2px;
-}
-.gallery-list img {
-  width: 100%;
-  height: auto;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px var(--shadow);
-  -webkit-touch-callout: default; /* 아이폰에서 길게 눌러 저장 */
-}
-.gallery-bottom {
-  padding-top: 12px;
-  display: grid;
-  gap: 6px;
-}
 .sub {
   margin: 26px 0 12px;
   font-size: 0.95rem;
@@ -301,12 +240,6 @@ h1 {
   margin: 0;
   font-size: 0.8rem;
 }
-/* 이미지로 만들 때 화면 밖에서 그리는 칸 */
-.export {
-  position: fixed;
-  left: -10000px;
-  top: 0;
-}
 
 /* 운영진이 전하는 글 */
 .note-card.staff {
@@ -315,4 +248,46 @@ h1 {
 }
 .note-card.staff .note-from {
   color: var(--ink-soft);
+}
+
+.tip {
+  color: var(--ink-soft);
+  font-size: 0.78rem;
+}
+
+/* ── PDF로 저장(인쇄): 편지 종이만, 쪽지가 페이지 경계에서 잘리지 않게 ── */
+@page {
+  size: A4;
+  margin: 14mm 12mm;
+}
+@media print {
+  body {
+    background: #fff;
+  }
+  .backdrop,
+  .head,
+  #pick,
+  .actions,
+  #state {
+    display: none !important;
+  }
+  .wrap {
+    max-width: none;
+    padding: 0;
+  }
+  .sheet {
+    box-shadow: none;
+    border-radius: 0;
+    padding: 0;
+    background: #fff;
+  }
+  .note-card,
+  .closing,
+  .sheet-head {
+    break-inside: avoid;
+  }
+  .note-card {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
 }
