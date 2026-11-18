@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <meta name="color-scheme" content="light only" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>작가님께 온 편지 · 조금 이상한 우리들</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Hahmlet:wght@500;700&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap"
+    />
+    <link rel="stylesheet" href="/assets/css/letters.css" />
+  </head>
+  <body>
+    <div class="backdrop" aria-hidden="true"></div>
+    <main class="wrap">
+      <header class="head">
+        <p class="eyebrow">조금 이상한 우리들 · 2026. 11. 12 – 17</p>
+        <h1>작가님께 온 편지</h1>
+      </header>
+
+      <!-- 1. 이름 고르기 -->
+      <section class="card" id="pick">
+        <p class="lead">전시를 찾아온 분들이 남긴 마음을 모아 전해 드려요.<br />본인 이름을 골라 주세요.</p>
+        <div class="names" id="names"></div>
+      </section>
+
+      <!-- 2. 열쇠 넣기 -->
+      <form class="card" id="key" hidden>
+        <p class="lead"><b id="keyName"></b> 작가님,<br />운영진에게 받은 열쇠 6자리를 넣어 주세요.</p>
+        <input
+          id="code"
+          type="text"
+          inputmode="text"
+          autocomplete="off"
+          autocapitalize="characters"
+          maxlength="6"
+          placeholder="예: AB3K7Q"
+          required
+        />
+        <p class="msg" id="keyMsg" role="alert"></p>
+        <button type="submit" class="primary" id="keyOpen">편지 열기</button>
+        <button type="button" class="link" id="keyBack">다른 이름 고르기</button>
+      </form>
+
+      <!-- 3. 편지 -->
+      <section id="letter" hidden>
+        <div class="sheet" id="sheet">
+          <div class="sheet-head">
+            <p class="to"><b id="toName"></b> 작가님께</p>
+            <p class="count" id="count"></p>
+          </div>
+          <ol class="notes" id="mine"></ol>
+          <div id="allWrap" hidden>
+            <h2 class="sub">참여 작가 모두에게 남긴 글</h2>
+            <ol class="notes" id="all"></ol>
+          </div>
+          <p class="closing" id="closing"></p>
+        </div>
+        <div class="actions">
+          <button type="button" class="primary" id="saveImg">이미지로 저장하기</button>
+          <p class="msg" id="saveMsg" role="status"></p>
+          <p class="note" id="until"></p>
+          <button type="button" class="link" id="logout">이 휴대폰에서 닫기</button>
+        </div>
+      </section>
+
+      <p class="msg center" id="state" role="status"></p>
+    </main>
+    <script src="/assets/js/letters.js"></script>
+  </body>
+</html>

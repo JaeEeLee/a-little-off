@@ -1,0 +1,244 @@
+/* 작가님께 온 편지 (/letters) — 전시 사이트와 같은 색. 라이트 모드 고정 */
+:root {
+  --ink: #332519;
+  --ink-soft: #6e6254;
+  --line: #e2dfd8;
+  --accent: #1e56b8;
+  --ember: #c8401b;
+  --paper: #fffdf8;
+  --shadow: rgba(53, 37, 24, 0.13);
+  --poster-blur: url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwgHBgoICAgLCgoLDhgQDg0NDh0VFhEYIx8lJCIfIiEmKzcvJik0KSEiMEExNDk7Pj4+JS5ESUM8SDc9Pjv/2wBDAQoLCw4NDhwQEBw7KCIoOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozv/wAARCAAUAA4DASIAAhEBAxEB/8QAGAAAAgMAAAAAAAAAAAAAAAAAAAUBAwT/xAAeEAACAgICAwAAAAAAAAAAAAABAgADBAURMRNBcf/EABYBAQEBAAAAAAAAAAAAAAAAAAYBBf/EABwRAAICAgMAAAAAAAAAAAAAAAABAgQDIQUSMf/aAAwDAQACEQMRAD8AX1a45IIXqYsjV+Kwho31tz0qfcpzb1e3lpMd5wrpR0aWXj+9xue0ThMTUfkU7Gxhd3CEPISy8Z//2Q==');
+  color-scheme: light;
+}
+* {
+  box-sizing: border-box;
+}
+[hidden] {
+  display: none !important;
+}
+body {
+  margin: 0;
+  background: #fafafa;
+  color: var(--ink);
+  font:
+    15px/1.6 'IBM Plex Sans KR',
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+  -webkit-text-size-adjust: 100%;
+}
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: var(--poster-blur);
+  background-size: 100% 100%;
+  filter: blur(80px) saturate(1.34);
+  opacity: 0.82;
+  transform: scale(1.25);
+}
+.wrap {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 0 16px 60px;
+}
+.head {
+  padding: 44px 0 18px;
+  text-align: center;
+}
+.eyebrow {
+  margin: 0 0 6px;
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+}
+h1 {
+  margin: 0;
+  font-family: 'Hahmlet', serif;
+  font-size: 1.7rem;
+  letter-spacing: -0.03em;
+}
+.card {
+  display: grid;
+  gap: 12px;
+  padding: 20px 18px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 6px 22px var(--shadow);
+}
+.lead {
+  margin: 0;
+  text-align: center;
+}
+.names {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+  gap: 8px;
+}
+.names button {
+  padding: 11px 6px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  font: inherit;
+  font-size: 0.95rem;
+  color: var(--ink);
+  cursor: pointer;
+}
+.names button:active {
+  background: #f3f0ea;
+}
+#code {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font:
+    600 20px/1 'IBM Plex Sans KR',
+    monospace;
+  letter-spacing: 0.35em;
+  text-align: center;
+  text-transform: uppercase;
+}
+.primary {
+  width: 100%;
+  padding: 14px;
+  border: 0;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--ember) 0%, #d9708a 45%, var(--accent) 100%);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(40, 20, 40, 0.25);
+  cursor: pointer;
+}
+.primary:disabled {
+  opacity: 0.6;
+}
+.link {
+  border: 0;
+  background: none;
+  color: var(--ink-soft);
+  font: inherit;
+  font-size: 0.85rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.msg {
+  margin: 0;
+  min-height: 1.2em;
+  font-size: 0.85rem;
+  color: #b5541c;
+  text-align: center;
+}
+.msg:empty {
+  min-height: 0;
+}
+.center {
+  margin-top: 16px;
+}
+
+/* ── 편지 (이미지로 저장할 때도 이 모양 그대로) ── */
+.sheet {
+  padding: 26px 18px 22px;
+  border-radius: 18px;
+  background: var(--paper);
+  box-shadow: 0 6px 22px var(--shadow);
+}
+.sheet-head {
+  text-align: center;
+  padding-bottom: 14px;
+  margin-bottom: 16px;
+  border-bottom: 1px dashed var(--line);
+}
+.to {
+  margin: 0;
+  font-family: 'Hahmlet', serif;
+  font-size: 1.35rem;
+}
+.count {
+  margin: 4px 0 0;
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+}
+.notes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+.note-card {
+  padding: 14px 16px 12px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid #efe9df;
+}
+.note-card:nth-child(4n + 1) {
+  background: #fff7f2;
+}
+.note-card:nth-child(4n + 2) {
+  background: #f4f7ff;
+}
+.note-card:nth-child(4n + 3) {
+  background: #fffbea;
+}
+.note-msg {
+  margin: 0;
+  font-family: 'Gaegu', 'IBM Plex Sans KR', sans-serif;
+  font-size: 1.2rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+.note-meta {
+  margin: 8px 0 0;
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+  text-align: right;
+}
+.sub {
+  margin: 26px 0 12px;
+  font-family: 'Hahmlet', serif;
+  font-size: 1rem;
+  text-align: center;
+}
+.empty {
+  margin: 0;
+  text-align: center;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+.closing {
+  margin: 26px 0 0;
+  padding-top: 16px;
+  border-top: 1px dashed var(--line);
+  text-align: center;
+  font-size: 0.88rem;
+  white-space: pre-line;
+}
+.page-no {
+  margin: 14px 0 0;
+  text-align: center;
+  font-size: 0.72rem;
+  color: var(--ink-soft);
+}
+.actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+  text-align: center;
+}
+.note {
+  margin: 0;
+  font-size: 0.8rem;
+}
+/* 이미지로 만들 때 화면 밖에서 그리는 칸 */
+.export {
+  position: fixed;
+  left: -10000px;
+  top: 0;
+  width: 420px;
+}

@@ -21,3 +21,9 @@
   X-Robots-Tag: noindex, nofollow
 /goods/*
   X-Robots-Tag: noindex, nofollow
+
+# 작가님께 온 편지: 검색에 나오지 않게
+/letters
+  X-Robots-Tag: noindex, nofollow
+/letters/*
+  X-Robots-Tag: noindex, nofollow

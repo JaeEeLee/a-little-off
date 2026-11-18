@@ -40,8 +40,14 @@
       meta: 'Oil on panel · 80.3 × 116.8 cm',
       text: [
         'Inspired by Alice’s Adventures in Wonderland, this work portrays the inner world of someone who is unpracticed at making her own choices because she is busy watching how others look at her and react.',
-        'In a chaotic, tangled world, Alice holds a chess piece in her hand but cannot decide where to place it. Instead she looks out at the viewer beyond the canvas, as if asking what her next move should be. It is the picture of someone who has kept putting her own voice aside while checking everyone around her.',
-        'Yet the hand holding the chess piece is, in the end, Alice’s own. Even if it isn’t the right answer, even if it’s imperfect, the one who makes the next move has to be herself. I hope that after leaving this exhibition, each of us listens to our own voice more than to the eyes of others, and chooses the next move in our lives for ourselves.'
+        'In a chaotic, tangled world, Alice holds a chess piece in her hand but cannot decide where to place it. Instead she turns to the viewer beyond the canvas and asks where she should place it. It is the picture of someone who has kept putting her own voice aside while checking everyone around her.',
+        'The pink that fills the canvas is a colour I don’t particularly like. I chose it because I thought people would find it pretty.',
+        'Look also for the little twins floating at the edge of the canvas. In Alice, there are twin brothers who chatter on endlessly, telling nonsense stories; even if it is nonsense, they keep talking in their own voices.',
+        'I, too, keep asking myself inside: did I make the wrong choice, did I act wrongly? But in the end those questions are me as well, my truest inner voice. So I painted the chattering twins, drifting about without ever settling down.',
+        'Yet the hand holding the chess piece is, in the end, Alice’s own. Even if it isn’t the right answer, even if it’s imperfect, the one who makes the next move has to be herself.',
+        'I was happy while painting this. I was painting an anxious Alice who carries this side of me, and she was the one asking me where to place her piece. It felt like looking into a mirror.',
+        'Then it struck me: holding the brush, drawing each stroke, choosing each colour — every moment of painting was my own choice, and those choices came together to finish this painting. Comparing myself before and after, I wondered if I had grown into a slightly more grown-up adult.',
+        'I hope that after leaving this exhibition, each of us listens to our own voice more than to the eyes of others, and chooses the next move in our lives for ourselves.'
       ]
     },
     이희지: {

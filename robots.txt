@@ -3,6 +3,7 @@ User-agent: *
 Allow: /
 Disallow: /docent/
 Disallow: /goods/
+Disallow: /letters/
 Disallow: /tests/
 Disallow: /docs/
 

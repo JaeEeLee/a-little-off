@@ -1,6 +1,12 @@
 // 예약 전용 페이지 (/jessie/visit) — 장면을 페이드로 넘기는 구조
 import { test, expect } from './fixtures.js';
 
+// 예약 전용 페이지는 전시가 끝나면 닫히므로, 열려 있던 때로 맞춘다
+test.beforeEach(async ({ page }) => {
+  // 장면 넘김은 시간 흐름(Date.now)으로 연속 넘김을 막으므로, 시각만 옮기고 시간은 흐르게 둔다
+  await page.clock.setSystemTime(new Date('2026-11-10T12:00:00+09:00'));
+});
+
 const active = (page) => page.locator('.scene.is-active');
 const activeName = (page) => active(page).getAttribute('aria-label');
 

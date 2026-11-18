@@ -16,6 +16,14 @@
   var PAGE_VISITS = { 'jessie/visit': '이재이' };
   var PAGE_PATH = location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
   var IS_VISIT = !!PAGE_VISITS[PAGE_PATH];
+  /* 관람 예약은 전시가 끝나면(11/17 20:00) 닫는다: 예약 카드 · 떠 있는 예약 버튼을 숨기고,
+     예약 전용 페이지(/jessie/visit)는 작가 페이지로 보낸다 */
+  var RESERVE_UNTIL = new Date('2026-11-17T20:00:00+09:00').getTime();
+  var RESERVE_CLOSED = Date.now() >= RESERVE_UNTIL;
+  if (IS_VISIT && RESERVE_CLOSED) {
+    location.replace('/' + PAGE_PATH.split('/')[0]);
+    return;
+  }
   var PAGE_ARTIST = PAGE_ARTISTS[PAGE_PATH] || PAGE_VISITS[PAGE_PATH] || '';
   /* 작가 이름은 두 가지다. 화면에는 작가명(정연·재이), 시트와 링크에는 본명(배정연·이재이).
      명단의 <li data-name="본명">작가명</li> 에서 짝을 읽는다. 작가명이 본명과 같으면 data-name 이 없다 */
@@ -1660,7 +1668,7 @@
   (function () {
     var sec = document.getElementById('visitSection');
     if (!sec) return;
-    if (SHEET_ENDPOINT.indexOf('http') !== 0) {
+    if (RESERVE_CLOSED || SHEET_ENDPOINT.indexOf('http') !== 0) {
       sec.hidden = true;
       return;
     }

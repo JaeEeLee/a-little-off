@@ -117,24 +117,44 @@ function buildSummary() {
   sum.getRange('B2').setNumberFormat('#,##0"개"');
 
   // 굿즈별: '굿즈 상품' 탭의 굿즈를 모두 줄로 세우고, 안 팔린 굿즈는 0
-  sum.getRange('A4:E4').setValues([['굿즈', '가격', '판매 개수', '판매 금액', '남은 재고']]).setFontWeight('bold').setBackground('#F0EFEC');
+  sum
+    .getRange('A4:E4')
+    .setValues([['굿즈', '가격', '판매 개수', '판매 금액', '남은 재고']])
+    .setFontWeight('bold')
+    .setBackground('#F0EFEC');
   sum.getRange('A5').setFormula('=FILTER(' + I + '!A2:B, ' + I + '!A2:A<>"")');
   // SUMIFS 는 ARRAYFORMULA 로 여러 줄을 한 번에 세지 않으므로, MAP 으로 굿즈마다 따로 센다
-  sum.getRange('C5').setFormula('=MAP(A5:A, LAMBDA(n, IF(n="", "", SUMIFS(' + S + '!E:E, ' + S + '!C:C, n, ' + ok + '))))');
-  sum.getRange('D5').setFormula('=MAP(A5:A, LAMBDA(n, IF(n="", "", SUMIFS(' + S + '!F:F, ' + S + '!C:C, n, ' + ok + '))))');
+  sum
+    .getRange('C5')
+    .setFormula('=MAP(A5:A, LAMBDA(n, IF(n="", "", SUMIFS(' + S + '!E:E, ' + S + '!C:C, n, ' + ok + '))))');
+  sum
+    .getRange('D5')
+    .setFormula('=MAP(A5:A, LAMBDA(n, IF(n="", "", SUMIFS(' + S + '!F:F, ' + S + '!C:C, n, ' + ok + '))))');
   // 남은 재고 = '굿즈 상품' 재고 칸 - 판매 개수 (재고 칸이 비어 있으면 빈칸)
-  sum.getRange('E5').setFormula('=MAP(A5:A, C5:C, LAMBDA(n, c, IF(n="", "", LET(s, IFERROR(XLOOKUP(n, ' + I + '!A2:A, ' + I + '!D2:D), ""), IF(s="", "", s - c)))))');
+  sum
+    .getRange('E5')
+    .setFormula(
+      '=MAP(A5:A, C5:C, LAMBDA(n, c, IF(n="", "", LET(s, IFERROR(XLOOKUP(n, ' +
+        I +
+        '!A2:A, ' +
+        I +
+        '!D2:D), ""), IF(s="", "", s - c)))))'
+    );
   sum.getRange('B5:B').setNumberFormat('#,##0');
   sum.getRange('C5:C').setNumberFormat('#,##0');
   sum.getRange('D5:D').setNumberFormat('#,##0');
 
   // 날짜별 (판매가 없으면 안내 문구)
   // 날짜는 TEXT 로 글자로 만든다. 칸 서식에 맡기면 서식이 바뀌거나 빠질 때 46337, ₩46,337 처럼 숫자로 보인다
-  sum.getRange('G4').setFormula(
-    '=IFERROR(LET(q, QUERY(' + S + "!A:H, \"select toDate(A), sum(E), sum(F) where H = '정상' group by toDate(A) label toDate(A) '', sum(E) '', sum(F) ''\", 0), " +
-      '{"날짜", "판매 개수", "금액"; ARRAYFORMULA(TEXT(CHOOSECOLS(q, 1), "yyyy-mm-dd (ddd)")), CHOOSECOLS(q, 2), CHOOSECOLS(q, 3)}), ' +
-      '"아직 판매 기록이 없어요")'
-  );
+  sum
+    .getRange('G4')
+    .setFormula(
+      '=IFERROR(LET(q, QUERY(' +
+        S +
+        "!A:H, \"select toDate(A), sum(E), sum(F) where H = '정상' group by toDate(A) label toDate(A) '', sum(E) '', sum(F) ''\", 0), " +
+        '{"날짜", "판매 개수", "금액"; ARRAYFORMULA(TEXT(CHOOSECOLS(q, 1), "yyyy-mm-dd (ddd)")), CHOOSECOLS(q, 2), CHOOSECOLS(q, 3)}), ' +
+        '"아직 판매 기록이 없어요")'
+    );
   sum.getRange('G4:I4').setFontWeight('bold');
   sum.getRange('G5:G').setNumberFormat('@').setHorizontalAlignment('left');
   sum.getRange('H5:H').setNumberFormat('#,##0"개"');
@@ -148,6 +168,8 @@ function buildSummary() {
 
 function doGet(e) {
   const p = (e && e.parameter) || {};
+  // 작가에게 온 편지 (/letters): 작가 열쇠로 연다. 굿즈 비밀번호와는 상관없다
+  if (p.type === 'letters') return out(readLetters(String(p.artist || ''), String(p.code || '')));
   if (!pinOk(p.pin)) return out({ ok: false, error: 'pin' });
   return out({ ok: true, items: readItems(), sales: readSales() });
 }
@@ -338,8 +360,12 @@ const PLAY_SUM_HEAD = ['순서', '이름', '작품', '이름 눌러서', '이어
 function logDocentPlay(b) {
   const now = new Date();
   if (now < OPEN_AT) return { ok: false, error: 'not_open' }; // 개관 전 점검 · 리허설 재생은 세지 않는다
-  const name = String(b.name || '').trim().slice(0, 20);
-  const work = String(b.work || '').trim().slice(0, 60);
+  const name = String(b.name || '')
+    .trim()
+    .slice(0, 20);
+  const work = String(b.work || '')
+    .trim()
+    .slice(0, 60);
   const order = Math.floor(Number(b.order));
   const how = b.how === 'qr' ? 'tap' : PLAY_HOW[b.how] ? b.how : 'next'; // 예전 'qr'은 직접 고른 것으로 센다
   const device = /^[a-z0-9]{6,24}$/.test(String(b.device || '')) ? String(b.device) : '';
@@ -397,6 +423,152 @@ function playSummary(ss) {
     .build();
   sum.insertChart(chart);
   return sum;
+}
+
+/* ── 작가에게 온 편지 (/letters) ──
+   방명록 시트의 쪽지 탭(사이트 '작가에게 한마디' · 도슨트 '한마디'가 쌓이는 곳)에서 그 작가 글과 '전체' 글을 내려 준다.
+   - '편지 열쇠' 탭: 작가마다 열쇠 하나. lettersSetup() 을 한 번 실행하면 만들어진다 (이미 있으면 그대로 둔다)
+   - 쪽지 탭의 '전달' 열: 체크를 해제한 글은 보내지 않는다. 시험 글(보낸 사람 '테스트', '시험용'으로 시작)도 뺀다
+   - LETTERS_UNTIL 이 지나면 닫는다 */
+const LETTERS_UNTIL = new Date('2026-12-31T23:59:59+09:00');
+const LETTER_KEYS = '편지 열쇠';
+const LETTERS_FROM = new Date('2026-10-01T00:00:00+09:00'); // 이보다 오래된 시험 글은 뺀다
+const NOTES_TAB = ''; // 쪽지 탭 이름. 비워 두면 머리줄(작가 · 메시지 열)을 보고 찾는다
+const LETTER_ARTISTS = [
+  ['노정균', ''],
+  ['배정연', '정연'],
+  ['엄현서', ''],
+  ['이재이', '재이'],
+  ['이희지', ''],
+  ['윤혜진', ''],
+  ['박정은', ''],
+  ['최윤지', ''],
+  ['최윤아', ''],
+  ['임소라', ''],
+  ['홍성호', ''],
+  ['남다름', ''],
+  ['남선주', ''],
+  ['박수룡', ''],
+  ['이경도', ''],
+  ['편해연', ''],
+  ['이서현', ''],
+  ['조수연', ''],
+  ['김지현', ''],
+  ['홍림', '']
+];
+
+// 처음 한 번 실행: '편지 열쇠' 탭과 쪽지 탭의 '전달' 열을 만든다. 실행 기록(로그)에 찾은 탭 이름이 나온다
+function lettersSetup() {
+  const ss = book();
+  const notes = findNotes(ss);
+  if (!notes) throw new Error('쪽지 탭을 찾지 못했어요. 맨 위 NOTES_TAB 에 탭 이름을 적어 주세요.');
+  Logger.log('쪽지 탭: ' + notes.sheet.getName() + ' / 열: ' + JSON.stringify(notes.col));
+  if (notes.col.send < 0) {
+    const c = notes.sheet.getLastColumn() + 1;
+    notes.sheet.getRange(1, c).setValue('전달');
+    const n = Math.max(notes.sheet.getMaxRows() - 1, 1);
+    const box = notes.sheet.getRange(2, c, n, 1);
+    box.insertCheckboxes();
+    const last = notes.sheet.getLastRow();
+    if (last > 1) notes.sheet.getRange(2, c, last - 1, 1).check(); // 기본은 모두 전달
+    Logger.log("'전달' 열을 " + c + '번째 열에 만들었어요.');
+  }
+  let keys = ss.getSheetByName(LETTER_KEYS);
+  if (!keys) {
+    keys = ss.insertSheet(LETTER_KEYS);
+    keys.appendRow(['작가', '표시 이름', '열쇠', '안내']);
+    keys.setFrozenRows(1);
+    const ABC = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // 헷갈리는 0 · O · 1 · I 는 뺀다
+    LETTER_ARTISTS.forEach(function (a) {
+      let code = '';
+      for (let i = 0; i < 6; i++) code += ABC.charAt(Math.floor(Math.random() * ABC.length));
+      keys.appendRow([
+        a[0],
+        a[1] || a[0],
+        code,
+        'a-little-off.pages.dev/letters 에서 이름을 고르고 열쇠를 넣어 주세요'
+      ]);
+    });
+    keys.getRange('C:C').setNumberFormat('@');
+    Logger.log("'편지 열쇠' 탭을 만들었어요.");
+  }
+}
+
+function findNotes(ss) {
+  const sheets = NOTES_TAB ? [ss.getSheetByName(NOTES_TAB)] : ss.getSheets();
+  for (const sh of sheets) {
+    if (!sh || sh.getLastRow() < 1) continue;
+    const head = sh
+      .getRange(1, 1, 1, sh.getLastColumn())
+      .getValues()[0]
+      .map(function (h) {
+        return String(h).trim().toLowerCase();
+      });
+    const find = function (words) {
+      return head.findIndex(function (h) {
+        return words.some(function (w) {
+          return h.indexOf(w) >= 0;
+        });
+      });
+    };
+    const col = {
+      artist: find(['artist', '작가', '받는']),
+      message: find(['message', '메시지', '내용', '쪽지', '한마디']),
+      sender: find(['sender', '보낸', '닉네임', 'from']),
+      at: head.indexOf('at') >= 0 ? head.indexOf('at') : find(['시각', '시간', '날짜', 'time', 'date']),
+      send: head.indexOf('전달')
+    };
+    if (col.artist >= 0 && col.message >= 0) return { sheet: sh, col: col };
+  }
+  return null;
+}
+
+function readLetters(artist, code) {
+  if (new Date() > LETTERS_UNTIL) return { ok: false, error: 'closed' };
+  const ss = book();
+  const keys = ss.getSheetByName(LETTER_KEYS);
+  if (!keys || keys.getLastRow() < 2) return { ok: false, error: 'unset' };
+  const row = keys
+    .getRange(2, 1, keys.getLastRow() - 1, 3)
+    .getValues()
+    .filter(function (r) {
+      return String(r[0]).trim() === artist;
+    })[0];
+  const want = row ? String(row[2]).trim().toUpperCase() : '';
+  if (!row || !want || want !== code.trim().toUpperCase()) {
+    Utilities.sleep(400); // 마구 넣어 보는 걸 조금이라도 늦춘다
+    return { ok: false, error: 'code' };
+  }
+  const notes = findNotes(ss);
+  if (!notes) return { ok: false, error: 'notes' };
+  const c = notes.col;
+  const values =
+    notes.sheet.getLastRow() > 1
+      ? notes.sheet.getRange(2, 1, notes.sheet.getLastRow() - 1, notes.sheet.getLastColumn()).getValues()
+      : [];
+  const mine = [];
+  const all = [];
+  values.forEach(function (r) {
+    if (c.send >= 0 && r[c.send] === false) return; // 운영진이 뺀 글
+    const message = String(r[c.message] || '').trim();
+    const sender = c.sender >= 0 ? String(r[c.sender] || '').trim() : '';
+    if (!message || sender === '테스트' || /^시험용/.test(message)) return;
+    const atRaw = c.at >= 0 ? r[c.at] : '';
+    const at = atRaw instanceof Date ? atRaw : atRaw ? new Date(atRaw) : null;
+    if (at && !isNaN(at) && at < LETTERS_FROM) return;
+    const to = String(r[c.artist] || '').trim();
+    const note = { message: message, sender: sender, at: at && !isNaN(at) ? at.toISOString() : '' };
+    if (to === artist) mine.push(note);
+    else if (to === '' || to === '전체' || to === '모두') all.push(note);
+  });
+  return {
+    ok: true,
+    artist: artist,
+    label: String(row[1] || artist),
+    notes: mine,
+    all: all,
+    until: LETTERS_UNTIL.toISOString()
+  };
 }
 
 function out(o) {

@@ -49,6 +49,7 @@ test('조금 이상한 질문: 이 기기에서 본 질문은 다음 방문 때 
 });
 
 test('작가 공유 링크(/#재이)는 초대 문구를 띄우고 예약 작가를 미리 골라 둔다', async ({ page, sheet }) => {
+  await at(page, '2026-11-10T12:00:00');
   await page.goto('/#재이');
   await expect(page.locator('#inviteLine')).toHaveText('재이 작가가 초대합니다');
   await expect(page.locator('#visitArtist')).toHaveValue('이재이');
@@ -77,6 +78,9 @@ test.describe('작가에게 한마디', () => {
 });
 
 test.describe('관람 예약', () => {
+  test.beforeEach(async ({ page }) => {
+    await at(page, '2026-11-10T12:00:00'); // 예약은 전시가 끝나면 닫히므로, 열려 있던 때로
+  });
   test('이름이 없으면 막는다', async ({ page, sheet }) => {
     await page.goto('/');
     await page.locator('#visitDate').selectOption('11/13(금)');
@@ -96,4 +100,17 @@ test.describe('관람 예약', () => {
     await expect(page.locator('#visitDone')).toBeVisible();
     await expect(page.locator('#visitDoneSub')).toContainText('11월 15일');
   });
+});
+
+test('전시가 끝나면(11/17 20:00) 예약 카드가 닫히고, 예약 전용 페이지는 작가 페이지로 간다', async ({
+  page,
+  sheet
+}) => {
+  await at(page, '2026-11-17T20:00:00');
+  await page.goto('/');
+  await expect(page.locator('#visitSection')).toBeHidden();
+  await page.goto('/jessie');
+  await expect(page.locator('#visitSection')).toBeHidden();
+  await page.goto('/jessie/visit');
+  await expect(page).toHaveURL(/\/jessie$/);
 });
